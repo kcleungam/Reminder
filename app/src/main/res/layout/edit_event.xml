@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#feebfe"
+    >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title:"
+            android:id="@+id/title"
+            android:textSize="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="0dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+            android:paddingTop="5dp" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTime"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+            android:paddingLeft="10dp"
+            android:layout_toRightOf="@+id/title"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="false"
+            android:layout_above="@+id/timeText"
+            android:layout_alignTop="@+id/title"
+            android:paddingTop="0dp" />
+        <View
+            android:layout_width="match_parent"
+            android:id="@+id/seperateLine1"
+            android:layout_height="2dp"
+            android:background="#00FFFF"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/title">
+        </View>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_alignLeft="@+id/title"
+            android:layout_alignStart="@+id/title"
+
+            android:text="Time:"
+            android:id="@+id/timeText"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+
+            android:layout_below="@+id/seperateLine1"
+            android:paddingTop="5dp" />
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageButton"
+            android:src="@drawable/Clock"
+            android:scaleType="fitXY"
+            android:layout_below="@+id/timeText"
+            android:layout_alignRight="@+id/title"
+            android:layout_alignEnd="@+id/title" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText2"
+            android:text="HH/MM"
+            android:textSize="20dp"
+            android:paddingLeft="10dp"
+            android:layout_alignRight="@+id/seperateLine1"
+            android:layout_alignEnd="@+id/seperateLine1"
+            android:layout_toRightOf="@+id/timeText"
+            android:layout_toEndOf="@+id/timeText"
+            android:layout_alignBottom="@+id/timeText"
+            android:layout_below="@+id/seperateLine1"
+            android:paddingTop="5dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:id="@+id/seperateLine2"
+            android:layout_height="2dp"
+            android:background="#00FFFF"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/imageButton">
+        </View>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_alignLeft="@+id/title"
+            android:layout_alignStart="@+id/title"
+
+            android:text="Repeat:"
+            android:id="@+id/repeat"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+
+            android:layout_below="@+id/seperateLine2"
+            android:paddingTop="5dp" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Once"
+            android:id="@+id/checkBox"
+            android:checked="false"
+            android:paddingRight="5dp"
+            android:layout_below="@+id/repeat"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignBottom="@+id/checkBox2" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Every Day"
+            android:id="@+id/checkBox2"
+            android:layout_below="@+id/repeat"
+            android:layout_toRightOf="@+id/checkBox"
+            android:layout_toEndOf="@+id/checkBox"
+            android:checked="false"
+            android:paddingRight="5dp" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mon - Fri"
+            android:id="@+id/checkBox3"
+            android:layout_alignBottom="@+id/checkBox2"
+            android:layout_toRightOf="@+id/checkBox2"
+            android:layout_toEndOf="@+id/checkBox2"
+            android:checked="false"
+            android:paddingRight="5dp" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sat - Sun"
+            android:id="@+id/checkBox4"
+            android:checked="false"
+            android:layout_alignTop="@+id/checkBox3"
+            android:layout_toRightOf="@+id/checkBox3"
+            android:layout_toEndOf="@+id/checkBox3" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Customize"
+            android:id="@+id/customizeRepeat"
+            android:layout_below="@+id/checkBox"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+
+    </RelativeLayout>
+</ScrollView>

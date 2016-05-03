@@ -49,4 +49,11 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     *
+     *      https://www.youtube.com/watch?v=cyk_ht8z6IA
+     *      https://www.youtube.com/watch?v=DzpwvZ4S27g
+     *
+     */
 }
