@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#feebfe"
-    >
+    android:fillViewport="false">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -14,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Title:"
-            android:id="@+id/title"
+            android:id="@+id/titleText"
             android:textSize="20dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
@@ -29,17 +29,18 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/editTime"
+            android:id="@+id/editTitle"
             android:textSize="20dp"
             android:textColor="#070707"
             android:textStyle="bold|italic"
             android:paddingLeft="10dp"
-            android:layout_toRightOf="@+id/title"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="false"
+            android:layout_toRightOf="@+id/titleText"
             android:layout_above="@+id/timeText"
-            android:layout_alignTop="@+id/title"
-            android:paddingTop="0dp" />
+            android:layout_alignTop="@+id/titleText"
+            android:paddingTop="0dp"
+            android:layout_alignRight="@+id/friBox"
+            android:layout_alignEnd="@+id/friBox" />
+
         <View
             android:layout_width="match_parent"
             android:id="@+id/seperateLine1"
@@ -47,15 +48,15 @@
             android:background="#00FFFF"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/title">
+            android:layout_below="@+id/titleText">
         </View>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_alignLeft="@+id/title"
-            android:layout_alignStart="@+id/title"
+            android:layout_alignLeft="@+id/titleText"
+            android:layout_alignStart="@+id/titleText"
 
             android:text="Time:"
             android:id="@+id/timeText"
@@ -73,13 +74,13 @@
             android:src="@drawable/Clock"
             android:scaleType="fitXY"
             android:layout_below="@+id/timeText"
-            android:layout_alignRight="@+id/title"
-            android:layout_alignEnd="@+id/title" />
+            android:layout_alignRight="@+id/titleText"
+            android:layout_alignEnd="@+id/titleText" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/editText2"
+            android:id="@+id/editTime"
             android:text="HH/MM"
             android:textSize="20dp"
             android:paddingLeft="10dp"
@@ -105,8 +106,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_alignLeft="@+id/title"
-            android:layout_alignStart="@+id/title"
+            android:layout_alignLeft="@+id/titleText"
+            android:layout_alignStart="@+id/titleText"
 
             android:text="Repeat:"
             android:id="@+id/repeat"
@@ -125,64 +126,63 @@
             android:checked="false"
             android:paddingRight="5dp"
             android:layout_below="@+id/repeat"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignBottom="@+id/tueBox" />
+            android:layout_alignLeft="@+id/repeat"
+            android:layout_alignStart="@+id/repeat" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tue"
             android:id="@+id/tueBox"
+            android:checked="false"
+            android:paddingRight="5dp"
             android:layout_below="@+id/repeat"
             android:layout_toRightOf="@+id/monBox"
-            android:layout_toEndOf="@+id/monBox"
-            android:checked="false"
-            android:paddingRight="5dp" />
+            android:layout_toEndOf="@+id/monBox" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Wed"
             android:id="@+id/wedBox"
-            android:layout_alignBottom="@+id/tueBox"
-            android:layout_toRightOf="@+id/tueBox"
-            android:layout_toEndOf="@+id/tueBox"
             android:checked="false"
-            android:paddingRight="5dp" />
+            android:paddingRight="5dp"
+            android:layout_alignTop="@+id/tueBox"
+            android:layout_toRightOf="@+id/tueBox"
+            android:layout_toEndOf="@+id/tueBox" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Thur"
             android:id="@+id/thurBox"
+            android:checked="false"
+            android:paddingRight="5dp"
             android:layout_alignTop="@+id/wedBox"
             android:layout_toRightOf="@+id/wedBox"
-            android:layout_toEndOf="@+id/wedBox"
-            android:checked="false"
-            android:paddingRight="5dp" />
+            android:layout_toEndOf="@+id/wedBox" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Fri"
             android:id="@+id/friBox"
+            android:checked="false"
+            android:paddingRight="5dp"
             android:layout_alignTop="@+id/thurBox"
             android:layout_toRightOf="@+id/thurBox"
-            android:layout_toEndOf="@+id/thurBox"
-            android:checked="false"
-            android:paddingRight="5dp"/>
+            android:layout_toEndOf="@+id/thurBox" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sat"
             android:id="@+id/satBox"
-            android:layout_below="@+id/monBox"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:checked="false"
-            android:paddingRight="5dp"/>
+            android:paddingRight="5dp"
+            android:layout_below="@+id/monBox"
+            android:layout_alignLeft="@+id/monBox"
+            android:layout_alignStart="@+id/monBox" />
 
         <CheckBox
             android:layout_width="wrap_content"
@@ -191,19 +191,121 @@
             android:id="@+id/sunBox"
             android:checked="false"
             android:paddingRight="5dp"
-            android:layout_alignTop="@+id/satBox"
-            android:layout_alignLeft="@+id/editText2"
-            android:layout_alignStart="@+id/editText2" />
+            android:layout_below="@+id/tueBox"
+            android:layout_toRightOf="@+id/repeat"
+            android:layout_toEndOf="@+id/repeat" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="select all"
             android:id="@+id/selectAll"
+            android:layout_alignTop="@+id/sunBox"
+            android:layout_alignLeft="@+id/thurBox"
+            android:layout_alignStart="@+id/thurBox" />
+
+        <View
+            android:layout_width="match_parent"
+            android:id="@+id/seperateLine3"
+            android:layout_height="2dp"
+            android:background="#00FFFF"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/satBox" />
+            android:layout_below="@+id/selectAll">
+        </View>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location:"
+            android:id="@+id/locationText"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+
+            android:paddingTop="5dp"
+            android:layout_below="@+id/seperateLine3"
+            android:layout_alignLeft="@+id/titleText"
+            android:layout_alignStart="@+id/titleText" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/editLocation"
+            android:layout_below="@+id/locationText"
+            android:layout_alignLeft="@+id/locationText"
+            android:layout_alignStart="@+id/locationText"
+            android:lines="1"
+            android:layout_alignRight="@+id/editDescription"
+            android:layout_alignEnd="@+id/editDescription" />
+
+        <View
+            android:layout_width="match_parent"
+            android:id="@+id/seperateLine4"
+            android:layout_height="2dp"
+            android:background="#00FFFF"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editLocation">
+        </View>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description:"
+            android:id="@+id/descriptionText"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+
+            android:paddingTop="5dp"
+            android:layout_below="@+id/seperateLine4"
+            android:layout_alignLeft="@+id/titleText"
+            android:layout_alignStart="@+id/titleText" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/editDescription"
+            android:layout_below="@+id/descriptionText"
+            android:layout_alignLeft="@+id/descriptionText"
+            android:layout_alignStart="@+id/descriptionText"
+            android:layout_alignRight="@+id/friBox"
+            android:layout_alignEnd="@+id/friBox"
+            android:lines="4" />
+
+        <View
+            android:layout_width="match_parent"
+            android:id="@+id/seperateLine5"
+            android:layout_height="2dp"
+            android:background="#00FFFF"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editDescription">
+        </View>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Photo related:"
+            android:id="@+id/photoText"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+
+            android:paddingTop="5dp"
+            android:layout_below="@+id/seperateLine5"
+            android:layout_alignLeft="@+id/titleText"
+            android:layout_alignStart="@+id/titleText" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:minHeight="100dp"
+            android:minWidth="200dp"
+            android:layout_below="@+id/photoText"
+            android:layout_centerHorizontal="true" />
 
 
     </RelativeLayout>
