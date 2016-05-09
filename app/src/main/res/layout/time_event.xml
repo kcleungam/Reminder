@@ -120,55 +120,90 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Once"
-            android:id="@+id/checkBox"
+            android:text="Mon"
+            android:id="@+id/monBox"
             android:checked="false"
             android:paddingRight="5dp"
             android:layout_below="@+id/repeat"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_alignBottom="@+id/checkBox2" />
+            android:layout_alignBottom="@+id/tueBox" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Every Day"
-            android:id="@+id/checkBox2"
+            android:text="Tue"
+            android:id="@+id/tueBox"
             android:layout_below="@+id/repeat"
-            android:layout_toRightOf="@+id/checkBox"
-            android:layout_toEndOf="@+id/checkBox"
+            android:layout_toRightOf="@+id/monBox"
+            android:layout_toEndOf="@+id/monBox"
             android:checked="false"
             android:paddingRight="5dp" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mon - Fri"
-            android:id="@+id/checkBox3"
-            android:layout_alignBottom="@+id/checkBox2"
-            android:layout_toRightOf="@+id/checkBox2"
-            android:layout_toEndOf="@+id/checkBox2"
+            android:text="Wed"
+            android:id="@+id/wedBox"
+            android:layout_alignBottom="@+id/tueBox"
+            android:layout_toRightOf="@+id/tueBox"
+            android:layout_toEndOf="@+id/tueBox"
             android:checked="false"
             android:paddingRight="5dp" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sat - Sun"
-            android:id="@+id/checkBox4"
+            android:text="Thur"
+            android:id="@+id/thurBox"
+            android:layout_alignTop="@+id/wedBox"
+            android:layout_toRightOf="@+id/wedBox"
+            android:layout_toEndOf="@+id/wedBox"
             android:checked="false"
-            android:layout_alignTop="@+id/checkBox3"
-            android:layout_toRightOf="@+id/checkBox3"
-            android:layout_toEndOf="@+id/checkBox3" />
+            android:paddingRight="5dp" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fri"
+            android:id="@+id/friBox"
+            android:layout_alignTop="@+id/thurBox"
+            android:layout_toRightOf="@+id/thurBox"
+            android:layout_toEndOf="@+id/thurBox"
+            android:checked="false"
+            android:paddingRight="5dp"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sat"
+            android:id="@+id/satBox"
+            android:layout_below="@+id/monBox"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:checked="false"
+            android:paddingRight="5dp"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sun"
+            android:id="@+id/sunBox"
+            android:checked="false"
+            android:paddingRight="5dp"
+            android:layout_alignTop="@+id/satBox"
+            android:layout_alignLeft="@+id/editText2"
+            android:layout_alignStart="@+id/editText2" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Customize"
-            android:id="@+id/customizeRepeat"
-            android:layout_below="@+id/checkBox"
+            android:text="select all"
+            android:id="@+id/selectAll"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/satBox" />
+
 
 
     </RelativeLayout>
