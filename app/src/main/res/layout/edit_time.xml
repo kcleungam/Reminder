@@ -21,10 +21,10 @@
             android:layout_alignParentStart="true"
             android:layout_marginLeft="0dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
             android:textColor="#070707"
             android:textStyle="bold|italic"
-            android:paddingTop="5dp" />
+            android:paddingTop="5dp"
+            android:layout_marginTop="10dp" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -35,11 +35,11 @@
             android:textStyle="bold|italic"
             android:paddingLeft="10dp"
             android:layout_toRightOf="@+id/titleText"
-            android:layout_above="@+id/timeText"
             android:layout_alignTop="@+id/titleText"
             android:paddingTop="0dp"
             android:layout_alignRight="@+id/friBox"
-            android:layout_alignEnd="@+id/friBox" />
+            android:layout_alignEnd="@+id/friBox"
+            android:layout_above="@+id/seperateLine1" />
 
         <View
             android:layout_width="match_parent"
@@ -55,27 +55,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_alignLeft="@+id/titleText"
-            android:layout_alignStart="@+id/titleText"
-
             android:text="Time:"
             android:id="@+id/timeText"
             android:textSize="20dp"
             android:textColor="#070707"
             android:textStyle="bold|italic"
 
+            android:paddingTop="5dp"
+
             android:layout_below="@+id/seperateLine1"
-            android:paddingTop="5dp" />
+            android:layout_alignLeft="@+id/titleText"
+            android:layout_alignStart="@+id/titleText" />
 
         <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:id="@+id/imageButton"
-            android:src="@drawable/Clock"
+            android:src="@drawable/clock"
             android:scaleType="fitXY"
-            android:layout_below="@+id/timeText"
-            android:layout_alignRight="@+id/titleText"
-            android:layout_alignEnd="@+id/titleText" />
+            android:layout_alignTop="@+id/timeText"
+            android:layout_toRightOf="@+id/thurBox"
+            android:layout_toEndOf="@+id/thurBox" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -84,13 +84,11 @@
             android:text="HH/MM"
             android:textSize="20dp"
             android:paddingLeft="10dp"
-            android:layout_alignRight="@+id/seperateLine1"
-            android:layout_alignEnd="@+id/seperateLine1"
-            android:layout_toRightOf="@+id/timeText"
-            android:layout_toEndOf="@+id/timeText"
-            android:layout_alignBottom="@+id/timeText"
-            android:layout_below="@+id/seperateLine1"
-            android:paddingTop="5dp" />
+            android:paddingTop="5dp"
+            android:layout_alignBottom="@+id/imageButton"
+            android:layout_toLeftOf="@+id/imageButton"
+            android:layout_alignLeft="@+id/repeat"
+            android:layout_alignStart="@+id/repeat" />
 
         <View
             android:layout_width="match_parent"
@@ -99,7 +97,7 @@
             android:background="#00FFFF"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/imageButton">
+            android:layout_below="@+id/editTime">
         </View>
 
         <TextView
@@ -197,12 +195,14 @@
 
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:text="select all"
             android:id="@+id/selectAll"
             android:layout_alignTop="@+id/sunBox"
             android:layout_alignLeft="@+id/thurBox"
-            android:layout_alignStart="@+id/thurBox" />
+            android:layout_alignStart="@+id/thurBox"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp" />
 
         <View
             android:layout_width="match_parent"
@@ -225,19 +225,20 @@
 
             android:paddingTop="5dp"
             android:layout_below="@+id/seperateLine3"
-            android:layout_alignLeft="@+id/titleText"
-            android:layout_alignStart="@+id/titleText" />
+            android:layout_alignLeft="@+id/editTime"
+            android:layout_alignStart="@+id/editTime" />
+
 
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/editLocation"
-            android:layout_below="@+id/locationText"
-            android:layout_alignLeft="@+id/locationText"
-            android:layout_alignStart="@+id/locationText"
             android:lines="1"
-            android:layout_alignRight="@+id/editDescription"
-            android:layout_alignEnd="@+id/editDescription" />
+            android:layout_above="@+id/seperateLine4"
+            android:layout_alignRight="@+id/editTime"
+            android:layout_alignEnd="@+id/editTime"
+            android:layout_alignLeft="@+id/locationText"
+            android:layout_alignStart="@+id/locationText" />
 
         <View
             android:layout_width="match_parent"
@@ -246,7 +247,7 @@
             android:background="#00FFFF"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/editLocation">
+            android:layout_below="@+id/googlemapButton">
         </View>
 
         <TextView
@@ -272,7 +273,7 @@
             android:layout_alignStart="@+id/descriptionText"
             android:layout_alignRight="@+id/friBox"
             android:layout_alignEnd="@+id/friBox"
-            android:lines="4" />
+            android:lines="3" />
 
         <View
             android:layout_width="match_parent"
@@ -306,6 +307,16 @@
             android:minWidth="200dp"
             android:layout_below="@+id/photoText"
             android:layout_centerHorizontal="true" />
+
+        <ImageButton
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:id="@+id/googlemapButton"
+            android:src="@drawable/googlemap"
+            android:scaleType="fitXY"
+            android:layout_below="@+id/seperateLine3"
+            android:layout_toRightOf="@+id/editLocation"
+            android:layout_toEndOf="@+id/editLocation" />
 
 
     </RelativeLayout>
