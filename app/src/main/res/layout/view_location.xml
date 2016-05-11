@@ -1,6 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#feebfe"
+    android:fillViewport="false">
 
-</LinearLayout>
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title:"
+            android:id="@+id/titleText"
+            android:textSize="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="0dp"
+            android:layout_marginStart="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+            android:paddingTop="5dp"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show Title"
+            android:id="@+id/showTitle"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="italic"
+            android:paddingTop="5dp"
+            android:layout_above="@+id/seperateLine1"
+            android:layout_toRightOf="@+id/titleText"
+            android:layout_toEndOf="@+id/titleText"
+            android:paddingLeft="10dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:id="@+id/seperateLine1"
+            android:layout_height="2dp"
+            android:background="#00FFFF"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/titleText">
+        </View>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Valid Until:"
+            android:id="@+id/validText"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+            android:paddingTop="5dp"
+
+            android:layout_below="@+id/seperateLine1"
+            android:layout_alignLeft="@+id/titleText"
+            android:layout_alignStart="@+id/titleText" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show Valid Until time"
+            android:id="@+id/showValid"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="italic"
+            android:paddingTop="5dp"
+
+            android:layout_below="@+id/validText"
+            android:layout_alignLeft="@+id/validText"
+            android:layout_alignStart="@+id/validText" />
+
+        <View
+            android:layout_width="match_parent"
+            android:id="@+id/seperateLine2"
+            android:layout_height="2dp"
+            android:background="#00FFFF"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/showValid">
+        </View>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location:"
+            android:id="@+id/locationText"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+
+            android:paddingTop="5dp"
+            android:layout_below="@+id/seperateLine2"
+            android:layout_alignLeft="@+id/showLocation"
+            android:layout_alignStart="@+id/showLocation" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show Location"
+            android:id="@+id/showLocation"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="italic"
+
+            android:paddingTop="5dp"
+            android:layout_below="@+id/locationText"
+            android:layout_alignLeft="@+id/titleText"
+            android:layout_alignStart="@+id/titleText"
+            android:minHeight="50dp"
+            android:minWidth="350dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:id="@+id/seperateLine4"
+            android:layout_height="2dp"
+            android:background="#00FFFF"
+            android:layout_alignBottom="@+id/showLocation"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+        </View>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description:"
+            android:id="@+id/descriptionText"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+
+            android:paddingTop="5dp"
+            android:layout_below="@+id/seperateLine4"
+            android:layout_alignLeft="@+id/titleText"
+            android:layout_alignStart="@+id/titleText" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show Description"
+            android:id="@+id/showDescription"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="italic"
+            android:paddingTop="5dp"
+
+            android:layout_below="@+id/descriptionText"
+            android:layout_alignLeft="@+id/descriptionText"
+            android:layout_alignStart="@+id/descriptionText"
+            android:gravity="center"
+            android:minHeight="100dp"
+            android:minWidth="350dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:id="@+id/seperateLine5"
+            android:layout_height="2dp"
+            android:background="#00FFFF"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/showDescription">
+        </View>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Photo related:"
+            android:id="@+id/photoText"
+            android:textSize="20dp"
+            android:textColor="#070707"
+            android:textStyle="bold|italic"
+
+            android:paddingTop="5dp"
+            android:layout_below="@+id/seperateLine5"
+            android:layout_alignLeft="@+id/titleText"
+            android:layout_alignStart="@+id/titleText" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:minHeight="100dp"
+            android:minWidth="200dp"
+            android:layout_below="@+id/photoText"
+            android:layout_centerHorizontal="true" />
+
+
+    </RelativeLayout>
+</ScrollView>
