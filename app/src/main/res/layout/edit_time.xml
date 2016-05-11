@@ -273,7 +273,7 @@
             android:layout_alignStart="@+id/descriptionText"
             android:layout_alignRight="@+id/friBox"
             android:layout_alignEnd="@+id/friBox"
-            android:lines="3" />
+            android:lines="10" />
 
         <View
             android:layout_width="match_parent"

@@ -23,6 +23,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/reminder_list" />
+    <include layout="@layout/edit_time_container" />
 
 </android.support.design.widget.CoordinatorLayout>
