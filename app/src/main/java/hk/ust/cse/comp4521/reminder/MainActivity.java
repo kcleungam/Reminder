@@ -10,8 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.Calendar;
+
 public class MainActivity extends AppCompatActivity {
     ListView reminderList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +24,23 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
+        ReminderDataAdapter adapter = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout);
+        ArrayList<ReminderData> sampleList = new ArrayList<ReminderData>();
+        for(int i=0; i<25; i++){
+            ReminderData data = new ReminderData();
+            data.title = "sample"+i;
+            data.location = "location"+i;
+            data.enabled = i%2==0;
+            data.reminderType = ReminderData.ReminderType.Time;
+            data.description = "general description";
+            Calendar time = Calendar.getInstance();
+            time.set(Calendar.DATE, i);
+            data.time = new Time(time.getTimeInMillis());
+        }
+        for(ReminderData sample:sampleList){
+            adapter.addItem(sample);
+        }
+        reminderList.setAdapter(adapter);
 
     }
 
