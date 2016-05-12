@@ -8,6 +8,7 @@ import java.sql.Time;
 public class ReminderData {
     public enum ReminderType{Time, Location}
 
+    public long id;
     public ReminderType reminderType = null;
     public String title = null;
     public Time time = null;
@@ -42,6 +43,42 @@ public class ReminderData {
         this.time = time;
         this.repeat = repeat;
         this.description = description;
+    }
+
+    public void setId(long id){
+        this.id = id;
+    }
+
+    public long getId(){
+        return this.id;
+    }
+
+    public void setReminderType(String reminderType){
+        try {
+            this.reminderType = ReminderType.valueOf(reminderType);
+        }catch(Exception e){
+            this.reminderType = null;
+        }
+    }
+
+    public void setTitle(String title){
+        this.title = title;
+    }
+
+    public void setDescription(String description){
+        this.description = description;
+    }
+
+    public void setLocation(String location){
+        this.location = location;
+    }
+
+    public void setTime(Time time){
+        this.time = time;
+    }
+
+    public void setValidUntil(Time time){
+        this.time = time;
     }
 
 }
