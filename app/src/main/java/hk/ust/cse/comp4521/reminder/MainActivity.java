@@ -27,20 +27,20 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
         final ReminderDataAdapter reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout);
-        ArrayList<ReminderData> sampleList = new ArrayList<ReminderData>();
-        for(int i=0; i<25; i++){
-            ReminderData data = new ReminderData();
-            data.title = "sample"+i;
-            data.location = "location"+i;
-            data.enabled = i%2==0;
-            data.reminderType = ReminderData.ReminderType.Time;
-            data.description = "general description";
-            Calendar time = Calendar.getInstance();
-            time.set(Calendar.DATE, i);
-            data.time = new Time(time.getTimeInMillis());
-            sampleList.add(data);
+
+        // 建立資料庫物件
+        ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
+
+        // 如果資料庫是空的，就建立一些範例資料
+        // 這是為了方便測試用的，完成應用程式以後可以拿掉
+        if (reminderDAO.getCount() == 0) {
+            reminderDAO.sample();
         }
-        for(ReminderData sample:sampleList){
+
+        // 取得所有記事資料
+        ArrayList<ReminderData> reminders = reminderDAO.getAll();
+
+        for(ReminderData sample:reminders){
             reminderAdaptor.addItem(sample);
         }
         reminderList.setAdapter(reminderAdaptor);

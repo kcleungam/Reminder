@@ -4,6 +4,7 @@ package hk.ust.cse.comp4521.reminder;
  * Created by Jeffrey on 13/5/2016.
  */
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -132,8 +133,8 @@ public class ReminderDAO {
     }
 
     // 讀取所有記事資料
-    public List<ReminderData> getAll() {
-        List<ReminderData> result = new ArrayList<>();
+    public ArrayList<ReminderData> getAll() {
+        ArrayList<ReminderData> result = new ArrayList<>();
         Cursor cursor = db.query(
                 TABLE_NAME, null, null, null, null, null, null, null);
 
@@ -202,7 +203,20 @@ public class ReminderDAO {
 
     // 建立範例資料
     public void sample() {
-
+        for(int i=0; i<25; i++){
+            ReminderData data = new ReminderData();
+            data.title = "sample"+i;
+            data.location = "location"+i;
+            data.enabled = i%2==0;
+            data.reminderType = ReminderData.ReminderType.Time;
+            data.description = "general description";
+            Calendar time = Calendar.getInstance();
+            time.set(Calendar.DATE, i);
+            data.time = new Time(time.getTimeInMillis());
+            time.set(Calendar.YEAR, time.get(Calendar.YEAR)+2);
+            data.validUntil = new Time(time.getTimeInMillis());
+            insert(data);
+        }
     }
 
 }

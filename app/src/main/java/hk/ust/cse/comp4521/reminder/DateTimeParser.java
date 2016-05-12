@@ -113,7 +113,7 @@ public final class DateTimeParser {
 			sdf = new SimpleDateFormat("yyyy-MM-dd");
 			break;
 		case ISO8601:
-			sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+			sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 			break;
 		case RFC3339:
 		default:
