@@ -1,14 +1,13 @@
 package hk.ust.cse.comp4521.reminder;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+
+import java.sql.Time;
 
 public class MainActivity extends AppCompatActivity {
     ListView reminderList;
@@ -25,8 +24,11 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
         reminderAdaptor = new ReminderAdaptor(getApplicationContext(), R.layout.row_layout);
-        reminderList.setAdapter(reminderAdaptor);
 
+        Data data1 = new Data("Fake title", new Time(1,2,3), "Fake description");
+        reminderAdaptor.add(data1);
+
+        reminderList.setAdapter(reminderAdaptor);
     }
 
     @Override
