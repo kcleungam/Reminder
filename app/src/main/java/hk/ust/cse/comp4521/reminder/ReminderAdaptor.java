@@ -69,7 +69,7 @@ public class ReminderAdaptor extends ArrayAdapter {
         Data data = (Data) reminderList.get(position);
         handler.titleText.setText(data.title);
         handler.timeText.setText("Test");
-        //handler.locationText.setText(data.location);
+        handler.locationText.setText(data.location);        // Modify this later
 
         return row;
     }
