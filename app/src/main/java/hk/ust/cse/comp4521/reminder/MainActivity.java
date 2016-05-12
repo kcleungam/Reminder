@@ -3,8 +3,11 @@ package hk.ust.cse.comp4521.reminder;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.sql.Time;
@@ -12,8 +15,6 @@ import java.sql.Time;
 public class MainActivity extends AppCompatActivity {
     ListView reminderList;
     ReminderAdaptor reminderAdaptor;
-
-
 
 
     @Override
@@ -24,11 +25,28 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
         reminderAdaptor = new ReminderAdaptor(getApplicationContext(), R.layout.row_layout);
-
-        Data data1 = new Data("Fake title", new Time(1,2,3), "Fake description");
-        reminderAdaptor.add(data1);
-
         reminderList.setAdapter(reminderAdaptor);
+
+
+        AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // do something here, like open another page
+                String string=(String) reminderAdaptor.getItem(position);
+                Log.d("**********", string);
+            }
+        };
+
+        reminderList.setOnItemClickListener(onItemClickListener);
+
+
+        /*You can test the list here*/
+        for(int i = 0 ; i <  20; i++){
+            Data data = new Data("Fake title", new Time(1,2,3), "Fake description");
+            reminderAdaptor.add(data);
+        }
+
     }
 
     @Override
@@ -52,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
     /**
      *
