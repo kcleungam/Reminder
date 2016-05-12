@@ -12,6 +12,11 @@ import android.widget.ListView;
 
 public class MainActivity extends AppCompatActivity {
     ListView reminderList;
+    ReminderAdaptor reminderAdaptor;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
+        reminderAdaptor = new ReminderAdaptor(getApplicationContext(), R.layout.row_layout);
+        reminderList.setAdapter(reminderAdaptor);
 
     }
 
