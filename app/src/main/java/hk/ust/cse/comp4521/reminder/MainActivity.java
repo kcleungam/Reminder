@@ -31,7 +31,10 @@ public class MainActivity extends AppCompatActivity {
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
+
+                Intent intent = new Intent(getApplicationContext(), ViewTimeActivity.class);
+                ReminderData temp = ( (ReminderDataAdapter.RowHandler) v.getTag() ).reminderData;
+                intent.putExtra("title",  temp.title);
                 startActivity(intent);
             }
         };
