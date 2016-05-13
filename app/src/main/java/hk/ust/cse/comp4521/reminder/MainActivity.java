@@ -3,20 +3,18 @@ package hk.ust.cse.comp4521.reminder;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
     ListView reminderList;
-    ReminderAdaptor reminderAdaptor;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,16 +23,36 @@ public class MainActivity extends AppCompatActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
-        reminderAdaptor = new ReminderAdaptor(getApplicationContext(), R.layout.row_layout);
+        final ReminderDataAdapter reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout);
+
+        // 建立資料庫物件
+        ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
+
+        // 如果資料庫是空的，就建立一些範例資料
+        // 這是為了方便測試用的，完成應用程式以後可以拿掉
+        if (reminderDAO.getCount() == 0) {
+            reminderDAO.sample();
+        }
+
+        // 取得所有記事資料
+        ArrayList<ReminderData> reminders = reminderDAO.getAll();
+
+        for(ReminderData sample:reminders){
+            reminderAdaptor.addItem(sample);
+        }
         reminderList.setAdapter(reminderAdaptor);
 
+        AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                // do something here, like open another page
+                //String string= (String) reminderAdaptor.getItem(position);
+                //Log.d("**********", string);
+            }
+        };
 
-        /*You can test the list here*/
-        for(int i = 0 ; i <  20; i++){
-            Data data = new Data(Integer.toString(i), new Time(1,2,3), "Fake description");
-            reminderAdaptor.add(data);
-        }
+        reminderList.setOnItemClickListener(onItemClickListener);
 
     }
 
@@ -59,8 +77,6 @@ public class MainActivity extends AppCompatActivity{
 
         return super.onOptionsItemSelected(item);
     }
-
-
 
     /**
      *
