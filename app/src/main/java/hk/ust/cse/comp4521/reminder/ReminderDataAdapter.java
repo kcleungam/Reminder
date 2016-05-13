@@ -1,17 +1,21 @@
 package hk.ust.cse.comp4521.reminder;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.logging.Handler;
 
 /**
  * Created by Jeffrey on 12/5/2016.
@@ -55,6 +59,7 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
             handler.timeView = (TextView) row.findViewById(R.id.rowTimeText);
             handler.titleView = (TextView) row.findViewById(R.id.rowTitleText);
             handler.locationView = (TextView) row.findViewById(R.id.rowLocationText);
+
             final int _position = position;
             handler.enabledSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -73,6 +78,17 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
         handler.timeView.setText(data.time.toString());
         handler.titleView.setText(data.title);
         handler.locationView.setText(data.location);
+
+
+        View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Toast.makeText(getContext(), ( (RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        };
+
+        row.setOnTouchListener(onTouchListener);
 
         return row;
     }
