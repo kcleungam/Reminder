@@ -11,7 +11,7 @@ public class ReminderData {
     public long id;
     public ReminderType reminderType = null;
     public String title = null;
-    public Time time = null;
+    public Time time = null;    //time only, no date
     public String location = null;
     public Time validUntil = null;                     // location event may valid until a certain time
     public boolean[] repeat = new boolean[7];       // Store the day for repetition, Mon to Fri

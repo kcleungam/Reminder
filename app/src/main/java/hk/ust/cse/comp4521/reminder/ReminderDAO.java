@@ -28,7 +28,6 @@ public class ReminderDAO {
     public static final String TYPE_COL = "Type";
     public static final String TITLE_COL = "Title";
     public static final String DESC_COL = "Desc";
-    public static final String TIME_COL = "Time";
     public static final String EXPIRE_TIME_COL = "ExpireTime";
     public static final String REPEAT_TIME_COL = "RepeatTime";
     public static final String REPEAT_WKDAY_COL = "RepeatWkday";
@@ -44,7 +43,6 @@ public class ReminderDAO {
                     TYPE_COL + " TEXT NOT NULL," +
                     TITLE_COL + " TEXT," +
                     DESC_COL + " TEXT," +
-                    TIME_COL + " TEXT," +
                     EXPIRE_TIME_COL + " TEXT NOT NULL," +
                     REPEAT_TIME_COL + " TEXT," +
                     REPEAT_WKDAY_COL + " TEXT," +
@@ -76,9 +74,8 @@ public class ReminderDAO {
         cv.put(TYPE_COL, item.reminderType.name());
         cv.put(TITLE_COL, item.title);
         cv.put(DESC_COL, item.description);
-        cv.put(TIME_COL, DateTimeParser.toString(item.time, DateTimeParser.Format.ISO8601));
         cv.put(EXPIRE_TIME_COL, DateTimeParser.toString(item.validUntil, DateTimeParser.Format.ISO8601));
-        cv.put(REPEAT_TIME_COL, DateTimeParser.toString(item.time, DateTimeParser.Format.ISO8601_DATE));
+        cv.put(REPEAT_TIME_COL, DateTimeParser.toString(item.time, DateTimeParser.Format.TIME));
         cv.put(REPEAT_WKDAY_COL, Util.toWkday(item.repeat));
         cv.put(LOCATION_COL, item.location);
         cv.put(LONGITUDE_COL, 0);
@@ -107,9 +104,8 @@ public class ReminderDAO {
         cv.put(TYPE_COL, item.reminderType.name());
         cv.put(TITLE_COL, item.title);
         cv.put(DESC_COL, item.description);
-        cv.put(TIME_COL, DateTimeParser.toString(item.time, DateTimeParser.Format.ISO8601));
         cv.put(EXPIRE_TIME_COL, DateTimeParser.toString(item.validUntil, DateTimeParser.Format.ISO8601));
-        cv.put(REPEAT_TIME_COL, DateTimeParser.toString(item.time, DateTimeParser.Format.ISO8601_DATE));
+        cv.put(REPEAT_TIME_COL, DateTimeParser.toString(item.time, DateTimeParser.Format.TIME));
         cv.put(REPEAT_WKDAY_COL, Util.toWkday(item.repeat));
         cv.put(LOCATION_COL, item.location);
         cv.put(LONGITUDE_COL, 0);
