@@ -88,6 +88,7 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
         handler.timeView.setText(data.time.toString());
         handler.titleView.setText(data.title);
         handler.locationView.setText(data.location);
+        handler.reminderData = data;
 
         /*
         View.OnTouchListener onTouchListener = new View.OnTouchListener() {
@@ -111,5 +112,6 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
         TextView locationView;
         TextView timeView;
         Switch enabledSwitch;
+        ReminderData reminderData;
     }
 }
