@@ -2,6 +2,7 @@ package hk.ust.cse.comp4521.reminder;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -19,6 +21,7 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     ListView reminderList;
+    ReminderDataAdapter reminderAdaptor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,42 +31,52 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
 
+        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Fab clicked", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
+                startActivity(intent);
+            }
+        });
+
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(getApplicationContext(), ViewTimeActivity.class);
-                ReminderData temp = ( (ReminderDataAdapter.RowHandler) v.getTag() ).reminderData;
-
-                intent.putExtra("title", temp.title);
-                String timeString = DateTimeParser.toString(temp.time, DateTimeParser.Format.SHORT);
-                intent.putExtra("time", timeString);
-                intent.putExtra("repeat", temp.repeat);
-                intent.putExtra("description", temp.description);
+                Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
+                long id = ( (ReminderDataAdapter.RowHandler) v.getTag() ).reminderId;
+                intent.putExtra("ReminderDataId", id);
                 startActivity(intent);
             }
         };
-
-        final ReminderDataAdapter reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener);
+        reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener);
 
         // 建立資料庫物件
         ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
-
         // 如果資料庫是空的，就建立一些範例資料
         // 這是為了方便測試用的，完成應用程式以後可以拿掉
         if (reminderDAO.getCount() == 0) {
             reminderDAO.sample();
         }
-
         // 取得所有記事資料
         ArrayList<ReminderData> reminders = reminderDAO.getAll();
-
         for(ReminderData sample:reminders){
             reminderAdaptor.addItem(sample);
         }
         reminderList.setAdapter(reminderAdaptor);
+    }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
+        reminderAdaptor.clear();
+        ArrayList<ReminderData> reminders = reminderDAO.getAll();
+        for(ReminderData sample:reminders){
+            reminderAdaptor.addItem(sample);
+        }
+        reminderAdaptor.notifyDataSetChanged();
     }
 
     @Override

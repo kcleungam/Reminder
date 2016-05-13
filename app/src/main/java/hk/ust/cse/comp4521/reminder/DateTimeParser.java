@@ -122,18 +122,26 @@ public final class DateTimeParser {
 	}
 
 	public static final Time toTime(String time, Format format) throws ParseException{
+		if(time == null || time.isEmpty())
+			return null;
 		return new Time(getFormat(format).parse(time).getTime());
 	}
 	
-	public static final long toLong(String time, Format format) throws ParseException{
+	public static final Long toLong(String time, Format format) throws ParseException{
+		if(time == null || time.isEmpty())
+			return null;
 		return getFormat(format).parse(time).getTime();
 	}
 	
 	public static final String toString(Date time, Format format){
+		if(time == null)
+			return null;
 		return getFormat(format).format(time);
 	}
 
 	public static final String toString(Time time, Format format){
+		if(time == null)
+			return null;
 		return getFormat(format).format(time);
 	}
 	

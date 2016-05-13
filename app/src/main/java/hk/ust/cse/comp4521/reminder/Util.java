@@ -20,8 +20,8 @@ public class Util {
         return sb.toString();
     }
 
-    public static boolean[] toRepeat(String s){
-        boolean[] bs = new boolean[s.length()];
+    public static boolean[] toRepeat(String s, int length){
+        boolean[] bs = new boolean[length];
         for(int i=0; i<s.length(); i++){
             bs[Integer.parseInt("" + s.charAt(i))] = true;
         }

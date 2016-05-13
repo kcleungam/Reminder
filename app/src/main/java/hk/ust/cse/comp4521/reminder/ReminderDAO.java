@@ -4,6 +4,7 @@ package hk.ust.cse.comp4521.reminder;
  * Created by Jeffrey on 13/5/2016.
  */
 
+import java.io.Serializable;
 import java.sql.Time;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class ReminderDAO {
     public static final String LOCATION_COL = "Location";
     public static final String LATITUDE_COL = "Latitude";
     public static final String LONGITUDE_COL = "Longitude";
+    public static final String ENABLED_COL = "Enabled";
     public static final String LASTMODIFY_COL = "LastModify";
 
     // 使用上面宣告的變數建立表格的SQL指令
@@ -43,12 +45,13 @@ public class ReminderDAO {
                     TYPE_COL + " TEXT NOT NULL," +
                     TITLE_COL + " TEXT," +
                     DESC_COL + " TEXT," +
-                    EXPIRE_TIME_COL + " TEXT NOT NULL," +
+                    EXPIRE_TIME_COL + " TEXT," +
                     REPEAT_TIME_COL + " TEXT," +
                     REPEAT_WKDAY_COL + " TEXT," +
                     LOCATION_COL + " TEXT," +
                     LATITUDE_COL + " REAL," +
                     LONGITUDE_COL + " REAL," +
+                    ENABLED_COL + " INTEGER," +
                     LASTMODIFY_COL + " TEXT)";
 
     // 資料庫物件
@@ -80,6 +83,7 @@ public class ReminderDAO {
         cv.put(LOCATION_COL, item.location);
         cv.put(LONGITUDE_COL, 0);
         cv.put(LATITUDE_COL, 0);
+        cv.put(ENABLED_COL, item.enabled);
         cv.put(LASTMODIFY_COL, DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.ISO8601));
 
         // 新增一筆資料並取得編號
@@ -110,6 +114,7 @@ public class ReminderDAO {
         cv.put(LOCATION_COL, item.location);
         cv.put(LONGITUDE_COL, 0);
         cv.put(LATITUDE_COL, 0);
+        cv.put(ENABLED_COL, item.enabled);
         cv.put(LASTMODIFY_COL, DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.ISO8601));
 
         // 設定修改資料的條件為編號
@@ -126,6 +131,10 @@ public class ReminderDAO {
         String where = KEY_ID + "=" + id;
         // 刪除指定編號資料並回傳刪除是否成功
         return db.delete(TABLE_NAME, where , null) > 0;
+    }
+
+    public void clear(){
+        db.delete(TABLE_NAME, null, null);
     }
 
     // 讀取所有記事資料
@@ -175,12 +184,13 @@ public class ReminderDAO {
         result.setDescription(cursor.getString(3));
         try {
             result.setValidUntil(DateTimeParser.toTime(cursor.getString(4), DateTimeParser.Format.ISO8601));
-            result.setTime(DateTimeParser.toTime(cursor.getString(5), DateTimeParser.Format.ISO8601));
-            result.setRepeat(Util.toRepeat(cursor.getString(6)));
+            result.setTime(DateTimeParser.toTime(cursor.getString(5), DateTimeParser.Format.TIME));
+            result.setRepeat(Util.toRepeat(cursor.getString(6), 7));
         } catch (ParseException e) {
             e.printStackTrace();
         }
         result.setLocation(cursor.getString(7));
+        result.setEnabled((cursor.getInt(10))==1);
 
         // 回傳結果
         return result;
@@ -200,7 +210,7 @@ public class ReminderDAO {
 
     // 建立範例資料
     public void sample() {
-        for(int i=0; i<25; i++){
+        for(int i=0; i<5; i++){
             ReminderData data = new ReminderData();
             data.title = "sample"+i;
             data.location = "location"+i;

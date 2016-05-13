@@ -1,14 +1,15 @@
 package hk.ust.cse.comp4521.reminder;
 
+import java.io.Serializable;
 import java.sql.Time;
 
 /**
  * Created by Krauser on 9/5/2016.
  */
-public class ReminderData {
+public class ReminderData implements Serializable{
     public enum ReminderType{Time, Location}
 
-    public long id;
+    public long id = -1;
     public ReminderType reminderType = null;
     public String title = null;
     public Time time = null;    //time only, no date
@@ -83,6 +84,10 @@ public class ReminderData {
 
     public void setRepeat(boolean[] repeat){
         this.repeat = repeat;
+    }
+
+    public void setEnabled(boolean enabled){
+        this.enabled = enabled;
     }
 
 }

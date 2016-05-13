@@ -1,25 +1,18 @@
 package hk.ust.cse.comp4521.reminder;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.logging.Handler;
-
-import static android.support.v4.app.ActivityCompat.startActivity;
-import static android.support.v4.content.ContextCompat.startActivities;
 
 /**
  * Created by Jeffrey on 12/5/2016.
@@ -27,7 +20,7 @@ import static android.support.v4.content.ContextCompat.startActivities;
 public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
     ArrayList<ReminderData> reminderList = new ArrayList<>();
-    View.OnClickListener onClickListener;
+    private View.OnClickListener onClickListener;
 
     public ReminderDataAdapter(Context context, int resource){
         super(context, resource);
@@ -59,6 +52,12 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
     }
 
     @Override
+    public void clear() {
+        super.clear();
+        reminderList.clear();
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         RowHandler handler = new RowHandler();
@@ -69,14 +68,16 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
             handler.timeView = (TextView) row.findViewById(R.id.rowTimeText);
             handler.titleView = (TextView) row.findViewById(R.id.rowTitleText);
             handler.locationView = (TextView) row.findViewById(R.id.rowLocationText);
-
-            final int _position = position;
+            handler.enabledSwitch.setTag(handler);
             handler.enabledSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     // do something, the isChecked will be
                     // true if the switch is in the On position
-                    ReminderData data = reminderList.get(_position);
+                    ReminderDAO reminderDAO = new ReminderDAO(getContext());
+                    long id = ( (ReminderDataAdapter.RowHandler) buttonView.getTag() ).reminderId;
+                    ReminderData data = reminderDAO.get(id);
                     data.enabled = isChecked;
+                    reminderDAO.update(data);
                 }
             });
             row.setTag(handler);        // When we get the row, we can retrieve the corresponing handler (tag)
@@ -84,11 +85,22 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
             handler = (RowHandler) row.getTag();
         }
         ReminderData data = getItem(position);
+        handler.reminderId = data.getId();
         handler.enabledSwitch.setChecked(data.enabled);
-        handler.timeView.setText(data.time.toString());
+        handler.timeView.setText(DateTimeParser.toString(data.time, DateTimeParser.Format.SHORT));
         handler.titleView.setText(data.title);
         handler.locationView.setText(data.location);
-        handler.reminderData = data;
+
+        row.setOnLongClickListener(new AdapterView.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // TODO Auto-generated method stub
+
+                Toast.makeText(getContext(), ( (RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
+
+                return true;
+            }
+        });
 
         /*
         View.OnTouchListener onTouchListener = new View.OnTouchListener() {
@@ -108,10 +120,10 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
     }
 
     public static class RowHandler{
+        long reminderId;
         TextView titleView;
         TextView locationView;
         TextView timeView;
         Switch enabledSwitch;
-        ReminderData reminderData;
     }
 }
