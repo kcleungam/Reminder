@@ -34,7 +34,12 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(getApplicationContext(), ViewTimeActivity.class);
                 ReminderData temp = ( (ReminderDataAdapter.RowHandler) v.getTag() ).reminderData;
-                intent.putExtra("title",  temp.title);
+
+                intent.putExtra("title", temp.title);
+                String timeString = DateTimeParser.toString(temp.time, DateTimeParser.Format.SHORT);
+                intent.putExtra("time", timeString);
+                intent.putExtra("repeat", temp.repeat);
+                intent.putExtra("description", temp.description);
                 startActivity(intent);
             }
         };
