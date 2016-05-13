@@ -13,7 +13,7 @@ import java.util.*;
 public final class DateTimeParser {
 	
 	public enum Format{
-		DATE, DATE_COMPACT, TIME, ALL, SHORT, RFC3339, RFC3339_COMPACT, ISO8601, ISO8601_DATE
+		DATE, DATE_COMPACT, TIME, ALL, SHORT, RFC3339, RFC3339_COMPACT, ISO8601
 	}
 
 	public static final String[] MONTH={"January","February","March","April","May","June","July","August","September","October","November","December"};
@@ -108,9 +108,6 @@ public final class DateTimeParser {
 			sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
 			TimeZone tz = TimeZone.getTimeZone("GMT+8");
 			sdf.setTimeZone(tz);
-			break;
-		case ISO8601_DATE:
-			sdf = new SimpleDateFormat("yyyy-MM-dd");
 			break;
 		case ISO8601:
 			sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");

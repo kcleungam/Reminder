@@ -81,5 +81,9 @@ public class ReminderData {
         this.time = time;
     }
 
+    public void setRepeat(boolean[] repeat){
+        this.repeat = repeat;
+    }
+
 }
 

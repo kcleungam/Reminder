@@ -174,12 +174,13 @@ public class ReminderDAO {
         result.setTitle(cursor.getString(2));
         result.setDescription(cursor.getString(3));
         try {
-            result.setTime(DateTimeParser.toTime(cursor.getString(4), DateTimeParser.Format.ISO8601));
-            result.setValidUntil(DateTimeParser.toTime(cursor.getString(5), DateTimeParser.Format.ISO8601));
+            result.setValidUntil(DateTimeParser.toTime(cursor.getString(4), DateTimeParser.Format.ISO8601));
+            result.setTime(DateTimeParser.toTime(cursor.getString(5), DateTimeParser.Format.ISO8601));
+            result.setRepeat(Util.toRepeat(cursor.getString(6)));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        result.setLocation(cursor.getString(8));
+        result.setLocation(cursor.getString(7));
 
         // 回傳結果
         return result;

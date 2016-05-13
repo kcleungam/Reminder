@@ -2,6 +2,7 @@ package hk.ust.cse.comp4521.reminder;
 
 import java.sql.Time;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
@@ -17,6 +18,14 @@ public class Util {
                 sb.append(i+1);
         }
         return sb.toString();
+    }
+
+    public static boolean[] toRepeat(String s){
+        boolean[] bs = new boolean[s.length()];
+        for(int i=0; i<s.length(); i++){
+            bs[Integer.parseInt("" + s.charAt(i))] = true;
+        }
+        return bs;
     }
 
 }
