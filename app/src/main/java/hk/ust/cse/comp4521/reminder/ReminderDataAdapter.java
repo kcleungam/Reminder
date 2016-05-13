@@ -2,6 +2,7 @@ package hk.ust.cse.comp4521.reminder;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,15 +18,24 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.Handler;
 
+import static android.support.v4.app.ActivityCompat.startActivity;
+import static android.support.v4.content.ContextCompat.startActivities;
+
 /**
  * Created by Jeffrey on 12/5/2016.
  */
 public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
     ArrayList<ReminderData> reminderList = new ArrayList<>();
+    View.OnTouchListener onTouchListener;
 
     public ReminderDataAdapter(Context context, int resource){
         super(context, resource);
+    }
+
+    public ReminderDataAdapter(Context context, int resource, View.OnTouchListener onTouchListener){
+        super(context, resource);
+        this.onTouchListener = onTouchListener;
     }
 
     public void addItem(ReminderData data){
@@ -79,17 +89,20 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
         handler.titleView.setText(data.title);
         handler.locationView.setText(data.location);
 
-
+        /*
         View.OnTouchListener onTouchListener = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Toast.makeText(getContext(), ( (RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), ( (RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), TimeReminderActivity.class);
+                startActivity(getContext(),intent,);
                 return false;
             }
         };
 
-        row.setOnTouchListener(onTouchListener);
+    */
 
+        row.setOnTouchListener(onTouchListener);
         return row;
     }
 
