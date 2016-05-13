@@ -27,15 +27,15 @@ import static android.support.v4.content.ContextCompat.startActivities;
 public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
     ArrayList<ReminderData> reminderList = new ArrayList<>();
-    View.OnTouchListener onTouchListener;
+    View.OnClickListener onClickListener;
 
     public ReminderDataAdapter(Context context, int resource){
         super(context, resource);
     }
 
-    public ReminderDataAdapter(Context context, int resource, View.OnTouchListener onTouchListener){
+    public ReminderDataAdapter(Context context, int resource, View.OnClickListener onClickListener){
         super(context, resource);
-        this.onTouchListener = onTouchListener;
+        this.onClickListener = onClickListener;
     }
 
     public void addItem(ReminderData data){
@@ -102,7 +102,7 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
     */
 
-        row.setOnTouchListener(onTouchListener);
+        row.setOnClickListener(onClickListener);
         return row;
     }
 

@@ -15,7 +15,7 @@ public class Util {
         StringBuilder sb = new StringBuilder();
         for(int i=0; i<bs.length; i++){
             if(bs[i]==true)
-                sb.append(i+1);
+                sb.append(i);
         }
         return sb.toString();
     }

@@ -28,16 +28,15 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
 
-        View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+        View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
                 startActivity(intent);
-                return false;
             }
         };
 
-        final ReminderDataAdapter reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onTouchListener);
+        final ReminderDataAdapter reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener);
 
         // 建立資料庫物件
         ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
