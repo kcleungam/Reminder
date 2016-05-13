@@ -1,13 +1,17 @@
 package hk.ust.cse.comp4521.reminder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.sql.Time;
 import java.util.ArrayList;
@@ -23,7 +27,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
-        final ReminderDataAdapter reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout);
+
+        View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
+                startActivity(intent);
+                return false;
+            }
+        };
+
+        final ReminderDataAdapter reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onTouchListener);
 
         // 建立資料庫物件
         ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
@@ -42,17 +56,6 @@ public class MainActivity extends AppCompatActivity {
         }
         reminderList.setAdapter(reminderAdaptor);
 
-        AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                // do something here, like open another page
-                //String string= (String) reminderAdaptor.getItem(position);
-                //Log.d("**********", string);
-            }
-        };
-
-        reminderList.setOnItemClickListener(onItemClickListener);
 
     }
 
