@@ -4,14 +4,13 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.text.ParseException;
 
@@ -50,7 +49,6 @@ public class TimeReminderActivity extends AppCompatActivity {
         wkdayBox[6] = (CheckBox) layout.findViewById(R.id.satBox);
         wkdayBox[0] = (CheckBox) layout.findViewById(R.id.sunBox);
         selectAllButton = (Button) layout.findViewById(R.id.selectAll);
-        locationText = (TextView) layout.findViewById(R.id.editLocation);
         View.OnClickListener selectAllListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,6 +64,7 @@ public class TimeReminderActivity extends AppCompatActivity {
             }
         };
         selectAllButton.setOnClickListener(selectAllListener);
+        locationText = (TextView) layout.findViewById(R.id.editLocation);
         editDescription = (TextView) layout.findViewById(R.id.editDescription);
         imageView = (ImageView) layout.findViewById(R.id.imageView);
         ImageView.OnClickListener imageViewListener = new View.OnClickListener() {
@@ -85,39 +84,15 @@ public class TimeReminderActivity extends AppCompatActivity {
         };
         imageView.setOnClickListener(imageViewListener);
         if(reminderData!=null){
-            editTitle.setText(reminderData.title);
-             editTime.setText(DateTimeParser.toString(reminderData.time, DateTimeParser.Format.SHORT));
+            editTitle.setText(reminderData.getTitle());
+             editTime.setText(reminderData.getTime());
             for(int i=0; i<wkdayBox.length; i++){
-                wkdayBox[i].setChecked(reminderData.repeat[i]);
+                wkdayBox[i].setChecked(reminderData.getRepeat()[i]);
             }
-            editDescription.setText(reminderData.description);
-            locationText.setText(reminderData.location);
+            editDescription.setText(reminderData.getDescription());
+            locationText.setText(reminderData.getLocation());
             //imageView
         }
-    }
-
-    @Override
-    protected void onPause() {
-        try {
-            reminderData.setReminderType("Time");
-            reminderData.setTitle(editTitle.getText().toString());
-            reminderData.setTime(DateTimeParser.toTime(editTime.getText().toString(), DateTimeParser.Format.SHORT));
-            boolean[] repeat = new boolean[wkdayBox.length];
-            for(int i=0; i<wkdayBox.length; i++){
-                repeat[i] = wkdayBox[i].isChecked();
-            }
-            reminderData.setRepeat(repeat);
-            reminderData.setLocation(locationText.getText().toString());
-            reminderData.setDescription(editDescription.getText().toString());
-            ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
-            if(reminderData.getId()<0)
-                reminderDAO.insert(reminderData);
-            else
-                reminderDAO.update(reminderData);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        super.onPause();
     }
 
     @Override
@@ -126,4 +101,35 @@ public class TimeReminderActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_save, menu);
         return true;
     }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int item_id = item.getItemId();
+
+        switch (item_id){
+            case R.id.action_save:
+                reminderData.setReminderType("Time");
+                reminderData.setTitle(editTitle.getText().toString());
+                reminderData.setTime(editTime.getText().toString());
+                boolean[] repeat = new boolean[wkdayBox.length];
+                for(int i=0; i<wkdayBox.length; i++){
+                    repeat[i] = wkdayBox[i].isChecked();
+                }
+                reminderData.setRepeat(repeat);
+                reminderData.setLocation(locationText.getText().toString());
+                reminderData.setDescription(editDescription.getText().toString());
+                ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
+                if(reminderData.getId()<0)
+                    reminderDAO.insert(reminderData);
+                else
+                    reminderDAO.update(reminderData);
+                finish();
+                break;
+            case R.id.action_cancel:
+                finish();
+                break;
+            default: return false;
+        }
+        return true;
+    }
+
 }

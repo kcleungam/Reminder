@@ -1,7 +1,6 @@
 package hk.ust.cse.comp4521.reminder;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,7 +75,7 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
                     ReminderDAO reminderDAO = new ReminderDAO(getContext());
                     long id = ( (ReminderDataAdapter.RowHandler) buttonView.getTag() ).reminderId;
                     ReminderData data = reminderDAO.get(id);
-                    data.enabled = isChecked;
+                    data.setEnabled(isChecked);
                     reminderDAO.update(data);
                 }
             });
@@ -86,10 +85,10 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
         }
         ReminderData data = getItem(position);
         handler.reminderId = data.getId();
-        handler.enabledSwitch.setChecked(data.enabled);
-        handler.timeView.setText(DateTimeParser.toString(data.time, DateTimeParser.Format.SHORT));
-        handler.titleView.setText(data.title);
-        handler.locationView.setText(data.location);
+        handler.enabledSwitch.setChecked(data.isEnabled());
+        handler.timeView.setText(data.getTime());
+        handler.titleView.setText(data.getTitle());
+        handler.locationView.setText(data.getLocation());
 
         row.setOnLongClickListener(new AdapterView.OnLongClickListener() {
             @Override

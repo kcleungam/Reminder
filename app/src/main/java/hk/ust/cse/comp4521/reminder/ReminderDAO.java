@@ -4,13 +4,11 @@ package hk.ust.cse.comp4521.reminder;
  * Created by Jeffrey on 13/5/2016.
  */
 
-import java.io.Serializable;
+import java.sql.Date;
 import java.sql.Time;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -74,16 +72,16 @@ public class ReminderDAO {
 
         // 加入ContentValues物件包裝的新增資料
         // 第一個參數是欄位名稱， 第二個參數是欄位的資料
-        cv.put(TYPE_COL, item.reminderType.name());
-        cv.put(TITLE_COL, item.title);
-        cv.put(DESC_COL, item.description);
-        cv.put(EXPIRE_TIME_COL, DateTimeParser.toString(item.validUntil, DateTimeParser.Format.ISO8601));
-        cv.put(REPEAT_TIME_COL, DateTimeParser.toString(item.time, DateTimeParser.Format.TIME));
-        cv.put(REPEAT_WKDAY_COL, Util.toWkday(item.repeat));
-        cv.put(LOCATION_COL, item.location);
+        cv.put(TYPE_COL, item.getReminderType());
+        cv.put(TITLE_COL, item.getTitle());
+        cv.put(DESC_COL, item.getDescription());
+        cv.put(EXPIRE_TIME_COL, item.getValidUntil());
+        cv.put(REPEAT_TIME_COL, item.getTime());
+        cv.put(REPEAT_WKDAY_COL, Util.toWkday(item.getRepeat()));
+        cv.put(LOCATION_COL, item.getLocation());
         cv.put(LONGITUDE_COL, 0);
         cv.put(LATITUDE_COL, 0);
-        cv.put(ENABLED_COL, item.enabled);
+        cv.put(ENABLED_COL, item.isEnabled());
         cv.put(LASTMODIFY_COL, DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.ISO8601));
 
         // 新增一筆資料並取得編號
@@ -105,16 +103,16 @@ public class ReminderDAO {
 
         // 加入ContentValues物件包裝的修改資料
         // 第一個參數是欄位名稱， 第二個參數是欄位的資料
-        cv.put(TYPE_COL, item.reminderType.name());
-        cv.put(TITLE_COL, item.title);
-        cv.put(DESC_COL, item.description);
-        cv.put(EXPIRE_TIME_COL, DateTimeParser.toString(item.validUntil, DateTimeParser.Format.ISO8601));
-        cv.put(REPEAT_TIME_COL, DateTimeParser.toString(item.time, DateTimeParser.Format.TIME));
-        cv.put(REPEAT_WKDAY_COL, Util.toWkday(item.repeat));
-        cv.put(LOCATION_COL, item.location);
+        cv.put(TYPE_COL, item.getReminderType());
+        cv.put(TITLE_COL, item.getTitle());
+        cv.put(DESC_COL, item.getDescription());
+        cv.put(EXPIRE_TIME_COL, item.getValidUntil());
+        cv.put(REPEAT_TIME_COL, item.getTime());
+        cv.put(REPEAT_WKDAY_COL, Util.toWkday(item.getRepeat()));
+        cv.put(LOCATION_COL, item.getLocation());
         cv.put(LONGITUDE_COL, 0);
         cv.put(LATITUDE_COL, 0);
-        cv.put(ENABLED_COL, item.enabled);
+        cv.put(ENABLED_COL, item.isEnabled());
         cv.put(LASTMODIFY_COL, DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.ISO8601));
 
         // 設定修改資料的條件為編號
@@ -182,13 +180,9 @@ public class ReminderDAO {
         result.setReminderType(cursor.getString(1));
         result.setTitle(cursor.getString(2));
         result.setDescription(cursor.getString(3));
-        try {
-            result.setValidUntil(DateTimeParser.toTime(cursor.getString(4), DateTimeParser.Format.ISO8601));
-            result.setTime(DateTimeParser.toTime(cursor.getString(5), DateTimeParser.Format.TIME));
-            result.setRepeat(Util.toRepeat(cursor.getString(6), 7));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        result.setValidUntil(cursor.getString(4));
+        result.setTime(cursor.getString(5));
+        result.setRepeat(Util.toRepeat(cursor.getString(6), 7));
         result.setLocation(cursor.getString(7));
         result.setEnabled((cursor.getInt(10))==1);
 
@@ -212,16 +206,16 @@ public class ReminderDAO {
     public void sample() {
         for(int i=0; i<5; i++){
             ReminderData data = new ReminderData();
-            data.title = "sample"+i;
-            data.location = "location"+i;
-            data.enabled = i%2==0;
-            data.reminderType = ReminderData.ReminderType.Time;
-            data.description = "general description";
+            data.setTitle("sample"+i);
+            data.setLocation("location"+i);
+            data.setEnabled(i%2==0);
+            data.setReminderType("Time");
+            data.setDescription("general description");
             Calendar time = Calendar.getInstance();
             time.set(Calendar.DATE, i);
-            data.time = new Time(time.getTimeInMillis());
+            data.setTime(DateTimeParser.toString(time.getTimeInMillis(), DateTimeParser.Format.SHORT));
             time.set(Calendar.YEAR, time.get(Calendar.YEAR)+2);
-            data.validUntil = new Time(time.getTimeInMillis());
+            data.setValidUntil(DateTimeParser.toString(time.getTimeInMillis(), DateTimeParser.Format.ISO8601));
             insert(data);
         }
     }
