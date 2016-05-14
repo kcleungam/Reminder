@@ -29,9 +29,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_add_circle_outline_white_3x"
+        android:src="@drawable/yellow_plus"
         android:elevation="6dp"
-        app:pressedTranslationZ="12dp" />
+        app:pressedTranslationZ="12dp"
+        android:scaleType="fitXY" />
 
     <include layout="@layout/reminder_list" />
 
