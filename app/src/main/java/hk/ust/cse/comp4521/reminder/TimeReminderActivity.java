@@ -175,7 +175,7 @@ public class TimeReminderActivity extends AppCompatActivity {
         switch (id) {
             case dialogID:
                 // set time picker as current time
-                timePickerDialog = new TimePickerDialog(this, onTimeSetListener, hour, minute, false);
+                timePickerDialog = new TimePickerDialog(this, onTimeSetListener, hour, minute, true);
                 return timePickerDialog;
 
         }
