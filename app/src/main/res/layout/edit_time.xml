@@ -71,7 +71,7 @@
         <ImageButton
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:id="@+id/imageButton"
+            android:id="@+id/timeButton"
             android:src="@drawable/clock"
             android:scaleType="fitXY"
             android:layout_alignTop="@+id/timeText"
@@ -86,8 +86,8 @@
             android:textSize="20dp"
             android:paddingLeft="10dp"
             android:paddingTop="5dp"
-            android:layout_alignBottom="@+id/imageButton"
-            android:layout_toLeftOf="@+id/imageButton"
+            android:layout_alignBottom="@+id/timeButton"
+            android:layout_toLeftOf="@+id/timeButton"
             android:layout_alignLeft="@+id/repeat"
             android:layout_alignStart="@+id/repeat" />
 
@@ -248,7 +248,7 @@
             android:background="#00FFFF"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/googlemapButton">
+            android:layout_below="@+id/locationButton">
         </View>
 
         <TextView
@@ -312,7 +312,7 @@
         <ImageButton
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:id="@+id/googlemapButton"
+            android:id="@+id/locationButton"
             android:src="@drawable/googlemap"
             android:scaleType="fitXY"
             android:layout_below="@+id/seperateLine3"
