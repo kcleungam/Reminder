@@ -26,9 +26,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Calendar;
 
 public class TimeReminderActivity extends AppCompatActivity {
@@ -94,31 +96,29 @@ public class TimeReminderActivity extends AppCompatActivity {
         checkBoxes[5] = (CheckBox) layout.findViewById(R.id.friBox);
         checkBoxes[6] = (CheckBox) layout.findViewById(R.id.satBox);
         checkBoxes[0] = (CheckBox) layout.findViewById(R.id.sunBox);
-        CompoundButton.OnCheckedChangeListener wkdayBoxListener = new CompoundButton.OnCheckedChangeListener() {
+        CompoundButton.OnClickListener wkdayBoxListener = new CompoundButton.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton button, boolean checked) {
+            public void onClick(View v) {
                 for (CheckBox box : checkBoxes) {
                     if(box.isChecked()!=true) {
-                        selectAllButton.setText("Select all");
-                        selectAllButton.setTag(true);
+                        setSelectAll(true);
                         return;
                     }
                 }
-                selectAllButton.setText("Unselect all");
-                selectAllButton.setTag(false);
+                setSelectAll(false);
             }
         };
         for(CheckBox checkBox: checkBoxes){
-            checkBox.setOnCheckedChangeListener(wkdayBoxListener);
+            checkBox.setOnClickListener(wkdayBoxListener);
         }
         selectAllButton = (Button) layout.findViewById(R.id.selectAll);
         View.OnClickListener selectAllListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 for (CheckBox box : checkBoxes) {
-                    boolean checked = v.getTag().equals(true);
-                    box.setChecked(checked);
+                    box.setChecked(v.getTag().equals(true));
                 }
+                setSelectAll(!v.getTag().equals(true));
             }
         };
         selectAllButton.setOnClickListener(selectAllListener);
@@ -153,6 +153,7 @@ public class TimeReminderActivity extends AppCompatActivity {
             for (int i = 0; i < checkBoxes.length; i++) {
                 checkBoxes[i].setChecked(reminderData.getRepeat()[i]);
             }
+            setSelectAll(!Arrays.asList(reminderData.getRepeat()).contains(false));
             editDescription.setText(reminderData.getDescription());
             locationText.setText(reminderData.getLocation());
             if(reminderData.getImageUri()!=null) {
@@ -168,6 +169,16 @@ public class TimeReminderActivity extends AppCompatActivity {
         }
     }
 
+    private void setSelectAll(boolean selectAll){
+        if(selectAll){
+            selectAllButton.setText("Select all");
+            selectAllButton.setTag(true);
+        }else{
+            selectAllButton.setText("Unselect all");
+            selectAllButton.setTag(false);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -180,6 +191,14 @@ public class TimeReminderActivity extends AppCompatActivity {
 
         switch (item_id) {
             case R.id.action_save:
+                if(editTitle.getText().length()==0){
+                    Toast.makeText(TimeReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                if(editTime.getText().length()==0){
+                    Toast.makeText(TimeReminderActivity.this, "Empty time", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
                 reminderData.setReminderType("Time");
                 reminderData.setTitle(editTitle.getText().toString());
                 reminderData.setTime(editTime.getText().toString());
