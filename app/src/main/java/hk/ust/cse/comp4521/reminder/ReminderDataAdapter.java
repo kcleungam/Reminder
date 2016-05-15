@@ -22,12 +22,10 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
     private View.OnClickListener onClickListener;
     private View.OnLongClickListener onLongClickListener;
 
-    public ReminderDataAdapter(Context context, int resource){
+    public ReminderDataAdapter(Context context, int resource, View.OnClickListener onClickListener, View.OnLongClickListener onLongClickListener){
         super(context, resource);
-    }
-
-    public ReminderDataAdapter(Context context, int resource, View.OnClickListener onClickListener){
-        super(context, resource);
+        this.onClickListener = onClickListener;
+        this.onLongClickListener = onLongClickListener;
     }
 
     public void addItem(ReminderData data){
@@ -106,14 +104,6 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
         row.setOnClickListener(onClickListener);
         row.setOnLongClickListener(onLongClickListener);
         return row;
-    }
-
-    public void setOnClickListener(View.OnClickListener onClickListener){
-        this.onClickListener = onClickListener;
-    }
-
-    public void setOnLongClickListener(View.OnLongClickListener onLongClickListener){
-        this.onLongClickListener = onLongClickListener;
     }
 
     public static class RowHandler{

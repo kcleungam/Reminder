@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -33,7 +34,7 @@ public class TimeReminderActivity extends AppCompatActivity {
     private TextView editTitle;
     private TextView editTime;
     private ImageButton timeButton;
-    private CheckBox[] wkdayBox;
+    private CheckBox[] checkBoxes;
     private Button selectAllButton;
     private TextView locationText;
     private ImageButton locationButton;
@@ -55,6 +56,8 @@ public class TimeReminderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //TODO: turn this into permission listener
+        //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
         for(String requiredPermission:REQUIRED_PERMISSION) {
             Integer value = checkSelfPermission(requiredPermission);
             synchronized (value) {
@@ -80,26 +83,33 @@ public class TimeReminderActivity extends AppCompatActivity {
                 showDialog(R.id.timeButton);
             }
         });
-        wkdayBox = new CheckBox[7];
-        wkdayBox[1] = (CheckBox) layout.findViewById(R.id.monBox);
-        wkdayBox[2] = (CheckBox) layout.findViewById(R.id.tueBox);
-        wkdayBox[3] = (CheckBox) layout.findViewById(R.id.wedBox);
-        wkdayBox[4] = (CheckBox) layout.findViewById(R.id.thurBox);
-        wkdayBox[5] = (CheckBox) layout.findViewById(R.id.friBox);
-        wkdayBox[6] = (CheckBox) layout.findViewById(R.id.satBox);
-        wkdayBox[0] = (CheckBox) layout.findViewById(R.id.sunBox);
+        checkBoxes = new CheckBox[7];
+        checkBoxes[1] = (CheckBox) layout.findViewById(R.id.monBox);
+        checkBoxes[2] = (CheckBox) layout.findViewById(R.id.tueBox);
+        checkBoxes[3] = (CheckBox) layout.findViewById(R.id.wedBox);
+        checkBoxes[4] = (CheckBox) layout.findViewById(R.id.thurBox);
+        checkBoxes[5] = (CheckBox) layout.findViewById(R.id.friBox);
+        checkBoxes[6] = (CheckBox) layout.findViewById(R.id.satBox);
+        checkBoxes[0] = (CheckBox) layout.findViewById(R.id.sunBox);
+        CompoundButton.OnCheckedChangeListener wkdayBoxListener = new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton button, boolean checked) {
+                for (CheckBox box : checkBoxes) {
+                    if(box.isChecked()!=checked)
+                        return;
+                }
+                selectAllButton.setEnabled(checked);
+            }
+        };
+        for(CheckBox checkBox: checkBoxes){
+            checkBox.setOnCheckedChangeListener(wkdayBoxListener);
+        }
         selectAllButton = (Button) layout.findViewById(R.id.selectAll);
         View.OnClickListener selectAllListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (v.isEnabled()) {
-                    for (CheckBox box : wkdayBox) {
-                        box.setChecked(true);
-                    }
-                } else {
-                    for (CheckBox box : wkdayBox) {
-                        box.setChecked(false);
-                    }
+                for (CheckBox box : checkBoxes) {
+                    box.setChecked(v.isEnabled());
                 }
             }
         };
@@ -131,8 +141,8 @@ public class TimeReminderActivity extends AppCompatActivity {
         if (reminderData != null) {
             editTitle.setText(reminderData.getTitle());
             editTime.setText(reminderData.getTime());
-            for (int i = 0; i < wkdayBox.length; i++) {
-                wkdayBox[i].setChecked(reminderData.getRepeat()[i]);
+            for (int i = 0; i < checkBoxes.length; i++) {
+                checkBoxes[i].setChecked(reminderData.getRepeat()[i]);
             }
             editDescription.setText(reminderData.getDescription());
             locationText.setText(reminderData.getLocation());
@@ -164,9 +174,9 @@ public class TimeReminderActivity extends AppCompatActivity {
                 reminderData.setReminderType("Time");
                 reminderData.setTitle(editTitle.getText().toString());
                 reminderData.setTime(editTime.getText().toString());
-                boolean[] repeat = new boolean[wkdayBox.length];
-                for (int i = 0; i < wkdayBox.length; i++) {
-                    repeat[i] = wkdayBox[i].isChecked();
+                boolean[] repeat = new boolean[checkBoxes.length];
+                for (int i = 0; i < checkBoxes.length; i++) {
+                    repeat[i] = checkBoxes[i].isChecked();
                 }
                 reminderData.setRepeat(repeat);
                 reminderData.setLocation(locationText.getText().toString());
@@ -185,15 +195,6 @@ public class TimeReminderActivity extends AppCompatActivity {
                 return false;
         }
         return true;
-    }
-
-    private boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
     }
 
     @Override

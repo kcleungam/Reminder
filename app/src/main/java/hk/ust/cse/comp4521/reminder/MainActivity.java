@@ -2,6 +2,8 @@ package hk.ust.cse.comp4521.reminder;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
         reminderList = (ListView)findViewById(R.id.reminder_list);
 
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+//        CoordinatorLayout.LayoutParams params =
+//                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+//        params.setBehavior(new FabHideOnScroll());
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,9 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         };
-        reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout);
-        reminderAdaptor.setOnClickListener(onClickListener);
-        reminderAdaptor.setOnLongClickListener(onLongClickListener);
+        reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener, onLongClickListener);
 
         // 建立資料庫物件
         ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
@@ -78,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
             reminderAdaptor.addItem(sample);
         }
         reminderList.setAdapter(reminderAdaptor);
-        //registerForContextMenu(reminderList);
     }
 
     @Override
@@ -124,6 +126,19 @@ public class MainActivity extends AppCompatActivity {
             menu.add(Menu.NONE, 0, 0, "Delete");
         }
         super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if(item.getTitle().equals("Delete")){
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+            ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
+            ReminderDataAdapter.RowHandler handler = (ReminderDataAdapter.RowHandler) info.targetView.getTag();
+            reminderDAO.delete(handler.reminderId);
+            Toast.makeText(MainActivity.this, "Reminder "+handler.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
+            reminderAdaptor.notifyDataSetChanged();
+        }
+        return true;
     }
 
     /**
