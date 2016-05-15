@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context="hk.ust.cse.comp4521.reminder.MainActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -35,5 +36,7 @@
         android:scaleType="fitXY"
         app:layout_behavior="hk.ust.cse.comp4521.reminder.FabHideOnScroll"
         />
+
+    <include layout="@layout/activity_main_fab_menu" />
 
 </android.support.design.widget.CoordinatorLayout>

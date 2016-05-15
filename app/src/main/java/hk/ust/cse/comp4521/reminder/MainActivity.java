@@ -30,15 +30,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_activity_main);
+        setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
 
         FloatingActionButton menuFab = (FloatingActionButton)findViewById(R.id.menuFab);
-//        CoordinatorLayout.LayoutParams params =
-//                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-//        params.setBehavior(new FabHideOnScroll());
         menuFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,6 +91,10 @@ public class MainActivity extends AppCompatActivity {
             reminderAdaptor.addItem(sample);
         }
         reminderList.setAdapter(reminderAdaptor);
+
+//        CoordinatorLayout.LayoutParams params =
+//                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+//        params.setBehavior(new FabHideOnScroll());
     }
 
     private void showFabMenu(){
