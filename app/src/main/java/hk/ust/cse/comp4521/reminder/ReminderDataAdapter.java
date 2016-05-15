@@ -90,16 +90,16 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
         handler.titleView.setText(data.getTitle());
         handler.locationView.setText(data.getLocation());
 
-        row.setOnLongClickListener(new AdapterView.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                // TODO Auto-generated method stub
-
-                Toast.makeText(getContext(), ( (RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
-
-                return true;
-            }
-        });
+//        row.setOnLongClickListener(new AdapterView.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                // TODO Auto-generated method stub
+//
+//                Toast.makeText(getContext(), ( (RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
+//
+//                return true;
+//            }
+//        });
 
         /*
         View.OnTouchListener onTouchListener = new View.OnTouchListener() {

@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
             reminderAdaptor.addItem(sample);
         }
         reminderList.setAdapter(reminderAdaptor);
+        registerForContextMenu(reminderList);
     }
 
     @Override
@@ -99,6 +101,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId()==R.id.reminder_list) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            menu.setHeaderTitle(((ReminderData)reminderList.getAdapter().getItem(info.position)).getTitle());
+            menu.add(Menu.NONE, 0, 0, "Delete");
+        }
+        super.onCreateContextMenu(menu, v, menuInfo);
     }
 
     /**

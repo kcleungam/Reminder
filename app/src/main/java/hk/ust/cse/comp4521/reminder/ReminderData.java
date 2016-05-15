@@ -11,14 +11,19 @@ public class ReminderData implements Serializable{
 
     public enum ReminderType{Time, Location}
 
+    public final static int REPEAT_ARRAY_LENGTH=7;
+
     private long id = -1;
     private ReminderType reminderType = null;
     private String title = null;
-    private Time time = null;    //time only, no date
-    private String location = null;
-    private Time validUntil = null;                     // location event may valid until a certain time
-    private boolean[] repeat = new boolean[7];       // Store the day for repetition, Mon to Fri
     private String description = null;
+    private String imagePath = null;
+    private Time time = null;    //time only, no date
+    private boolean[] repeat = new boolean[REPEAT_ARRAY_LENGTH];       // Store the day for repetition, Mon to Fri
+    private String location = null;
+    private Double longitude = null;
+    private Double lattitude = null;
+    private Time validUntil = null;                     // location event may valid until a certain time
     private boolean enabled = false;
     // Location
     // Image
@@ -142,5 +147,28 @@ public class ReminderData implements Serializable{
         return enabled;
     }
 
+    public String getImageUri() {
+        return imagePath;
+    }
+
+    public void setImageUri(String imageUri) {
+        this.imagePath = imageUri;
+    }
+
+    public Double getLattitude() {
+        return lattitude;
+    }
+
+    public void setLattitude(Double lattitude) {
+        this.lattitude = lattitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
 }
 

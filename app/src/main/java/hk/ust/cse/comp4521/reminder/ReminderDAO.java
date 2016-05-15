@@ -4,9 +4,6 @@ package hk.ust.cse.comp4521.reminder;
  * Created by Jeffrey on 13/5/2016.
  */
 
-import java.sql.Date;
-import java.sql.Time;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -27,12 +24,13 @@ public class ReminderDAO {
     public static final String TYPE_COL = "Type";
     public static final String TITLE_COL = "Title";
     public static final String DESC_COL = "Desc";
-    public static final String EXPIRE_TIME_COL = "ExpireTime";
+    public static final String IMAGE_PATH_COL = "ImagePath";
     public static final String REPEAT_TIME_COL = "RepeatTime";
     public static final String REPEAT_WKDAY_COL = "RepeatWkday";
     public static final String LOCATION_COL = "Location";
     public static final String LATITUDE_COL = "Latitude";
     public static final String LONGITUDE_COL = "Longitude";
+    public static final String EXPIRE_TIME_COL = "ExpireTime";
     public static final String ENABLED_COL = "Enabled";
     public static final String LASTMODIFY_COL = "LastModify";
 
@@ -43,12 +41,13 @@ public class ReminderDAO {
                     TYPE_COL + " TEXT NOT NULL," +
                     TITLE_COL + " TEXT," +
                     DESC_COL + " TEXT," +
-                    EXPIRE_TIME_COL + " TEXT," +
+                    IMAGE_PATH_COL + " TEXT," +
                     REPEAT_TIME_COL + " TEXT," +
                     REPEAT_WKDAY_COL + " TEXT," +
                     LOCATION_COL + " TEXT," +
-                    LATITUDE_COL + " REAL," +
                     LONGITUDE_COL + " REAL," +
+                    LATITUDE_COL + " REAL," +
+                    EXPIRE_TIME_COL + " TEXT," +
                     ENABLED_COL + " INTEGER," +
                     LASTMODIFY_COL + " TEXT)";
 
@@ -75,12 +74,13 @@ public class ReminderDAO {
         cv.put(TYPE_COL, item.getReminderType());
         cv.put(TITLE_COL, item.getTitle());
         cv.put(DESC_COL, item.getDescription());
-        cv.put(EXPIRE_TIME_COL, item.getValidUntil());
+        cv.put(IMAGE_PATH_COL, item.getImageUri());
         cv.put(REPEAT_TIME_COL, item.getTime());
         cv.put(REPEAT_WKDAY_COL, Util.toWkday(item.getRepeat()));
         cv.put(LOCATION_COL, item.getLocation());
         cv.put(LONGITUDE_COL, 0);
         cv.put(LATITUDE_COL, 0);
+        cv.put(EXPIRE_TIME_COL, item.getValidUntil());
         cv.put(ENABLED_COL, item.isEnabled());
         cv.put(LASTMODIFY_COL, DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.ISO8601));
 
@@ -106,12 +106,13 @@ public class ReminderDAO {
         cv.put(TYPE_COL, item.getReminderType());
         cv.put(TITLE_COL, item.getTitle());
         cv.put(DESC_COL, item.getDescription());
-        cv.put(EXPIRE_TIME_COL, item.getValidUntil());
+        cv.put(IMAGE_PATH_COL, item.getImageUri());
         cv.put(REPEAT_TIME_COL, item.getTime());
         cv.put(REPEAT_WKDAY_COL, Util.toWkday(item.getRepeat()));
         cv.put(LOCATION_COL, item.getLocation());
         cv.put(LONGITUDE_COL, 0);
         cv.put(LATITUDE_COL, 0);
+        cv.put(EXPIRE_TIME_COL, item.getValidUntil());
         cv.put(ENABLED_COL, item.isEnabled());
         cv.put(LASTMODIFY_COL, DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.ISO8601));
 
@@ -180,11 +181,14 @@ public class ReminderDAO {
         result.setReminderType(cursor.getString(1));
         result.setTitle(cursor.getString(2));
         result.setDescription(cursor.getString(3));
-        result.setValidUntil(cursor.getString(4));
+        result.setImageUri(cursor.getString(4));
         result.setTime(cursor.getString(5));
-        result.setRepeat(Util.toRepeat(cursor.getString(6), 7));
+        result.setRepeat(Util.toRepeat(cursor.getString(6), ReminderData.REPEAT_ARRAY_LENGTH));
         result.setLocation(cursor.getString(7));
-        result.setEnabled((cursor.getInt(10))==1);
+        result.setLongitude(cursor.getDouble(8));
+        result.setLattitude(cursor.getDouble(9));
+        result.setValidUntil(cursor.getString(10));
+        result.setEnabled((cursor.getInt(11))==1);
 
         // 回傳結果
         return result;
