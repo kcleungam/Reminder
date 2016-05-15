@@ -51,7 +51,19 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         };
-        reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener);
+        View.OnLongClickListener onLongClickListener = new AdapterView.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(getApplicationContext(), ( (ReminderDataAdapter.RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
+                registerForContextMenu(v);
+                openContextMenu(v);
+                unregisterForContextMenu(v);
+                return true;
+            }
+        };
+        reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout);
+        reminderAdaptor.setOnClickListener(onClickListener);
+        reminderAdaptor.setOnLongClickListener(onLongClickListener);
 
         // 建立資料庫物件
         ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
@@ -66,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             reminderAdaptor.addItem(sample);
         }
         reminderList.setAdapter(reminderAdaptor);
-        registerForContextMenu(reminderList);
+        //registerForContextMenu(reminderList);
     }
 
     @Override
@@ -106,9 +118,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
-        if (v.getId()==R.id.reminder_list) {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-            menu.setHeaderTitle(((ReminderData)reminderList.getAdapter().getItem(info.position)).getTitle());
+        if (v.getTag() instanceof ReminderDataAdapter.RowHandler) {
+            ReminderDataAdapter.RowHandler handler = (ReminderDataAdapter.RowHandler) v.getTag();
+            menu.setHeaderTitle(handler.titleView.getText());
             menu.add(Menu.NONE, 0, 0, "Delete");
         }
         super.onCreateContextMenu(menu, v, menuInfo);

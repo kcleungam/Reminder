@@ -20,6 +20,7 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
     ArrayList<ReminderData> reminderList = new ArrayList<>();
     private View.OnClickListener onClickListener;
+    private View.OnLongClickListener onLongClickListener;
 
     public ReminderDataAdapter(Context context, int resource){
         super(context, resource);
@@ -27,7 +28,6 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
     public ReminderDataAdapter(Context context, int resource, View.OnClickListener onClickListener){
         super(context, resource);
-        this.onClickListener = onClickListener;
     }
 
     public void addItem(ReminderData data){
@@ -90,17 +90,6 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
         handler.titleView.setText(data.getTitle());
         handler.locationView.setText(data.getLocation());
 
-//        row.setOnLongClickListener(new AdapterView.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                // TODO Auto-generated method stub
-//
-//                Toast.makeText(getContext(), ( (RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
-//
-//                return true;
-//            }
-//        });
-
         /*
         View.OnTouchListener onTouchListener = new View.OnTouchListener() {
             @Override
@@ -115,7 +104,16 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
     */
 
         row.setOnClickListener(onClickListener);
+        row.setOnLongClickListener(onLongClickListener);
         return row;
+    }
+
+    public void setOnClickListener(View.OnClickListener onClickListener){
+        this.onClickListener = onClickListener;
+    }
+
+    public void setOnLongClickListener(View.OnLongClickListener onLongClickListener){
+        this.onLongClickListener = onLongClickListener;
     }
 
     public static class RowHandler{
