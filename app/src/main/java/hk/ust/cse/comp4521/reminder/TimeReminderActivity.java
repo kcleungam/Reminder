@@ -57,7 +57,7 @@ public class TimeReminderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         //TODO: turn this into permission listener
-        //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
+        //source:
         for(String requiredPermission:REQUIRED_PERMISSION) {
             Integer value = checkSelfPermission(requiredPermission);
             synchronized (value) {
@@ -95,10 +95,14 @@ public class TimeReminderActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton button, boolean checked) {
                 for (CheckBox box : checkBoxes) {
-                    if(box.isChecked()!=checked)
+                    if(box.isChecked()!=true) {
+                        selectAllButton.setText("Select all");
+                        selectAllButton.setTag(true);
                         return;
+                    }
                 }
-                selectAllButton.setEnabled(checked);
+                selectAllButton.setText("Unselect all");
+                selectAllButton.setTag(false);
             }
         };
         for(CheckBox checkBox: checkBoxes){
@@ -109,11 +113,13 @@ public class TimeReminderActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 for (CheckBox box : checkBoxes) {
-                    box.setChecked(v.isEnabled());
+                    boolean checked = v.getTag().equals(true);
+                    box.setChecked(checked);
                 }
             }
         };
         selectAllButton.setOnClickListener(selectAllListener);
+        selectAllButton.setTag(true);
         locationText = (TextView) layout.findViewById(R.id.editLocation);
         locationButton = (ImageButton) layout.findViewById(R.id.locationButton);
         editDescription = (TextView) layout.findViewById(R.id.editDescription);
