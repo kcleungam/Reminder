@@ -2,48 +2,61 @@ package hk.ust.cse.comp4521.reminder;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     ListView reminderList;
     ReminderDataAdapter reminderAdaptor;
+    private boolean fabMenuShown = false;
+    private int[] fabMenuItems = {R.id.timeReminderFab, R.id.fab_2, R.id.fab_3};
+    private double[][] fabMenuOffsetRatio = {{1.7, 0.25}, {1.5, 1.5}, {0.25, 1.7}};
+    private int[] fabMenuShowAnimation = {R.anim.fab1_show, R.anim.fab2_show, R.anim.fab3_show};
+    private int[] fabMenuHideAnimation = {R.anim.fab1_hide, R.anim.fab2_hide, R.anim.fab3_hide};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.new_activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
 
-        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
+        FloatingActionButton menuFab = (FloatingActionButton)findViewById(R.id.menuFab);
 //        CoordinatorLayout.LayoutParams params =
 //                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
 //        params.setBehavior(new FabHideOnScroll());
-        fab.setOnClickListener(new View.OnClickListener() {
+        menuFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "Fab clicked", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
+                if(fabMenuShown)
+                    hideFabMenu();
+                else
+                    showFabMenu();
+            }
+        });
+        FloatingActionButton timeReminderFab = (FloatingActionButton)findViewById(R.id.timeReminderFab);
+        timeReminderFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
                 startActivity(intent);
+                hideFabMenu();
             }
         });
 
@@ -81,6 +94,34 @@ public class MainActivity extends AppCompatActivity {
             reminderAdaptor.addItem(sample);
         }
         reminderList.setAdapter(reminderAdaptor);
+    }
+
+    private void showFabMenu(){
+        fabMenuShown = true;
+        for(int i=0; i<fabMenuItems.length; i++){
+            FloatingActionButton fab = (FloatingActionButton) findViewById(fabMenuItems[i]);
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab.getLayoutParams();
+            layoutParams.rightMargin += (int) (fab.getWidth() * fabMenuOffsetRatio[i][0]);
+            layoutParams.bottomMargin += (int) (fab.getHeight() * fabMenuOffsetRatio[i][1]);
+            fab.setLayoutParams(layoutParams);
+            Animation show_fab = AnimationUtils.loadAnimation(getApplication(), fabMenuShowAnimation[i]);
+            fab.startAnimation(show_fab);
+            fab.setClickable(true);
+        }
+    }
+
+    private void hideFabMenu(){
+        fabMenuShown = false;
+        for(int i=0; i<fabMenuItems.length; i++){
+            FloatingActionButton fab = (FloatingActionButton) findViewById(fabMenuItems[i]);
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab.getLayoutParams();
+            layoutParams.rightMargin -= (int) (fab.getWidth() * fabMenuOffsetRatio[i][0]);
+            layoutParams.bottomMargin -= (int) (fab.getHeight() * fabMenuOffsetRatio[i][1]);
+            fab.setLayoutParams(layoutParams);
+            Animation hide_fab = AnimationUtils.loadAnimation(getApplication(), fabMenuHideAnimation[i]);
+            fab.startAnimation(hide_fab);
+            fab.setClickable(false);
+        }
     }
 
     @Override

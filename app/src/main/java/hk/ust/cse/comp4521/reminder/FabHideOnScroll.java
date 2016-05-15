@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ListView;
 
 /**
  * Created by Jeffrey on 16/5/2016.
@@ -31,5 +32,21 @@ public class FabHideOnScroll extends FloatingActionButton.Behavior {
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, FloatingActionButton child, View directTargetChild, View target, int nestedScrollAxes) {
         return nestedScrollAxes == ViewCompat.SCROLL_AXIS_VERTICAL;
+    }
+
+    @Override
+    public boolean layoutDependsOn(CoordinatorLayout parent, FloatingActionButton child, View dependency) {
+        return dependency instanceof ListView;
+    }
+
+    @Override
+    public boolean onDependentViewChanged(CoordinatorLayout parent, FloatingActionButton child, View dependency) {
+//        float translationY = getFabTranslationYForSnackbar(parent, child);
+//        float percentComplete = -translationY / dependency.getHeight();
+//        float scaleFactor = 1 - percentComplete;
+//
+//        child.setScaleX(scaleFactor);
+//        child.setScaleY(scaleFactor);
+        return false;
     }
 }
