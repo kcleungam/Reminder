@@ -3,8 +3,11 @@ package hk.ust.cse.comp4521.reminder;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -192,6 +195,7 @@ public class TimeReminderActivity extends AppCompatActivity {
                     reminderDAO.insert(reminderData);
                 else
                     reminderDAO.update(reminderData);
+                setAlarm();
                 finish();
                 break;
             case R.id.action_cancel:
@@ -201,6 +205,32 @@ public class TimeReminderActivity extends AppCompatActivity {
                 return false;
         }
         return true;
+    }
+
+    public void setAlarm(){
+        //使用Calendar指定時間
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(reminderData.getTimeInMillis());
+
+        //建立意圖
+        Intent intent = new Intent();
+
+        //這裡的 this 是指當前的 Activity
+        //AlarmReceiver.class 則是負責接收的 BroadcastReceiver
+        intent.setClass(this, AlarmReceiver.class);
+        intent.putExtra("ReminderId", reminderData.getId());
+
+        //建立待處理意圖
+        PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+
+        //取得AlarmManager
+        AlarmManager alarm = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+
+        //設定一個警報
+        //參數1,我們選擇一個會在指定時間喚醒裝置的警報類型
+        //參數2,將指定的時間以millisecond傳入
+        //參數3,傳入待處理意圖
+        alarm.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pending);
     }
 
     @Override

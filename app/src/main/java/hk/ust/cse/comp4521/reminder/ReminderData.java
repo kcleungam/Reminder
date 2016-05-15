@@ -109,6 +109,10 @@ public class ReminderData implements Serializable{
         return DateTimeParser.toString(time, DateTimeParser.Format.SHORT);
     }
 
+    public long getTimeInMillis(){
+        return time.getTime();
+    }
+
     public void setValidUntil(String time){
         try {
             validUntil = DateTimeParser.toTime(time, DateTimeParser.Format.ISO8601);
