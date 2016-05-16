@@ -11,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -41,6 +44,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
     private int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 100000;
     private boolean fastLocateCurrent = false;
+
+    private EditText editLocation;
+    private EditText editLatLng;
+    private Button searchButton;
+    private LocationData locationData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +56,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         fastLocateCurrent = false;
 
         setContentView(R.layout.activity_maps);
+        editLocation = (EditText) findViewById(R.id.editLocation);
+        editLatLng = (EditText) findViewById(R.id.editLatLng);
+        searchButton = (Button) findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(editLocation.getText().equals("")){
+                    // do nothing
+                }else{
+                    // resolve address and get the location data
+                }
+            }
+        });
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
