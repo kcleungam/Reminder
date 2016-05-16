@@ -52,25 +52,25 @@ public class TimeReminderActivity extends AppCompatActivity {
     // https://www.youtube.com/watch?v=OdcYLOIScOI
 
     @Override
-    @TargetApi(23)
+    //@TargetApi(23)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //TODO: turn this into permission listener
         //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
-        for(String requiredPermission:REQUIRED_PERMISSION) {
-            Integer value = checkSelfPermission(requiredPermission);
-            synchronized (value) {
-                if (value == -1) {
-                    requestPermissions(REQUIRED_PERMISSION, 1);
-                    value = checkSelfPermission(requiredPermission);
-                    if (value == -1) {
-                        finish();
-                        return;
-                    }
-                }
-            }
-        }
+//        for(String requiredPermission:REQUIRED_PERMISSION) {
+//            Integer value = checkSelfPermission(requiredPermission);
+//            synchronized (value) {
+//                if (value == -1) {
+//                    requestPermissions(REQUIRED_PERMISSION, 1);
+//                    value = checkSelfPermission(requiredPermission);
+//                    if (value == -1) {
+//                        finish();
+//                        return;
+//                    }
+//                }
+//            }
+//        }
 
         setContentView(R.layout.edit_time_container);
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.editTimeLayout);
@@ -116,6 +116,16 @@ public class TimeReminderActivity extends AppCompatActivity {
         selectAllButton.setOnClickListener(selectAllListener);
         locationText = (TextView) layout.findViewById(R.id.editLocation);
         locationButton = (ImageButton) layout.findViewById(R.id.locationButton);
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
         editDescription = (TextView) layout.findViewById(R.id.editDescription);
         imageView = (ImageView) layout.findViewById(R.id.imageView);
         ImageView.OnClickListener imageViewListener = new View.OnClickListener() {
@@ -147,14 +157,14 @@ public class TimeReminderActivity extends AppCompatActivity {
             editDescription.setText(reminderData.getDescription());
             locationText.setText(reminderData.getLocation());
             if(reminderData.getImageUri()!=null) {
-                try {
-                    Uri imageUri = Uri.parse(reminderData.getImageUri());
-                    InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                    Bitmap image = BitmapFactory.decodeStream(imageStream);
-                    imageView.setImageBitmap(image);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    Uri imageUri = Uri.parse(reminderData.getImageUri());
+//                    InputStream imageStream = getContentResolver().openInputStream(imageUri);
+//                    Bitmap image = BitmapFactory.decodeStream(imageStream);
+//                    imageView.setImageBitmap(image);
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
     }
@@ -205,15 +215,15 @@ public class TimeReminderActivity extends AppCompatActivity {
                 //Display an error
                 return;
             }
-            try {
-                Uri imageUri = data.getData();
-                InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                imageView.setImageBitmap(selectedImage);
-                reminderData.setImageUri(data.getData().toString());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Uri imageUri = data.getData();
+//                InputStream imageStream = getContentResolver().openInputStream(imageUri);
+//                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+//                imageView.setImageBitmap(selectedImage);
+//                reminderData.setImageUri(data.getData().toString());
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
             //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
         }
     }
