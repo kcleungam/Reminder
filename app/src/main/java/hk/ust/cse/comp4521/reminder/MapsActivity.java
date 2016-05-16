@@ -133,7 +133,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(fastLocateCurrent == false){
             fastLocateCurrent = true;
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 6);   // layer 6 means show details(place) , 1 means show big area(country)
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, (float) 15);   // layer 21 means show details(your home) , 2 means show big area(Earth)
             mMap.animateCamera(cameraUpdate);
 
             if (myMarker != null)
@@ -294,6 +294,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
      @Override
      protected void onPause() {
+
+        fastLocateCurrent = false;
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
         }
@@ -302,6 +304,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onStop() {
+        fastLocateCurrent = false;
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -310,6 +313,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onDestroy() {
+        fastLocateCurrent = false;
 
         super.onDestroy();
     }
