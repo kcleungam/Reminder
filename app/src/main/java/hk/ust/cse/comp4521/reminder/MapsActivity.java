@@ -1,15 +1,26 @@
 package hk.ust.cse.comp4521.reminder;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -20,14 +31,22 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener,
-        GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener, LocationListener, ResultCallback<Status> {
+        GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener, LocationListener, ResultCallback<Status> ,GoogleApiClient.ConnectionCallbacks
+        , GoogleApiClient.OnConnectionFailedListener{
 
     private GoogleMap mMap;
     private Marker myMarker;
-
+    protected GoogleApiClient mGoogleApiClient;
+    protected LocationRequest mLocationRequest;
+    private int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
+    private int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 100000;
+    private boolean fastLocateCurrent = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        buildGoogleApiClient();
+        fastLocateCurrent = false;
+
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -49,11 +68,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        //myLocation =new LatLng ( mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude() );
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
     }
 
     @Override
@@ -109,17 +129,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      // Callback that fires when the location changes.
     @Override
     public void onLocationChanged(Location location) {
+        Toast.makeText(this,"OnLocation Changed", Toast.LENGTH_LONG).show();
+        if(fastLocateCurrent == false){
+            fastLocateCurrent = true;
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 6);   // layer 6 means show details(place) , 1 means show big area(country)
+            mMap.animateCamera(cameraUpdate);
 
-        if (myMarker != null)
-            myMarker.remove();
+            if (myMarker != null)
+                myMarker.remove();
 
-        MarkerOptions markCur = new MarkerOptions()
-                .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.walking_man))
-                .title("Current_Location");
+            MarkerOptions markCur = new MarkerOptions()
+                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pink_stick_man))
+                    .title("Current_Location");
 
-        myMarker = mMap.addMarker(markCur);
+            myMarker = mMap.addMarker(markCur);
+        } else {
+            // do nothing, we don't want the camera of map move when user search for location
+        }
+
     }
+
 
     /**
      * Runs when the result of calling addGeofences() and removeGeofences() becomes available.
@@ -134,5 +165,152 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onResult(Status status) {
 
+    }
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Toast.makeText(this,"On connected", Toast.LENGTH_LONG).show();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation != null) {
+            String message = "Last Location is: " +
+                    "  Latitude = " + String.valueOf(mLastLocation.getLatitude()) +
+                    "  Longitude = " + String.valueOf(mLastLocation.getLongitude());
+
+//            mLocationOutput = message;
+            Log.i("Fuck", message);
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this,"No location detected", Toast.LENGTH_LONG).show();
+        }
+
+        // Determine whether a Geocoder is available.
+        if (!Geocoder.isPresent()) {
+            Toast.makeText(this, "No geocoder available", Toast.LENGTH_LONG).show();
+            return;
+        }
+        // It is possible that the user presses the button to get the address before the
+        // GoogleApiClient object successfully connects. In such a case, mAddressRequested
+        // is set to true, but no attempt is made to fetch the address (see
+        // fetchAddressButtonHandler()) . Instead, we start the intent service here if the
+        // user has requested an address, since we now have a connection to GoogleApiClient.
+//        if (mAddressRequested) {
+//            startIntentService(mLastLocation);
+//        }
+
+//        if (!mRequestingLocationUpdates) {
+//            mRequestingLocationUpdates = true;
+            startLocationUpdates();
+//        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+        mGoogleApiClient.connect();
+    }
+
+
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        createLocationRequest();
+    }
+
+
+    protected void createLocationRequest() {
+        Toast.makeText(this,"create location request", Toast.LENGTH_LONG).show();
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+    }
+
+
+    protected void startLocationUpdates() {
+        // The final argument to {@code requestLocationUpdates()} is a LocationListener
+        // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
+
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    protected void onStart() {
+        fastLocateCurrent = false;
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onRestart() {
+        fastLocateCurrent = false;
+        super.onRestart();
+    }
+
+    @Override
+    protected void onResume() {
+        Toast.makeText(this,"onResume", Toast.LENGTH_LONG).show();
+        fastLocateCurrent = false;
+        super.onResume();
+        if (mGoogleApiClient.isConnected()) {
+            startLocationUpdates();
+        }
+    }
+
+     @Override
+     protected void onPause() {
+        if (mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
     }
 }
