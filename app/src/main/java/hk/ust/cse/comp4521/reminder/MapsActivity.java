@@ -1,21 +1,29 @@
 package hk.ust.cse.comp4521.reminder;
 
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener,
+        GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener, LocationListener, ResultCallback<Status> {
 
     private GoogleMap mMap;
+    private Marker myMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,5 +78,61 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return false;
         }
         return true;
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return false;
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+
+    }
+
+
+     // Callback that fires when the location changes.
+    @Override
+    public void onLocationChanged(Location location) {
+
+        if (myMarker != null)
+            myMarker.remove();
+
+        MarkerOptions markCur = new MarkerOptions()
+                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.walking_man))
+                .title("Current_Location");
+
+        myMarker = mMap.addMarker(markCur);
+    }
+
+    /**
+     * Runs when the result of calling addGeofences() and removeGeofences() becomes available.
+     * Either method can complete successfully or with an error.
+     *
+     * Since this activity implements the {@link com.google.android.gms.common.api.ResultCallback} interface, we are required to
+     * define this method.
+     *
+     * @param status The Status returned through a PendingIntent when addGeofences() or
+     *               removeGeofences() get called.
+     */
+    @Override
+    public void onResult(Status status) {
+
     }
 }
