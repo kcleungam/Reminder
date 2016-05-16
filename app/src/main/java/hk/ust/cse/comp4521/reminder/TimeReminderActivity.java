@@ -229,7 +229,8 @@ public class TimeReminderActivity extends AppCompatActivity {
     public void setAlarm(){
         //使用Calendar指定時間
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(reminderData.getTimeInMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, DateTimeParser.toHour(reminderData.getTimeInMillis()));
+        calendar.set(Calendar.MINUTE, DateTimeParser.toMin(reminderData.getTimeInMillis()));
 
         //建立意圖
         Intent intent = new Intent();
@@ -249,7 +250,13 @@ public class TimeReminderActivity extends AppCompatActivity {
         //參數1,我們選擇一個會在指定時間喚醒裝置的警報類型
         //參數2,將指定的時間以millisecond傳入
         //參數3,傳入待處理意圖
-        alarm.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pending);
+//        for(int i=0; i<reminderData.getRepeat().length; i++) {
+//            if(!reminderData.getRepeat()[i])
+//                continue;
+//            calendar.set(Calendar.DAY_OF_WEEK, i+1);
+//            alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pending);
+//        }
+        alarm.set(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis(), pending);
     }
 
     @Override
