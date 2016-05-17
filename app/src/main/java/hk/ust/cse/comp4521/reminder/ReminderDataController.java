@@ -1,5 +1,6 @@
 package hk.ust.cse.comp4521.reminder;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -17,6 +18,7 @@ public class ReminderDataController {
     private static Context context;
     private ReminderDAO reminderDAO;
 
+    //singleton pattern, no public constructor
     private ReminderDataController(){
 
     }
@@ -55,7 +57,9 @@ public class ReminderDataController {
     }
 
     public ReminderData addReminder(ReminderData reminderData){
-        return reminderDAO.insert(reminderData);
+        reminderDAO.insert(reminderData);
+        setAlarm(reminderData);
+        return reminderData;
     }
 
     public boolean deleteReminder(long reminderId){
@@ -75,6 +79,7 @@ public class ReminderDataController {
         return false;
     }
 
+    @TargetApi(19)
     private void setAlarm(ReminderData reminderData){
         //使用Calendar指定時間
         Calendar calendar = Calendar.getInstance();
@@ -91,8 +96,6 @@ public class ReminderDataController {
         // Now create and schedule a new Alarm
         Intent intent = new Intent(context, AlarmReceiver.class); // New component for alarm
         intent.putExtra("ReminderId", reminderData.getId());
-        //TODO: unsafe long to int conversion
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         //設定一個警報
         //參數1,我們選擇一個會在指定時間喚醒裝置的警報類型
@@ -101,12 +104,18 @@ public class ReminderDataController {
         if(reminderData.noRepeat()) { //if no repeat, alarm time closet future moment that met the input HH;mm
             if(calendar.before(Calendar.getInstance()))
                 calendar.add(Calendar.DATE, 1);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            //TODO: unsafe long to int conversion
+            intent.putExtra("NotificationId", reminderData.getId()*7);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }else{ //if repeats, alarms every day-of-week
             for (int i = 0; i < reminderData.getRepeat().length; i++) {
                 if (!reminderData.getRepeat()[i])
                     continue;
                 calendar.set(Calendar.DAY_OF_WEEK, i + 1);
+                //TODO: unsafe long to int conversion
+                intent.putExtra("NotificationId", reminderData.getId()*7+i);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7+i, intent, PendingIntent.FLAG_CANCEL_CURRENT);
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
             }
         }

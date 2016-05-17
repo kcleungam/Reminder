@@ -146,8 +146,8 @@ public class ReminderData implements Serializable{
     public boolean noRepeat(){
         for(int i=0; i<repeat.length; i++)
             if(repeat[i])
-                return true;
-        return false;
+                return false;
+        return true;
     }
 
     public void setEnabled(boolean enabled){

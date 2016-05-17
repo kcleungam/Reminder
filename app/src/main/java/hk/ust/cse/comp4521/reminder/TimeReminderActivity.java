@@ -259,7 +259,7 @@ public class TimeReminderActivity extends AppCompatActivity {
         switch (id) {
             case R.id.timeButton:
                 // set time picker as current time
-                if(reminderData!=null) {
+                if(reminderData.getId()!=-1) {
                     timePickerDialog = new TimePickerDialog(this, onTimeSetListener, DateTimeParser.toHour(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()), true);
                 }else{
                     Calendar now = Calendar.getInstance();
