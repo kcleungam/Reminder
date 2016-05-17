@@ -109,6 +109,10 @@ public class ReminderData implements Serializable{
         return DateTimeParser.toString(time, DateTimeParser.Format.SHORT);
     }
 
+    public long getTimeInMillis(){
+        return time.getTime();
+    }
+
     public void setValidUntil(String time){
         try {
             validUntil = DateTimeParser.toTime(time, DateTimeParser.Format.ISO8601);
@@ -137,6 +141,13 @@ public class ReminderData implements Serializable{
     //TODO: no more object reference
     public boolean[] getRepeat(){
         return repeat;
+    }
+
+    public boolean noRepeat(){
+        for(int i=0; i<repeat.length; i++)
+            if(repeat[i])
+                return false;
+        return true;
     }
 
     public void setEnabled(boolean enabled){

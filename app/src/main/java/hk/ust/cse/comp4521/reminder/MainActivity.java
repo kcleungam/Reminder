@@ -8,21 +8,19 @@ import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,13 +33,17 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
     ListView reminderList;
     ReminderDataAdapter reminderAdaptor;
+    ReminderDataAdapter.RowHandler rowOnSelected;
+    private boolean fabMenuShown = false;
+    private int[] fabMenuItems = {R.id.timeReminderFab, R.id.fab_2, R.id.fab_3};
+    private double[][] fabMenuOffsetRatio = {{1.7, 0.25}, {1.5, 1.5}, {0.25, 1.7}};
+    private int[] fabMenuShowAnimation = {R.anim.fab1_show, R.anim.fab2_show, R.anim.fab3_show};
+    private int[] fabMenuHideAnimation = {R.anim.fab1_hide, R.anim.fab2_hide, R.anim.fab3_hide};
 
     protected LocationRequest mLocationRequest;
     private int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
@@ -54,21 +56,30 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.new_activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
 
-        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-//        CoordinatorLayout.LayoutParams params =
-//                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-//        params.setBehavior(new FabHideOnScroll());
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton menuFab = (FloatingActionButton)findViewById(R.id.menuFab);
+        menuFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "Fab clicked", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
+                if(fabMenuShown)
+                    hideFabMenu();
+                else
+                    showFabMenu();
+            }
+        });
+        FloatingActionButton timeReminderFab = (FloatingActionButton)findViewById(R.id.timeReminderFab);
+        timeReminderFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
                 startActivity(intent);
+                hideFabMenu();
             }
         });
 
@@ -84,28 +95,27 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         View.OnLongClickListener onLongClickListener = new AdapterView.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(getApplicationContext(), ( (ReminderDataAdapter.RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
-                registerForContextMenu(v);
-                openContextMenu(v);
-                unregisterForContextMenu(v);
+                rowOnSelected = (ReminderDataAdapter.RowHandler) v.getTag();
+                openContextMenu(reminderList);
                 return true;
             }
         };
         reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener, onLongClickListener);
 
         // 建立資料庫物件
-        ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
+        ReminderDataController.setContext(getApplicationContext());
         // 如果資料庫是空的，就建立一些範例資料
         // 這是為了方便測試用的，完成應用程式以後可以拿掉
-        if (reminderDAO.getCount() == 0) {
-            reminderDAO.sample();
+        if (ReminderDataController.getInstance().getCount() == 0) {
+            ReminderDataController.getInstance().sample();
         }
         // 取得所有記事資料
-        ArrayList<ReminderData> reminders = reminderDAO.getAll();
+        ArrayList<ReminderData> reminders = ReminderDataController.getInstance().getAll();
         for(ReminderData sample:reminders){
             reminderAdaptor.addItem(sample);
         }
         reminderList.setAdapter(reminderAdaptor);
+
 //        for(int i = 0; i < reminderList.getChildCount(); i++){
 //            ReminderDataAdapter.RowHandler rowHandler = ((ReminderDataAdapter.RowHandler) reminderList.getChildAt(i).getTag());
 //            ReminderData reminderData = reminderDAO.get(rowHandler.reminderId);
@@ -117,17 +127,47 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         mGeofenceList = new ArrayList<Geofence>();
 
         buildGoogleApiClient();
+        registerForContextMenu(reminderList);
+
+//        CoordinatorLayout.LayoutParams params =
+//                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+//        params.setBehavior(new FabHideOnScroll());
+    }
+
+    private void showFabMenu(){
+        fabMenuShown = true;
+        for(int i=0; i<fabMenuItems.length; i++){
+            FloatingActionButton fab = (FloatingActionButton) findViewById(fabMenuItems[i]);
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab.getLayoutParams();
+            layoutParams.rightMargin += (int) (fab.getWidth() * fabMenuOffsetRatio[i][0]);
+            layoutParams.bottomMargin += (int) (fab.getHeight() * fabMenuOffsetRatio[i][1]);
+            fab.setLayoutParams(layoutParams);
+            Animation show_fab = AnimationUtils.loadAnimation(getApplication(), fabMenuShowAnimation[i]);
+            fab.startAnimation(show_fab);
+            fab.setClickable(true);
+        }
+    }
+
+    private void hideFabMenu(){
+        fabMenuShown = false;
+        for(int i=0; i<fabMenuItems.length; i++){
+            FloatingActionButton fab = (FloatingActionButton) findViewById(fabMenuItems[i]);
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) fab.getLayoutParams();
+            layoutParams.rightMargin -= (int) (fab.getWidth() * fabMenuOffsetRatio[i][0]);
+            layoutParams.bottomMargin -= (int) (fab.getHeight() * fabMenuOffsetRatio[i][1]);
+            fab.setLayoutParams(layoutParams);
+            Animation hide_fab = AnimationUtils.loadAnimation(getApplication(), fabMenuHideAnimation[i]);
+            fab.startAnimation(hide_fab);
+            fab.setClickable(false);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
         reminderAdaptor.clear();
-        ArrayList<ReminderData> reminders = reminderDAO.getAll();
-        for(ReminderData sample:reminders){
-            reminderAdaptor.addItem(sample);
-        }
+        for(ReminderData reminderData:ReminderDataController.getInstance().getAll())
+            reminderAdaptor.add(reminderData);
         reminderAdaptor.notifyDataSetChanged();
     }
 
@@ -156,9 +196,8 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
-        if (v.getTag() instanceof ReminderDataAdapter.RowHandler) {
-            ReminderDataAdapter.RowHandler handler = (ReminderDataAdapter.RowHandler) v.getTag();
-            menu.setHeaderTitle(handler.titleView.getText());
+        if (v instanceof ListView) {
+            menu.setHeaderTitle(rowOnSelected.titleView.getText());
             menu.add(Menu.NONE, 0, 0, "Delete");
         }
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -167,11 +206,11 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if(item.getTitle().equals("Delete")){
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-            ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
-            ReminderDataAdapter.RowHandler handler = (ReminderDataAdapter.RowHandler) info.targetView.getTag();
-            reminderDAO.delete(handler.reminderId);
-            Toast.makeText(MainActivity.this, "Reminder "+handler.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
+            ReminderDataController.getInstance().deleteReminder(rowOnSelected.reminderId);
+            Toast.makeText(MainActivity.this, "Reminder "+rowOnSelected.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
+            reminderAdaptor.clear();
+            for(ReminderData reminderData:ReminderDataController.getInstance().getAll())
+                reminderAdaptor.add(reminderData);
             reminderAdaptor.notifyDataSetChanged();
         }
         return true;
