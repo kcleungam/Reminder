@@ -88,7 +88,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         editLatLng.setText(latString + "," + longString);
 
                         LatLng latLng = new LatLng(addressesList.get(0).getLatitude(), addressesList.get(0).getLongitude());
-                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, (float) 15);   // layer 21 means show details(your home) , 2 means show big area(Earth)
+                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, (float) 16);   // layer 21 means show details(your home) , 2 means show big area(Earth)
                         mMap.animateCamera(cameraUpdate);
 
                     } catch (Exception f){
