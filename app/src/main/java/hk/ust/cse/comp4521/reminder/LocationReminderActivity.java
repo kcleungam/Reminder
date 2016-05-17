@@ -2,20 +2,16 @@ package hk.ust.cse.comp4521.reminder;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -23,7 +19,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.util.Arrays;
 import java.util.Calendar;
 
 public class LocationReminderActivity extends AppCompatActivity {
@@ -31,9 +26,7 @@ public class LocationReminderActivity extends AppCompatActivity {
     private TextView editTitle;
     private TextView editTime;
     private TextView editDate;
-    private ImageButton timeButton;
-    private CheckBox[] checkBoxes;
-    private Button selectAllButton;
+//    private ImageButton timeButton;
     private TextView locationText;
     private ImageButton locationButton;
     private TextView editDescription;
@@ -42,8 +35,6 @@ public class LocationReminderActivity extends AppCompatActivity {
     private static final String[] REQUIRED_PERMISSION = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private static final int PICK_IMAGE = 1;
     public static final int RETURN_LOCATION = 2;
-    private TimePickerDialog timePickerDialog;
-
 
     // try this to make time picker
     // https://www.youtube.com/watch?v=OdcYLOIScOI
@@ -69,21 +60,26 @@ public class LocationReminderActivity extends AppCompatActivity {
 //            }
 //        }
 
-
         setContentView(R.layout.edit_location_container);
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.editLocationLayout);
         editTitle = (TextView) layout.findViewById(R.id.editTitle);
         editDate=(TextView)layout.findViewById(R.id.editDate);
-        editTime = (TextView) layout.findViewById(R.id.editTime);
-        timeButton = (ImageButton) layout.findViewById(R.id.timeButton);
-        timeButton.setOnClickListener(new View.OnClickListener() {
+        editDate.setText(DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.DATE));
+        editDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(R.id.timeButton);
+                showDialog(R.id.editDate);
             }
         });
-
-
+        editTime = (TextView) layout.findViewById(R.id.editTime);
+        editTime.setText(DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.SHORT));
+        editTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(R.id.editTime);
+            }
+        });
+//        timeButton = (ImageButton) layout.findViewById(R.id.timeButton);
         locationText = (TextView) layout.findViewById(R.id.editLocation);
         locationButton = (ImageButton) layout.findViewById(R.id.locationButton);
         locationButton.setOnClickListener(new View.OnClickListener() {
@@ -93,9 +89,6 @@ public class LocationReminderActivity extends AppCompatActivity {
                 startActivityForResult(intent, RETURN_LOCATION);
             }
         });
-
-
-
         editDescription = (TextView) layout.findViewById(R.id.editDescription);
         imageView = (ImageView) layout.findViewById(R.id.imageView);
         ImageView.OnClickListener imageViewListener = new View.OnClickListener() {
@@ -156,11 +149,10 @@ public class LocationReminderActivity extends AppCompatActivity {
                     Toast.makeText(LocationReminderActivity.this, "Empty time", Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                reminderData.setReminderType("Time");
+                reminderData.setReminderType(ReminderData.ReminderType.Location);
                 reminderData.setTitle(editTitle.getText().toString());
-                reminderData.setTime(editTime.getText().toString());
-               //TODO: change the GUI
-                //reminderData.setValidUntil();
+                reminderData.setValidUntilTime(editTime.getText().toString());
+                reminderData.setValidUntilDate(editDate.getText().toString());
                 reminderData.setLocation(locationText.getText().toString());
                 reminderData.setDescription(editDescription.getText().toString());
                 if (reminderData.getId() < 0) {
@@ -205,7 +197,7 @@ public class LocationReminderActivity extends AppCompatActivity {
                 String locationName = data.getStringExtra("locationName");
                 double latitude = data.getDoubleExtra("latitude", -999);
                 double longitude = data.getDoubleExtra("longitude", -999);
-                reminderData.setLocation(locationName);
+                locationText.setText(locationName);
                 reminderData.setLatitude(latitude);
                 reminderData.setLongitude(longitude);
             } catch (Exception f){
@@ -229,8 +221,9 @@ public class LocationReminderActivity extends AppCompatActivity {
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
-            case R.id.timeButton:
+            case R.id.editTime:
                 // set time picker as current time
+                TimePickerDialog timePickerDialog;
                 if(reminderData.getId()!=-1) {
                     timePickerDialog = new TimePickerDialog(this, onTimeSetListener, DateTimeParser.toHour(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()), true);
                 }else{
@@ -238,7 +231,16 @@ public class LocationReminderActivity extends AppCompatActivity {
                     timePickerDialog = new TimePickerDialog(this, onTimeSetListener, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true);
                 }
                 return timePickerDialog;
-
+            case R.id.editDate:
+                // set date picker as current time
+                DatePickerDialog datePickerDialog;
+                if(reminderData.getId()!=-1) {
+                    datePickerDialog = new DatePickerDialog(this, onDateSetListener, DateTimeParser.toYear(reminderData.getTimeInMillis()), DateTimeParser.toMonth(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()));
+                }else{
+                    Calendar now = Calendar.getInstance();
+                    datePickerDialog = new DatePickerDialog(this, onDateSetListener, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+                }
+                return datePickerDialog;
         }
         return null;
     }
@@ -250,6 +252,17 @@ public class LocationReminderActivity extends AppCompatActivity {
             now.set(Calendar.HOUR_OF_DAY, hourOfDay);
             now.set(Calendar.MINUTE, min);
             editTime.setText(DateTimeParser.toString(now.getTimeInMillis(), DateTimeParser.Format.SHORT));
+        }
+    };
+
+    private DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener(){
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            Calendar now = Calendar.getInstance();
+            now.set(Calendar.YEAR, year);
+            now.set(Calendar.MONTH, monthOfYear);
+            now.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            editDate.setText(DateTimeParser.toString(now.getTimeInMillis(), DateTimeParser.Format.DATE));
         }
     };
 }

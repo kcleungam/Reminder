@@ -71,7 +71,7 @@ public class ReminderDAO {
 
         // 加入ContentValues物件包裝的新增資料
         // 第一個參數是欄位名稱， 第二個參數是欄位的資料
-        cv.put(TYPE_COL, item.getReminderType());
+        cv.put(TYPE_COL, item.getReminderType().name());
         cv.put(TITLE_COL, item.getTitle());
         cv.put(DESC_COL, item.getDescription());
         cv.put(IMAGE_PATH_COL, item.getImageUri());
@@ -103,7 +103,7 @@ public class ReminderDAO {
 
         // 加入ContentValues物件包裝的修改資料
         // 第一個參數是欄位名稱， 第二個參數是欄位的資料
-        cv.put(TYPE_COL, item.getReminderType());
+        cv.put(TYPE_COL, item.getReminderType().name());
         cv.put(TITLE_COL, item.getTitle());
         cv.put(DESC_COL, item.getDescription());
         cv.put(IMAGE_PATH_COL, item.getImageUri());
@@ -178,7 +178,7 @@ public class ReminderDAO {
         ReminderData result = new ReminderData();
 
         result.setId(cursor.getLong(0));
-        result.setReminderType(cursor.getString(1));
+        result.setReminderType(ReminderData.ReminderType.valueOf(cursor.getString(1)));
         result.setTitle(cursor.getString(2));
         result.setDescription(cursor.getString(3));
         result.setImageUri(cursor.getString(4));
@@ -213,7 +213,7 @@ public class ReminderDAO {
             data.setTitle("sample"+i);
             data.setLocation("location"+i);
             data.setEnabled(i%2==0);
-            data.setReminderType("Time");
+            data.setReminderType(ReminderData.ReminderType.Time);
             data.setDescription("general description");
             Calendar time = Calendar.getInstance();
             time.set(Calendar.DATE, i);

@@ -2,5 +2,6 @@
     <string name="app_name">Reminder</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_maps">Map</string>
-    <string name="title_activity_location_reminder">LocationReminderActivity</string>
+    <string name="title_activity_location_reminder">Location Reminder</string>
+    <string name="title_activity_time_reminder">Time Reminder</string>
 </resources>

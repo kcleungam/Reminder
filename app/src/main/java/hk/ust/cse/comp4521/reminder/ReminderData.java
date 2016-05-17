@@ -1,6 +1,7 @@
 package hk.ust.cse.comp4521.reminder;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.sql.Time;
 import java.text.ParseException;
 
@@ -25,7 +26,6 @@ public class ReminderData implements Serializable{
     private Double latitude = null;
     private Time validUntil = null;                     // location event may valid until a certain time
     private boolean enabled = false;
-    // Image
 
     public ReminderData(){
 
@@ -60,16 +60,12 @@ public class ReminderData implements Serializable{
         return this.id;
     }
 
-    public String getReminderType(){
-        return this.reminderType.name();
+    public ReminderType getReminderType(){
+        return reminderType;
     }
 
-    public void setReminderType(String reminderType){
-        try {
-            this.reminderType = ReminderType.valueOf(reminderType);
-        }catch(Exception e){
-            this.reminderType = null;
-        }
+    public void setReminderType(ReminderType reminderType){
+        this.reminderType = reminderType;
     }
 
     public void setTitle(String title){
@@ -130,6 +126,27 @@ public class ReminderData implements Serializable{
 
     public String getValidUntilTime(){
         return DateTimeParser.toString(validUntil, DateTimeParser.Format.SHORT);
+    }
+
+    public void setValidUntilTime(String time){
+        try {
+            long t = DateTimeParser.toLong(time, DateTimeParser.Format.SHORT);
+            validUntil.setHours(DateTimeParser.toHour(t));
+            validUntil.setMinutes(DateTimeParser.toMin(t));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setValidUntilDate(String date){
+        try {
+            long t = DateTimeParser.toLong(date, DateTimeParser.Format.DATE);
+            validUntil.setDate(DateTimeParser.toDay(t));
+            validUntil.setMonth(DateTimeParser.toMonth(t));
+            validUntil.setYear(DateTimeParser.toYear(t));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     //TODO: no more object reference

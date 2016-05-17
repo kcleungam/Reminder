@@ -39,8 +39,6 @@ public class TimeReminderActivity extends AppCompatActivity {
     private static final String[] REQUIRED_PERMISSION = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private static final int PICK_IMAGE = 1;
     public static final int RETURN_LOCATION = 2;
-    private TimePickerDialog timePickerDialog;
-
 
     // try this to make time picker
     // https://www.youtube.com/watch?v=OdcYLOIScOI
@@ -71,6 +69,12 @@ public class TimeReminderActivity extends AppCompatActivity {
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.editTimeLayout);
         editTitle = (TextView) layout.findViewById(R.id.editTitle);
         editTime = (TextView) layout.findViewById(R.id.editTime);
+        editTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(R.id.editTime);
+            }
+        });
         timeButton = (ImageButton) layout.findViewById(R.id.timeButton);
         timeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,7 +202,7 @@ public class TimeReminderActivity extends AppCompatActivity {
                     Toast.makeText(TimeReminderActivity.this, "Empty time", Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                reminderData.setReminderType("Time");
+                reminderData.setReminderType(ReminderData.ReminderType.Time);
                 reminderData.setTitle(editTitle.getText().toString());
                 reminderData.setTime(editTime.getText().toString());
                 boolean[] repeat = new boolean[checkBoxes.length];
@@ -250,7 +254,7 @@ public class TimeReminderActivity extends AppCompatActivity {
                 String locationName = data.getStringExtra("locationName");
                 double latitude = data.getDoubleExtra("latitude", -999);
                 double longitude = data.getDoubleExtra("longitude", -999);
-                reminderData.setLocation(locationName);
+                locationText.setText(locationName);
                 reminderData.setLatitude(latitude);
                 reminderData.setLongitude(longitude);
             } catch (Exception f){
@@ -275,7 +279,9 @@ public class TimeReminderActivity extends AppCompatActivity {
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case R.id.timeButton:
+            case R.id.editTime:
                 // set time picker as current time
+                TimePickerDialog timePickerDialog;
                 if(reminderData.getId()!=-1) {
                     timePickerDialog = new TimePickerDialog(this, onTimeSetListener, DateTimeParser.toHour(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()), true);
                 }else{

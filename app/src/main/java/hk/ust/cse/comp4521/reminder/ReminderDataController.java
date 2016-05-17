@@ -27,6 +27,11 @@ public class ReminderDataController {
         if(instance==null) {
             instance = new ReminderDataController();
             instance.reminderDAO = new ReminderDAO(context);
+            // 如果資料庫是空的，就建立一些範例資料
+            // 這是為了方便測試用的，完成應用程式以後可以拿掉
+            if (instance.getCount() == 0) {
+                instance.sample();
+            }
         }
         return instance;
     }
@@ -49,16 +54,32 @@ public class ReminderDataController {
 
     public ReminderData addReminder(ReminderData reminderData){
         reminderDAO.insert(reminderData);
-        if(reminderData.isEnabled())
-            setAlarm(reminderData);
+        if(reminderData.isEnabled()) {
+            if (reminderData.isEnabled()) {
+                switch (reminderData.getReminderType()) {
+                    case Location:
+                        break;
+                    case Time:
+                        setAlarm(reminderData);
+                        break;
+                }
+            }
+        }
         return reminderData;
     }
 
     public boolean putReminder(ReminderData reminderData){
         if(reminderDAO.update(reminderData)) {
             deleteAlarm(reminderData.getId());
-            if(reminderData.isEnabled())
-                setAlarm(reminderData);
+            if(reminderData.isEnabled()) {
+                switch (reminderData.getReminderType()) {
+                    case Location:
+                        break;
+                    case Time:
+                        setAlarm(reminderData);
+                        break;
+                }
+            }
             return true;
         }else
             return false;

@@ -72,6 +72,7 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
         }
         ReminderData data = getItem(position);
         handler.reminderId = data.getId();
+        handler.reminderType = data.getReminderType();
         handler.enabledSwitch.setChecked(data.isEnabled());
         handler.timeView.setText(data.getTime());
         handler.titleView.setText(data.getTitle());
@@ -81,7 +82,6 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // do something, the isChecked will be
                 // true if the switch is in the On position
-                long id = ( (ReminderDataAdapter.RowHandler) buttonView.getTag() ).reminderId;
                 ReminderData data = getItem(position);
                 data.setEnabled(isChecked);
                 ReminderDataController.getInstance().putReminder(data);
@@ -94,6 +94,7 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
     public static class RowHandler{
         long reminderId;
+        ReminderData.ReminderType reminderType;
         TextView titleView;
         TextView locationView;
         TextView timeView;

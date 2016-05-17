@@ -46,8 +46,8 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     private int[] fabMenuHideAnimation = {R.anim.fab1_hide, R.anim.fab2_hide, R.anim.fab3_hide};
 
     protected LocationRequest mLocationRequest;
-    private int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
-    private int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 100000;
+    private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
+    private final static int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 100000;
     protected GoogleApiClient mGoogleApiClient;
     protected ArrayList<Geofence> mGeofenceList;
     private boolean mGeofencesAdded = false;
@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
 
         FloatingActionButton menuFab = (FloatingActionButton)findViewById(R.id.menuFab);
@@ -95,8 +95,17 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
                 long id = ( (ReminderDataAdapter.RowHandler) v.getTag() ).reminderId;
+                ReminderData.ReminderType reminderType = ( (ReminderDataAdapter.RowHandler) v.getTag() ).reminderType;
+                Intent intent = null;
+                switch(reminderType){
+                    case Location:
+                        intent = new Intent(getApplicationContext(), LocationReminderActivity.class);
+                        break;
+                    case Time:
+                        intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
+                        break;
+                }
                 intent.putExtra("ReminderDataId", id);
                 startActivity(intent);
             }
@@ -113,11 +122,6 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
 
         // 建立資料庫物件
         ReminderDataController.setContext(getApplicationContext());
-        // 如果資料庫是空的，就建立一些範例資料
-        // 這是為了方便測試用的，完成應用程式以後可以拿掉
-        if (ReminderDataController.getInstance().getCount() == 0) {
-            ReminderDataController.getInstance().sample();
-        }
         // 取得所有記事資料
         ArrayList<ReminderData> reminders = ReminderDataController.getInstance().getAll();
         for(ReminderData sample:reminders){
