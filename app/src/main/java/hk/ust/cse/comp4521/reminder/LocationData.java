@@ -8,6 +8,8 @@ public class LocationData {
     double latitude;
     double longitude;
 
+    public LocationData(){}
+
     public LocationData(String name, double latitude, double longitude){
         this.name = name;
         this.latitude = latitude;

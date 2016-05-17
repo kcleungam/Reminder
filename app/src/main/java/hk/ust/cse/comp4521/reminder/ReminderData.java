@@ -25,7 +25,7 @@ public class ReminderData implements Serializable{
     private Double lattitude = null;
     private Time validUntil = null;                     // location event may valid until a certain time
     private boolean enabled = false;
-    // Location
+    private LocationData locationData = null;       // TODO please store this and make constructor and setting method etc
     // Image
 
     public ReminderData(){

@@ -1,6 +1,8 @@
 package hk.ust.cse.comp4521.reminder;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
@@ -92,8 +94,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, (float) 16);   // layer 21 means show details(your home) , 2 means show big area(Earth)
                         mMap.animateCamera(cameraUpdate);
 
+                        locationData = new LocationData(locationText, addressesList.get(0).getLatitude(), addressesList.get(0).getLongitude());
+
+                        if(targetMarker != null){
+                            targetMarker.remove();
+                        }
+                        MarkerOptions markCur = new MarkerOptions().position(latLng).title("Target").icon(BitmapDescriptorFactory.defaultMarker());
+                        targetMarker = mMap.addMarker(markCur);
+
                     } catch (Exception f){
-                        f.printStackTrace();
+                        Toast.makeText(getApplicationContext(),"Fail to resolve address", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -141,7 +151,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         switch (item_id) {
             case R.id.location_save:
-
+                if(locationData.equals(null)){
+                    Toast.makeText(this,"Please specify location", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
+                    intent.putExtra("locationName", locationData.getName());
+                    intent.putExtra("latitude", locationData.getLatitude());
+                    intent.putExtra("longitude", locationData.getLongitude());
+                    setResult(Activity.RESULT_OK, intent);
+                    finish();
+                }
                 break;
 
             case R.id.location_cancel:
@@ -172,6 +191,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 editLocation.setText(stringBuilder.toString());
+
+                locationData = null;
+                locationData = new LocationData(stringBuilder.toString(), latLng.latitude, latLng.longitude);
+
             }
             String latString = Double.toString(addressesList.get(0).getLatitude());
             String longString = Double.toString(addressesList.get(0).getLongitude());
@@ -212,7 +235,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      // Callback that fires when the location changes.
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(this,"OnLocation Changed", Toast.LENGTH_LONG).show();
+        Toast.makeText(this,"OnLocation Changed", Toast.LENGTH_SHORT).show();
         if(fastLocateCurrent == false){
             fastLocateCurrent = true;
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -253,7 +276,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onConnected(Bundle bundle) {
-        Toast.makeText(this,"On connected", Toast.LENGTH_LONG).show();
+        Toast.makeText(this,"On connected", Toast.LENGTH_SHORT).show();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -272,15 +295,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     "  Longitude = " + String.valueOf(mLastLocation.getLongitude());
 
 //            mLocationOutput = message;
-            Log.i("Fuck", message);
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this,"No location detected", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"No location detected", Toast.LENGTH_SHORT).show();
         }
 
         // Determine whether a Geocoder is available.
         if (!Geocoder.isPresent()) {
-            Toast.makeText(this, "No geocoder available", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No geocoder available", Toast.LENGTH_SHORT).show();
             return;
         }
         // It is possible that the user presses the button to get the address before the
@@ -317,7 +339,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     protected void createLocationRequest() {
-        Toast.makeText(this,"create location request", Toast.LENGTH_LONG).show();
+        Toast.makeText(this,"create location request", Toast.LENGTH_SHORT).show();
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
@@ -367,7 +389,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onResume() {
-        Toast.makeText(this,"onResume", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this,"onResume", Toast.LENGTH_SHORT).show();
         fastLocateCurrent = false;
         super.onResume();
         if (mGoogleApiClient.isConnected()) {

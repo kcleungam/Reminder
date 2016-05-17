@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -43,9 +44,12 @@ public class TimeReminderActivity extends AppCompatActivity {
 
     private static final String[] REQUIRED_PERMISSION = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private static final int PICK_IMAGE = 1;
+    public static final int RETURN_LOCATION = 2;
     private static int hour = 0;
     private static int minute = 0;
     private TimePickerDialog timePickerDialog;
+
+    private LocationData locationData;      // TODO Please store this
 
 
     // try this to make time picker
@@ -120,7 +124,7 @@ public class TimeReminderActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, RETURN_LOCATION);
             }
         });
 
@@ -209,7 +213,6 @@ public class TimeReminderActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK) {
             if (data == null) {
                 //Display an error
@@ -225,6 +228,20 @@ public class TimeReminderActivity extends AppCompatActivity {
 //                e.printStackTrace();
 //            }
             //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
+        } else if( requestCode == RETURN_LOCATION && resultCode == Activity.RESULT_OK){
+            if(data == null){
+                //Display an error
+                return;
+            }
+            try{
+                String locationName = data.getStringExtra("locationName");
+                double latitude = data.getDoubleExtra("latitude", -999);
+                double longitude = data.getDoubleExtra("longitude", -999);
+                locationData = new LocationData(locationName, latitude, longitude);
+                locationText.setText(locationData.getName());
+            } catch (Exception f){
+                f.printStackTrace();
+            }
         }
     }
 
@@ -262,4 +279,8 @@ public class TimeReminderActivity extends AppCompatActivity {
                             .append(":").append(Integer.toString(minute)));
         }
     };
+
+
+
+
 }
