@@ -149,6 +149,15 @@ public final class DateTimeParser {
 		return getFormat(format).format(time);
 	}
 
+	public static final boolean validate(String time, Format format){
+		try{
+			getFormat(format).parse(time).getTime();
+			return true;
+		}catch(ParseException e){
+			return false;
+		}
+	}
+
 	/**
 	 * Convert the Calendar.Month to the corresponding full name, like January. The full time has the capital letter in the beginning only.
 	 * @param month starting from 0 (January)

@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
 
         // 建立資料庫物件
         ReminderDataController.setContext(getApplicationContext());
+        ReminderDataController.getInstance().clear();
+        ReminderDataController.getInstance().sample();
         // 取得所有記事資料
         ArrayList<ReminderData> reminders = ReminderDataController.getInstance().getAll();
         for(ReminderData sample:reminders){

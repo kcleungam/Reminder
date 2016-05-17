@@ -145,8 +145,12 @@ public class LocationReminderActivity extends AppCompatActivity {
                     Toast.makeText(LocationReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                if(editTime.getText().length()==0){
-                    Toast.makeText(LocationReminderActivity.this, "Empty time", Toast.LENGTH_SHORT).show();
+                if(!DateTimeParser.validate(editTime.getText().toString(), DateTimeParser.Format.SHORT)){
+                    Toast.makeText(LocationReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                if(!DateTimeParser.validate(editDate.getText().toString(), DateTimeParser.Format.DATE)){
+                    Toast.makeText(LocationReminderActivity.this, "Empty date", Toast.LENGTH_SHORT).show();
                     return true;
                 }
                 reminderData.setReminderType(ReminderData.ReminderType.Location);

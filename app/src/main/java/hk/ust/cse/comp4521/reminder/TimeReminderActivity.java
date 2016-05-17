@@ -198,7 +198,7 @@ public class TimeReminderActivity extends AppCompatActivity {
                     Toast.makeText(TimeReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                if(editTime.getText().length()==0){
+                if(!DateTimeParser.validate(editTime.getText().toString(), DateTimeParser.Format.SHORT)){
                     Toast.makeText(TimeReminderActivity.this, "Empty time", Toast.LENGTH_SHORT).show();
                     return true;
                 }

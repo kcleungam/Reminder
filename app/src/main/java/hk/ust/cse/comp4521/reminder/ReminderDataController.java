@@ -29,9 +29,6 @@ public class ReminderDataController {
             instance.reminderDAO = new ReminderDAO(context);
             // 如果資料庫是空的，就建立一些範例資料
             // 這是為了方便測試用的，完成應用程式以後可以拿掉
-            if (instance.getCount() == 0) {
-                instance.sample();
-            }
         }
         return instance;
     }
@@ -46,6 +43,10 @@ public class ReminderDataController {
 
     public ArrayList<ReminderData> getAll(){
         return reminderDAO.getAll();
+    }
+
+    public void clear(){
+        reminderDAO.clear();
     }
 
     public int getCount(){
