@@ -228,4 +228,3 @@ public class LocationReminderActivity extends AppCompatActivity {
 
 }
 
-}

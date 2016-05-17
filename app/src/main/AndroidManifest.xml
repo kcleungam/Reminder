@@ -12,7 +12,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
@@ -48,6 +47,19 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
+        <activity
+            android:name=".LocationReminderActivity"
+            android:label="@string/title_activity_location_reminder"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <service
+            android:name=".GeofenceTransitionIntentService"
+            android:exported="false" />
+        <service
+            android:name=".GeofenceService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>
