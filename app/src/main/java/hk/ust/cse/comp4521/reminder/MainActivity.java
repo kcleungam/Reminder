@@ -40,10 +40,10 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     ReminderDataAdapter reminderAdaptor;
     ReminderDataAdapter.RowHandler rowOnSelected;
     private boolean fabMenuShown = false;
-    private int[] fabMenuItems = {R.id.timeReminderFab, R.id.fab_2, R.id.fab_3};
-    private double[][] fabMenuOffsetRatio = {{1.7, 0.25}, {1.5, 1.5}, {0.25, 1.7}};
-    private int[] fabMenuShowAnimation = {R.anim.fab1_show, R.anim.fab2_show, R.anim.fab3_show};
-    private int[] fabMenuHideAnimation = {R.anim.fab1_hide, R.anim.fab2_hide, R.anim.fab3_hide};
+    private int[] fabMenuItems = {R.id.timeReminderFab, R.id.fab_2};
+    private double[][] fabMenuOffsetRatio = {{1.7, 0.25}, {1.5, 1.5}};
+    private int[] fabMenuShowAnimation = {R.anim.fab1_show, R.anim.fab2_show};
+    private int[] fabMenuHideAnimation = {R.anim.fab1_hide, R.anim.fab2_hide};
 
     protected LocationRequest mLocationRequest;
     private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         locationReminderFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(getApplicationContext(),LocationReminderActivity.class);
+                Intent intent=new Intent(getApplicationContext(), LocationReminderActivity.class);
                 startActivity(intent);
                 hideFabMenu();
             }
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
                         intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
                         break;
                 }
-                intent.putExtra("ReminderDataId", id);
+                intent.putExtra("ReminderId", id);
                 startActivity(intent);
             }
         };
@@ -122,8 +122,6 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
 
         // 建立資料庫物件
         ReminderDataController.setContext(getApplicationContext());
-        ReminderDataController.getInstance().clear();
-        ReminderDataController.getInstance().sample();
         // 取得所有記事資料
         ArrayList<ReminderData> reminders = ReminderDataController.getInstance().getAll();
         for(ReminderData sample:reminders){

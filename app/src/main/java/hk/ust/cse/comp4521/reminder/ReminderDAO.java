@@ -212,7 +212,7 @@ public class ReminderDAO {
             ReminderData data = new ReminderData();
             data.setTitle("sample"+i);
             data.setLocation("location"+i);
-            data.setEnabled(i%2==0);
+            data.setEnabled(false);
             data.setReminderType(ReminderData.ReminderType.Time);
             data.setDescription("general description");
             Calendar time = Calendar.getInstance();

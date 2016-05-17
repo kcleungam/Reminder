@@ -105,7 +105,7 @@ public class LocationReminderActivity extends AppCompatActivity {
         };
         imageView.setOnClickListener(imageViewListener);
 
-        long reminderId = getIntent().getLongExtra("ReminderDataId", -1);
+        long reminderId = getIntent().getLongExtra("ReminderId", -1);
         if (reminderId != -1)
             reminderData = ReminderDataController.getInstance().getReminder(reminderId);
         else
@@ -116,6 +116,7 @@ public class LocationReminderActivity extends AppCompatActivity {
             editDate.setText(reminderData.getValidUntilDate());
             editDescription.setText(reminderData.getDescription());
             locationText.setText(reminderData.getLocation());
+            //TODO: Enable image view
             if(reminderData.getImageUri()!=null) {
 //                try {
 //                    Uri imageUri = Uri.parse(reminderData.getImageUri());
@@ -182,6 +183,7 @@ public class LocationReminderActivity extends AppCompatActivity {
                 //Display an error
                 return;
             }
+            //TODO: Enable image preview
 //            try {
 //                Uri imageUri = data.getData();
 //                InputStream imageStream = getContentResolver().openInputStream(imageUri);

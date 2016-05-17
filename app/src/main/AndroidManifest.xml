@@ -55,12 +55,32 @@
             android:label="@string/title_activity_time_reminder"/>
 
         <activity
+            android:name=".ViewTimeActivity"
+            android:label="@string/title_activity_time_reminder"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
 
         <activity
             android:name=".LocationReminderActivity"
             android:label="@string/title_activity_location_reminder" />
+
+        <activity
+            android:name=".ViewLocationActivity"
+            android:label="@string/title_activity_location_reminder"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".GeofenceTransitionIntentService"

@@ -138,6 +138,7 @@ public class ReminderDataController {
         // Now create and schedule a new Alarm
         Intent intent = new Intent(context, AlarmReceiver.class); // New component for alarm
         intent.putExtra("ReminderId", reminderData.getId());
+        intent.putExtra("ReminderType", reminderData.getReminderType().ordinal());
 
         //設定一個警報
         //參數1,我們選擇一個會在指定時間喚醒裝置的警報類型
