@@ -82,6 +82,15 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
                 hideFabMenu();
             }
         });
+        FloatingActionButton locationReminderFab=(FloatingActionButton)findViewById(R.id.fab_2);
+        locationReminderFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getApplicationContext(),LocationReminderActivity.class);
+                startActivity(intent);
+                hideFabMenu();
+            }
+        });
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
