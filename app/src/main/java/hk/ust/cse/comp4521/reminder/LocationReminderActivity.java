@@ -21,18 +21,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import java.util.Arrays;
 import java.util.Calendar;
 
 public class LocationReminderActivity extends AppCompatActivity {
-
-
     private ReminderData reminderData;
     private TextView editTitle;
-
     private TextView editTime;
     private TextView editDate;
-
+    private ImageButton timeButton;
+    private CheckBox[] checkBoxes;
+    private Button selectAllButton;
     private TextView locationText;
     private ImageButton locationButton;
     private TextView editDescription;
@@ -41,11 +42,7 @@ public class LocationReminderActivity extends AppCompatActivity {
     private static final String[] REQUIRED_PERMISSION = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private static final int PICK_IMAGE = 1;
     public static final int RETURN_LOCATION = 2;
-    private static int hour = 0;
-    private static int minute = 0;
     private TimePickerDialog timePickerDialog;
-
-    private LocationData locationData;      // TODO Please store this
 
 
     // try this to make time picker
@@ -72,11 +69,21 @@ public class LocationReminderActivity extends AppCompatActivity {
 //            }
 //        }
 
+
         setContentView(R.layout.edit_location_container);
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.editLocationLayout);
         editTitle = (TextView) layout.findViewById(R.id.editTitle);
+        editDate=(TextView)layout.findViewById(R.id.editDate);
+        editTime = (TextView) layout.findViewById(R.id.editTime);
+        timeButton = (ImageButton) layout.findViewById(R.id.timeButton);
+        timeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(R.id.timeButton);
+            }
+        });
 
-        //TODO
+
         locationText = (TextView) layout.findViewById(R.id.editLocation);
         locationButton = (ImageButton) layout.findViewById(R.id.locationButton);
         locationButton.setOnClickListener(new View.OnClickListener() {
@@ -105,16 +112,15 @@ public class LocationReminderActivity extends AppCompatActivity {
         };
         imageView.setOnClickListener(imageViewListener);
 
-        ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
         long reminderId = getIntent().getLongExtra("ReminderDataId", -1);
         if (reminderId != -1)
-            reminderData = reminderDAO.get(reminderId);
+            reminderData = ReminderDataController.getInstance().getReminder(reminderId);
         else
             reminderData = new ReminderData();
         if (reminderData != null) {
             editTitle.setText(reminderData.getTitle());
-
-
+            editTime.setText(reminderData.getValidUntilTime());
+            editDate.setText(reminderData.getValidUntilDate());
             editDescription.setText(reminderData.getDescription());
             locationText.setText(reminderData.getLocation());
             if(reminderData.getImageUri()!=null) {
@@ -142,18 +148,26 @@ public class LocationReminderActivity extends AppCompatActivity {
 
         switch (item_id) {
             case R.id.action_save:
-                reminderData.setReminderType("Location");
+                if(editTitle.getText().length()==0){
+                    Toast.makeText(LocationReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                if(editTime.getText().length()==0){
+                    Toast.makeText(LocationReminderActivity.this, "Empty time", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                reminderData.setReminderType("Time");
                 reminderData.setTitle(editTitle.getText().toString());
-
-                //TODO
-
+                reminderData.setTime(editTime.getText().toString());
+               //TODO: change the GUI
+                //reminderData.setValidUntil();
                 reminderData.setLocation(locationText.getText().toString());
                 reminderData.setDescription(editDescription.getText().toString());
-                ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
-                if (reminderData.getId() < 0)
-                    reminderDAO.insert(reminderData);
-                else
-                    reminderDAO.update(reminderData);
+                if (reminderData.getId() < 0) {
+                    reminderData.setEnabled(true);
+                    ReminderDataController.getInstance().addReminder(reminderData);
+                }else
+                    ReminderDataController.getInstance().putReminder(reminderData);
                 finish();
                 break;
             case R.id.action_cancel:
@@ -191,21 +205,38 @@ public class LocationReminderActivity extends AppCompatActivity {
                 String locationName = data.getStringExtra("locationName");
                 double latitude = data.getDoubleExtra("latitude", -999);
                 double longitude = data.getDoubleExtra("longitude", -999);
-                locationData = new LocationData(locationName, latitude, longitude);
-                locationText.setText(locationData.getName());
+                reminderData.setLocation(locationName);
+                reminderData.setLatitude(latitude);
+                reminderData.setLongitude(longitude);
             } catch (Exception f){
                 f.printStackTrace();
             }
         }
     }
 
+    // display current time
+//    public void setCurrentTimeOnView() {
+//        final Calendar c = Calendar.getInstance();
+//        hour = c.get(Calendar.HOUR_OF_DAY);
+//        minute = c.get(Calendar.MINUTE);
+//
+//        // set current time into textview
+//        editTime.setText(
+//                new StringBuilder().append(Integer.toString(hour))
+//                        .append(":").append(Integer.toString(minute)));
+//    }
 
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case R.id.timeButton:
                 // set time picker as current time
-                timePickerDialog = new TimePickerDialog(this, onTimeSetListener, hour, minute, true);
+                if(reminderData.getId()!=-1) {
+                    timePickerDialog = new TimePickerDialog(this, onTimeSetListener, DateTimeParser.toHour(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()), true);
+                }else{
+                    Calendar now = Calendar.getInstance();
+                    timePickerDialog = new TimePickerDialog(this, onTimeSetListener, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true);
+                }
                 return timePickerDialog;
 
         }
@@ -215,16 +246,11 @@ public class LocationReminderActivity extends AppCompatActivity {
     private TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int min) {
-            hour = hourOfDay;
-            minute = min;
-            editTime.setText(
-                    new StringBuilder().append(Integer.toString(hour))
-                            .append(":").append(Integer.toString(minute)));
+            Calendar now = Calendar.getInstance();
+            now.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            now.set(Calendar.MINUTE, min);
+            editTime.setText(DateTimeParser.toString(now.getTimeInMillis(), DateTimeParser.Format.SHORT));
         }
     };
-
-
-
-
 }
 
