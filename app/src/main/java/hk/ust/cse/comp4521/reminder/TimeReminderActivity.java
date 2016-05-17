@@ -48,8 +48,6 @@ public class TimeReminderActivity extends AppCompatActivity {
 
     private static final String[] REQUIRED_PERMISSION = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private static final int PICK_IMAGE = 1;
-    private static int hour = 0;
-    private static int minute = 0;
     private TimePickerDialog timePickerDialog;
 
 
@@ -114,7 +112,7 @@ public class TimeReminderActivity extends AppCompatActivity {
         selectAllButton = (Button) layout.findViewById(R.id.selectAll);
         View.OnClickListener selectAllListener = new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) { //if all box checked, set button to "unselect all", vice versa
                 for (CheckBox box : checkBoxes) {
                     box.setChecked(v.getTag().equals(true));
                 }
@@ -226,39 +224,6 @@ public class TimeReminderActivity extends AppCompatActivity {
         return true;
     }
 
-    public void setAlarm(){
-        //使用Calendar指定時間
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, DateTimeParser.toHour(reminderData.getTimeInMillis()));
-        calendar.set(Calendar.MINUTE, DateTimeParser.toMin(reminderData.getTimeInMillis()));
-
-        //建立意圖
-        Intent intent = new Intent();
-
-        //這裡的 this 是指當前的 Activity
-        //AlarmReceiver.class 則是負責接收的 BroadcastReceiver
-        intent.setClass(this, AlarmReceiver.class);
-        intent.putExtra("ReminderId", reminderData.getId());
-
-        //建立待處理意圖
-        PendingIntent pending = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
-
-        //取得AlarmManager
-        AlarmManager alarm = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-
-        //設定一個警報
-        //參數1,我們選擇一個會在指定時間喚醒裝置的警報類型
-        //參數2,將指定的時間以millisecond傳入
-        //參數3,傳入待處理意圖
-//        for(int i=0; i<reminderData.getRepeat().length; i++) {
-//            if(!reminderData.getRepeat()[i])
-//                continue;
-//            calendar.set(Calendar.DAY_OF_WEEK, i+1);
-//            alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pending);
-//        }
-        alarm.set(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis(), pending);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -281,23 +246,28 @@ public class TimeReminderActivity extends AppCompatActivity {
     }
 
     // display current time
-    public void setCurrentTimeOnView() {
-        final Calendar c = Calendar.getInstance();
-        hour = c.get(Calendar.HOUR_OF_DAY);
-        minute = c.get(Calendar.MINUTE);
-
-        // set current time into textview
-        editTime.setText(
-                new StringBuilder().append(Integer.toString(hour))
-                        .append(":").append(Integer.toString(minute)));
-    }
+//    public void setCurrentTimeOnView() {
+//        final Calendar c = Calendar.getInstance();
+//        hour = c.get(Calendar.HOUR_OF_DAY);
+//        minute = c.get(Calendar.MINUTE);
+//
+//        // set current time into textview
+//        editTime.setText(
+//                new StringBuilder().append(Integer.toString(hour))
+//                        .append(":").append(Integer.toString(minute)));
+//    }
 
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case R.id.timeButton:
                 // set time picker as current time
-                timePickerDialog = new TimePickerDialog(this, onTimeSetListener, hour, minute, true);
+                if(reminderData!=null) {
+                    timePickerDialog = new TimePickerDialog(this, onTimeSetListener, DateTimeParser.toHour(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()), true);
+                }else{
+                    Calendar now = Calendar.getInstance();
+                    timePickerDialog = new TimePickerDialog(this, onTimeSetListener, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true);
+                }
                 return timePickerDialog;
 
         }
@@ -307,11 +277,10 @@ public class TimeReminderActivity extends AppCompatActivity {
     private TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int min) {
-            hour = hourOfDay;
-            minute = min;
-            editTime.setText(
-                    new StringBuilder().append(Integer.toString(hour))
-                            .append(":").append(Integer.toString(minute)));
+            Calendar now = Calendar.getInstance();
+            now.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            now.set(Calendar.MINUTE, min);
+            editTime.setText(DateTimeParser.toString(now.getTimeInMillis(), DateTimeParser.Format.SHORT));
         }
     };
 }

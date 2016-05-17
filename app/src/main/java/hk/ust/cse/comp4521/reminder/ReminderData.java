@@ -143,6 +143,13 @@ public class ReminderData implements Serializable{
         return repeat;
     }
 
+    public boolean noRepeat(){
+        for(int i=0; i<repeat.length; i++)
+            if(repeat[i])
+                return true;
+        return false;
+    }
+
     public void setEnabled(boolean enabled){
         this.enabled = enabled;
     }

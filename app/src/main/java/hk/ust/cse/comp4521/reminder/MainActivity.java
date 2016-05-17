@@ -70,11 +70,8 @@ public class MainActivity extends AppCompatActivity {
         View.OnLongClickListener onLongClickListener = new AdapterView.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(getApplicationContext(), ( (ReminderDataAdapter.RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
-//                registerForContextMenu(v);
                 rowOnSelected = (ReminderDataAdapter.RowHandler) v.getTag();
                 openContextMenu(reminderList);
-//                unregisterForContextMenu(v);
                 return true;
             }
         };
