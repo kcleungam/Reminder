@@ -24,6 +24,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         ReminderDAO reminderDAO = new ReminderDAO(context);
         ReminderData reminderData = reminderDAO.get(intent.getLongExtra("ReminderId", -1));
         long notificationId = intent.getLongExtra("NotificationId", -1);
+        Log.i("AlarmReceiver", ""+notificationId);
 
         //建立通知物件
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
@@ -51,11 +52,17 @@ public class AlarmReceiver extends BroadcastReceiver {
         stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         //TODO: unsafe long to int conversion
-        PendingIntent pendingResultIntent = stackBuilder.getPendingIntent((int) notificationId, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingResultIntent = stackBuilder.getPendingIntent((int) reminderData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
         notification.setContentIntent(pendingResultIntent);
         //取得通知管理器
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //執行通知
-        mNotificationManager.notify(1, notification.build());
+        //TODO: unsafe long to int conversion
+        mNotificationManager.notify((int) notificationId, notification.build());
+
+        if(reminderData.noRepeat()) {
+            reminderData.setEnabled(false);
+            ReminderDataController.getInstance().putReminder(reminderData);
+        }
     }
 }

@@ -35,15 +35,6 @@ public class ReminderDataController {
         ReminderDataController.context = context;
     }
 
-    public boolean putReminder(ReminderData reminderData){
-        if(reminderDAO.update(reminderData)) {
-            //deleteAlarm(reminderData.getId());
-            setAlarm(reminderData);
-            return true;
-        }else
-            return false;
-    }
-
     public ReminderData getReminder(long reminderId){
         return reminderDAO.get(reminderId);
     }
@@ -58,25 +49,53 @@ public class ReminderDataController {
 
     public ReminderData addReminder(ReminderData reminderData){
         reminderDAO.insert(reminderData);
-        setAlarm(reminderData);
+        if(reminderData.isEnabled())
+            setAlarm(reminderData);
         return reminderData;
     }
 
+    public boolean putReminder(ReminderData reminderData){
+        if(reminderDAO.update(reminderData)) {
+            deleteAlarm(reminderData.getId());
+            if(reminderData.isEnabled())
+                setAlarm(reminderData);
+            return true;
+        }else
+            return false;
+    }
+
     public boolean deleteReminder(long reminderId){
-        return reminderDAO.delete(reminderId);
+        if(reminderDAO.delete(reminderId)){
+            deleteAlarm(reminderId);
+            return true;
+        }else
+            return false;
+    }
+
+    public void enableReminder(long reminderId, boolean enable){
+        if(enable) {
+            ReminderData reminderData = getReminder(reminderId);
+            setAlarm(reminderData);
+        }else{
+            deleteAlarm(reminderId);
+        }
     }
 
     private boolean deleteAlarm(long reminderId){
         //取得AlarmManager
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_NO_CREATE); // find the old PendingIntent
-        if (pendingIntent != null) {
-            // Now cancel the alarm that matches the old PendingIntent
-            alarmManager.cancel(pendingIntent);
-            return true;
+        // find the old PendingIntent
+        boolean hasPendingIntent = false;
+        for(int i=0; i<7; i++) {
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderId*7+i, intent, PendingIntent.FLAG_NO_CREATE);
+            if (pendingIntent != null) {
+                // Now cancel the alarm that matches the old PendingIntent
+                alarmManager.cancel(pendingIntent);
+                hasPendingIntent = true;
+            }
         }
-        return false;
+        return hasPendingIntent;
     }
 
     @TargetApi(19)
@@ -85,6 +104,7 @@ public class ReminderDataController {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, DateTimeParser.toHour(reminderData.getTimeInMillis()));
         calendar.set(Calendar.MINUTE, DateTimeParser.toMin(reminderData.getTimeInMillis()));
+        calendar.set(Calendar.SECOND, 0);
 
         //取得AlarmManager
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -106,7 +126,7 @@ public class ReminderDataController {
                 calendar.add(Calendar.DATE, 1);
             //TODO: unsafe long to int conversion
             intent.putExtra("NotificationId", reminderData.getId()*7);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7, intent, 0);
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }else{ //if repeats, alarms every day-of-week
             for (int i = 0; i < reminderData.getRepeat().length; i++) {
@@ -115,7 +135,7 @@ public class ReminderDataController {
                 calendar.set(Calendar.DAY_OF_WEEK, i + 1);
                 //TODO: unsafe long to int conversion
                 intent.putExtra("NotificationId", reminderData.getId()*7+i);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7+i, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7+i, intent, 0);
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
             }
         }

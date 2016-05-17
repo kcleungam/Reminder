@@ -206,9 +206,10 @@ public class TimeReminderActivity extends AppCompatActivity {
                 reminderData.setRepeat(repeat);
                 reminderData.setLocation(locationText.getText().toString());
                 reminderData.setDescription(editDescription.getText().toString());
-                if (reminderData.getId() < 0)
+                if (reminderData.getId() < 0) {
+                    reminderData.setEnabled(true);
                     ReminderDataController.getInstance().addReminder(reminderData);
-                else
+                }else
                     ReminderDataController.getInstance().putReminder(reminderData);
                 finish();
                 break;
