@@ -22,10 +22,9 @@ public class ReminderData implements Serializable{
     private boolean[] repeat = new boolean[REPEAT_ARRAY_LENGTH];       // Store the day for repetition, Mon to Fri
     private String location = null;
     private Double longitude = null;
-    private Double lattitude = null;
+    private Double latitude = null;
     private Time validUntil = null;                     // location event may valid until a certain time
     private boolean enabled = false;
-    private LocationData locationData = null;       // TODO please store this and make constructor and setting method etc
     // Image
 
     public ReminderData(){
@@ -166,12 +165,12 @@ public class ReminderData implements Serializable{
         this.imagePath = imageUri;
     }
 
-    public Double getLattitude() {
-        return lattitude;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setLattitude(Double lattitude) {
-        this.lattitude = lattitude;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
     public Double getLongitude() {

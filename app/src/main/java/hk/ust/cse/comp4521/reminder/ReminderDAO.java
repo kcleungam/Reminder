@@ -186,7 +186,7 @@ public class ReminderDAO {
         result.setRepeat(Util.toRepeat(cursor.getString(6), ReminderData.REPEAT_ARRAY_LENGTH));
         result.setLocation(cursor.getString(7));
         result.setLongitude(cursor.getDouble(8));
-        result.setLattitude(cursor.getDouble(9));
+        result.setLatitude(cursor.getDouble(9));
         result.setValidUntil(cursor.getString(10));
         result.setEnabled((cursor.getInt(11))==1);
 

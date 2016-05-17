@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
 //            ReminderDataAdapter.RowHandler rowHandler = ((ReminderDataAdapter.RowHandler) reminderList.getChildAt(i).getTag());
 //            ReminderData reminderData = reminderDAO.get(rowHandler.reminderId);
 //            String id = Long.toString( reminderData.getId());
-//            double latitude = reminderData.getLattitude();
+//            double latitude = reminderData.getLatitude();
 //            double longitude = reminderData.getLongitude();
 //        }
 
