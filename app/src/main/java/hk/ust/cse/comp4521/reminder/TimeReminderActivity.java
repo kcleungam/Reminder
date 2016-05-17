@@ -139,10 +139,9 @@ public class TimeReminderActivity extends AppCompatActivity {
         };
         imageView.setOnClickListener(imageViewListener);
 
-        ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
         long reminderId = getIntent().getLongExtra("ReminderDataId", -1);
         if (reminderId != -1)
-            reminderData = reminderDAO.get(reminderId);
+            reminderData = ReminderDataController.getInstance().getReminder(reminderId);
         else
             reminderData = new ReminderData();
         if (reminderData != null) {
@@ -207,12 +206,10 @@ public class TimeReminderActivity extends AppCompatActivity {
                 reminderData.setRepeat(repeat);
                 reminderData.setLocation(locationText.getText().toString());
                 reminderData.setDescription(editDescription.getText().toString());
-                ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
                 if (reminderData.getId() < 0)
-                    reminderDAO.insert(reminderData);
+                    ReminderDataController.getInstance().addReminder(reminderData);
                 else
-                    reminderDAO.update(reminderData);
-                setAlarm();
+                    ReminderDataController.getInstance().putReminder(reminderData);
                 finish();
                 break;
             case R.id.action_cancel:

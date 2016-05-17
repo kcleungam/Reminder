@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -34,22 +35,34 @@ public class ReminderDataController {
 
     public boolean putReminder(ReminderData reminderData){
         if(reminderDAO.update(reminderData)) {
-            deleteAlarm(reminderData);
+            //deleteAlarm(reminderData.getId());
             setAlarm(reminderData);
             return true;
         }else
             return false;
     }
 
-    public ReminderData getReminder(int reminderId){
+    public ReminderData getReminder(long reminderId){
         return reminderDAO.get(reminderId);
     }
 
-    public boolean deleteReminder(int reminderId){
+    public ArrayList<ReminderData> getAll(){
+        return reminderDAO.getAll();
+    }
+
+    public int getCount(){
+        return reminderDAO.getCount();
+    }
+
+    public ReminderData addReminder(ReminderData reminderData){
+        return reminderDAO.insert(reminderData);
+    }
+
+    public boolean deleteReminder(long reminderId){
         return reminderDAO.delete(reminderId);
     }
 
-    private boolean deleteAlarm(int reminderId){
+    private boolean deleteAlarm(long reminderId){
         //取得AlarmManager
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -97,5 +110,9 @@ public class ReminderDataController {
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
             }
         }
+    }
+
+    public void sample(){
+        reminderDAO.sample();
     }
 }

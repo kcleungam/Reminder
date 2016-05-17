@@ -78,14 +78,14 @@ public class MainActivity extends AppCompatActivity {
         reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener, onLongClickListener);
 
         // 建立資料庫物件
-        ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
+        ReminderDataController.setContext(getApplicationContext());
         // 如果資料庫是空的，就建立一些範例資料
         // 這是為了方便測試用的，完成應用程式以後可以拿掉
-        if (reminderDAO.getCount() == 0) {
-            reminderDAO.sample();
+        if (ReminderDataController.getInstance().getCount() == 0) {
+            ReminderDataController.getInstance().sample();
         }
         // 取得所有記事資料
-        ArrayList<ReminderData> reminders = reminderDAO.getAll();
+        ArrayList<ReminderData> reminders = ReminderDataController.getInstance().getAll();
         for(ReminderData sample:reminders){
             reminderAdaptor.addItem(sample);
         }
@@ -128,9 +128,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
         reminderAdaptor.clear();
-        for(ReminderData reminderData:reminderDAO.getAll())
+        for(ReminderData reminderData:ReminderDataController.getInstance().getAll())
             reminderAdaptor.add(reminderData);
         reminderAdaptor.notifyDataSetChanged();
     }
@@ -170,11 +169,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if(item.getTitle().equals("Delete")){
-            ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
-            reminderDAO.delete(rowOnSelected.reminderId);
+            ReminderDataController.getInstance().deleteReminder(rowOnSelected.reminderId);
             Toast.makeText(MainActivity.this, "Reminder "+rowOnSelected.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
             reminderAdaptor.clear();
-            for(ReminderData reminderData:reminderDAO.getAll())
+            for(ReminderData reminderData:ReminderDataController.getInstance().getAll())
                 reminderAdaptor.add(reminderData);
             reminderAdaptor.notifyDataSetChanged();
         }

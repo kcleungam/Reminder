@@ -55,7 +55,7 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View row = convertView;
         RowHandler handler = new RowHandler();
         if(convertView == null){
@@ -70,11 +70,10 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     // do something, the isChecked will be
                     // true if the switch is in the On position
-                    ReminderDAO reminderDAO = new ReminderDAO(getContext());
                     long id = ( (ReminderDataAdapter.RowHandler) buttonView.getTag() ).reminderId;
-                    ReminderData data = reminderDAO.get(id);
+                    ReminderData data = getItem(position);
                     data.setEnabled(isChecked);
-                    reminderDAO.update(data);
+                    ReminderDataController.getInstance().putReminder(data);
                 }
             });
             row.setTag(handler);        // When we get the row, we can retrieve the corresponing handler (tag)
