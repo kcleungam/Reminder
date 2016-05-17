@@ -44,6 +44,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private Marker myMarker;
+    private Marker targetMarker;
     protected GoogleApiClient mGoogleApiClient;
     protected LocationRequest mLocationRequest;
     private int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
@@ -123,6 +124,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        LatLng sydney = new LatLng(-34, 151);
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+        mMap.setOnMapLongClickListener(this);
+        mMap.setOnMarkerClickListener(this);
+        mMap.setOnMarkerDragListener(this);
     }
 
     @Override
@@ -152,6 +156,36 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapLongClick(LatLng latLng) {
 
+        try {
+            addressesList = geocode.getFromLocation(latLng.latitude, latLng.longitude, 5);
+
+            android.location.Address address = addressesList.get(0);
+            if(address.getLocality() == null && address.getFeatureName() == null){
+                editLocation.setText("Place with no name");
+            } else {
+                StringBuilder stringBuilder = new StringBuilder();
+                if(address.getFeatureName() != null) {
+                    stringBuilder.append(address.getFeatureName() );
+                    if (address.getLocality() != null) {
+                        stringBuilder.append( "," + address.getLocality());
+                    }
+                }
+
+                editLocation.setText(stringBuilder.toString());
+            }
+            String latString = Double.toString(addressesList.get(0).getLatitude());
+            String longString = Double.toString(addressesList.get(0).getLongitude());
+            editLatLng.setText(latString + "," + longString);
+
+            if(targetMarker != null){
+                targetMarker.remove();
+            }
+            MarkerOptions markCur = new MarkerOptions().position(latLng).title("Target").icon(BitmapDescriptorFactory.defaultMarker());
+            targetMarker = mMap.addMarker(markCur);
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
