@@ -20,6 +20,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -33,6 +34,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener,
         GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener, LocationListener, ResultCallback<Status> ,GoogleApiClient.ConnectionCallbacks
         , GoogleApiClient.OnConnectionFailedListener{
@@ -44,6 +49,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
     private int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 100000;
     private boolean fastLocateCurrent = false;
+    private Geocoder geocode;
+    List<android.location.Address> addressesList;
 
     private EditText editLocation;
     private EditText editLatLng;
@@ -55,6 +62,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         buildGoogleApiClient();
         fastLocateCurrent = false;
 
+        geocode = new Geocoder(getApplicationContext());
+
         setContentView(R.layout.activity_maps);
         editLocation = (EditText) findViewById(R.id.editLocation);
         editLatLng = (EditText) findViewById(R.id.editLatLng);
@@ -62,10 +71,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(editLocation.getText().equals("")){
+                String locationText = "";
+                try{
+                    locationText = editLocation.getText().toString();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                if(locationText.equals("")){
                     // do nothing
                 }else{
                     // resolve address and get the location data
+                    try {
+                        addressesList = geocode.getFromLocationName(locationText, 5);
+                        String latString = Double.toString(addressesList.get(0).getLatitude());
+                        String longString = Double.toString(addressesList.get(0).getLongitude());
+                        editLatLng.setText(latString + "," + longString);
+
+                        LatLng latLng = new LatLng(addressesList.get(0).getLatitude(), addressesList.get(0).getLongitude());
+                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, (float) 15);   // layer 21 means show details(your home) , 2 means show big area(Earth)
+                        mMap.animateCamera(cameraUpdate);
+
+                    } catch (Exception f){
+                        f.printStackTrace();
+                    }
                 }
             }
         });

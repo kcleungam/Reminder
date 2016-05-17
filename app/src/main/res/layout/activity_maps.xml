@@ -31,7 +31,8 @@ android:layout_height="fill_parent" >
         android:minWidth="150dp"
         android:layout_below="@+id/editLocation"
         android:layout_toLeftOf="@+id/searchButton"
-        android:layout_toStartOf="@+id/searchButton" />
+        android:layout_toStartOf="@+id/searchButton"
+        android:editable="false" />
 
     <fragment
         android:layout_width="match_parent"
