@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     ListView reminderList;
     ReminderDataAdapter reminderAdaptor;
+    ReminderDataAdapter.RowHandler rowOnSelected;
     private boolean fabMenuShown = false;
     private int[] fabMenuItems = {R.id.timeReminderFab, R.id.fab_2, R.id.fab_3};
     private double[][] fabMenuOffsetRatio = {{1.7, 0.25}, {1.5, 1.5}, {0.25, 1.7}};
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.new_activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
@@ -70,9 +71,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onLongClick(View v) {
                 Toast.makeText(getApplicationContext(), ( (ReminderDataAdapter.RowHandler)v.getTag() ).titleView.getText() , Toast.LENGTH_SHORT).show();
-                registerForContextMenu(v);
-                openContextMenu(v);
-                unregisterForContextMenu(v);
+//                registerForContextMenu(v);
+                rowOnSelected = (ReminderDataAdapter.RowHandler) v.getTag();
+                openContextMenu(reminderList);
+//                unregisterForContextMenu(v);
                 return true;
             }
         };
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
             reminderAdaptor.addItem(sample);
         }
         reminderList.setAdapter(reminderAdaptor);
+        registerForContextMenu(reminderList);
 
 //        CoordinatorLayout.LayoutParams params =
 //                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
@@ -130,10 +133,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
         reminderAdaptor.clear();
-        ArrayList<ReminderData> reminders = reminderDAO.getAll();
-        for(ReminderData sample:reminders){
-            reminderAdaptor.addItem(sample);
-        }
+        for(ReminderData reminderData:reminderDAO.getAll())
+            reminderAdaptor.add(reminderData);
         reminderAdaptor.notifyDataSetChanged();
     }
 
@@ -162,9 +163,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
-        if (v.getTag() instanceof ReminderDataAdapter.RowHandler) {
-            ReminderDataAdapter.RowHandler handler = (ReminderDataAdapter.RowHandler) v.getTag();
-            menu.setHeaderTitle(handler.titleView.getText());
+        if (v instanceof ListView) {
+            menu.setHeaderTitle(rowOnSelected.titleView.getText());
             menu.add(Menu.NONE, 0, 0, "Delete");
         }
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -173,11 +173,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if(item.getTitle().equals("Delete")){
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
             ReminderDAO reminderDAO = new ReminderDAO(getApplicationContext());
-            ReminderDataAdapter.RowHandler handler = (ReminderDataAdapter.RowHandler) info.targetView.getTag();
-            reminderDAO.delete(handler.reminderId);
-            Toast.makeText(MainActivity.this, "Reminder "+handler.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
+            reminderDAO.delete(rowOnSelected.reminderId);
+            Toast.makeText(MainActivity.this, "Reminder "+rowOnSelected.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
+            reminderAdaptor.clear();
+            for(ReminderData reminderData:reminderDAO.getAll())
+                reminderAdaptor.add(reminderData);
             reminderAdaptor.notifyDataSetChanged();
         }
         return true;
