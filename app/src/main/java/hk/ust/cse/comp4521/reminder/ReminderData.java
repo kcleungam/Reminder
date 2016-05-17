@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.ParseException;
+import java.util.Calendar;
 
 /**
  * Created by Krauser on 9/5/2016.
@@ -105,6 +106,12 @@ public class ReminderData implements Serializable{
         return DateTimeParser.toString(time, DateTimeParser.Format.SHORT);
     }
 
+    public int getTime(int field){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(time.getTime());
+        return c.get(field);
+    }
+
     public long getTimeInMillis(){
         return time.getTime();
     }
@@ -123,8 +130,20 @@ public class ReminderData implements Serializable{
         return DateTimeParser.toString(validUntilDate, DateTimeParser.Format.DATE);
     }
 
+    public int getValidUntilDate(int field){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(validUntilDate.getTime());
+        return c.get(field);
+    }
+
     public String getValidUntilTime(){
         return DateTimeParser.toString(validUntilTime, DateTimeParser.Format.SHORT);
+    }
+
+    public int getValidUntilTime(int field){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(validUntilTime.getTime());
+        return c.get(field);
     }
 
     public void setValidUntilTime(String time){

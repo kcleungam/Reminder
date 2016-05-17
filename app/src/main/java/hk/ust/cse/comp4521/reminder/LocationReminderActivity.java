@@ -229,7 +229,7 @@ public class LocationReminderActivity extends AppCompatActivity {
                 // set time picker as current time
                 TimePickerDialog timePickerDialog;
                 if(reminderData.getId()!=-1) {
-                    timePickerDialog = new TimePickerDialog(this, onTimeSetListener, DateTimeParser.toHour(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()), true);
+                    timePickerDialog = new TimePickerDialog(this, onTimeSetListener, reminderData.getValidUntilTime(Calendar.HOUR_OF_DAY), reminderData.getValidUntilTime(Calendar.MINUTE), true);
                 }else{
                     Calendar now = Calendar.getInstance();
                     timePickerDialog = new TimePickerDialog(this, onTimeSetListener, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true);
@@ -239,7 +239,7 @@ public class LocationReminderActivity extends AppCompatActivity {
                 // set date picker as current time
                 DatePickerDialog datePickerDialog;
                 if(reminderData.getId()!=-1) {
-                    datePickerDialog = new DatePickerDialog(this, onDateSetListener, DateTimeParser.toYear(reminderData.getTimeInMillis()), DateTimeParser.toMonth(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()));
+                    datePickerDialog = new DatePickerDialog(this, onDateSetListener, reminderData.getValidUntilDate(Calendar.YEAR), reminderData.getValidUntilDate(Calendar.MONTH), reminderData.getValidUntilDate(Calendar.DAY_OF_MONTH));
                 }else{
                     Calendar now = Calendar.getInstance();
                     datePickerDialog = new DatePickerDialog(this, onDateSetListener, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));

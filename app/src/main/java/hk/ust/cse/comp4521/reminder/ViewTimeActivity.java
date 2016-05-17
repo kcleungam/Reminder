@@ -7,9 +7,30 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 public class ViewTimeActivity extends AppCompatActivity {
+
+    private ReminderData reminderData;
+    private TextView editTitle;
+    private TextView editTime;
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+
+            //TODO: turn this into permission listener
+            //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
+            //        for(String requiredPermission:REQUIRED_PERMISSION) {
+            //            Integer value = checkSelfPermission(requiredPermission);
+            //            synchronized (value) {
+            //                if (value == -1) {
+            //                    requestPermissions(REQUIRED_PERMISSION, 1);
+            //                    value = checkSelfPermission(requiredPermission);
+            //                    if (value == -1) {
+            //                        finish();
+            //                        return;
+            //                    }
+            //                }
+            //            }
+            //        }
             setContentView(R.layout.view_time_container);
 
             String title = getIntent().getStringExtra("title");

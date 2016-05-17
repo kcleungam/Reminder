@@ -124,8 +124,8 @@ public class ReminderDataController {
     private void setAlarm(ReminderData reminderData){
         //使用Calendar指定時間
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, DateTimeParser.toHour(reminderData.getTimeInMillis()));
-        calendar.set(Calendar.MINUTE, DateTimeParser.toMin(reminderData.getTimeInMillis()));
+        calendar.set(Calendar.HOUR_OF_DAY, reminderData.getTime(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE, reminderData.getTime(Calendar.MINUTE));
         calendar.set(Calendar.SECOND, 0);
 
         //取得AlarmManager
