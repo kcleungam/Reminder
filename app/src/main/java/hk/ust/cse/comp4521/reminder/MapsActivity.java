@@ -32,6 +32,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -46,6 +48,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private Marker myMarker;
+    private Circle myCircle;
     private Marker targetMarker;
     protected GoogleApiClient mGoogleApiClient;
     protected LocationRequest mLocationRequest;
@@ -90,6 +93,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String longString = Double.toString(addressesList.get(0).getLongitude());
                         editLatLng.setText(latString + "," + longString);
 
+
+
                         LatLng latLng = new LatLng(addressesList.get(0).getLatitude(), addressesList.get(0).getLongitude());
                         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, (float) 16);   // layer 21 means show details(your home) , 2 means show big area(Earth)
                         mMap.animateCamera(cameraUpdate);
@@ -101,6 +106,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                         MarkerOptions markCur = new MarkerOptions().position(latLng).title("Target").icon(BitmapDescriptorFactory.defaultMarker());
                         targetMarker = mMap.addMarker(markCur);
+
 
                     } catch (Exception f){
                         Toast.makeText(getApplicationContext(),"Fail to resolve address", Toast.LENGTH_SHORT).show();
@@ -251,6 +257,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .title("Current_Location");
 
             myMarker = mMap.addMarker(markCur);
+
+            if(myCircle != null){
+                myCircle.remove();
+            }
+            double radiusInMeters = 100.0;
+            int strokeColor = 0xffff0000;
+            int shadeColor = 0x44ff0000;
+            CircleOptions circleOptions = new CircleOptions().center(latLng).radius(radiusInMeters).fillColor(shadeColor).strokeColor(strokeColor).strokeWidth(2);
+            myCircle = mMap.addCircle(circleOptions);
         } else {
             // do nothing, we don't want the camera of map move when user search for location
         }
