@@ -89,7 +89,7 @@
             android:layout_below="@+id/validText"
             android:layout_alignLeft="@+id/validText"
             android:layout_alignStart="@+id/validText"
-            android:enabled="false" />
+            android:enabled="true" />
 
         <TextView
             android:layout_width="wrap_content"

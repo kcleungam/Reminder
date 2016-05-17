@@ -5,47 +5,26 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/reminder_list"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-        <!--<android.support.v7.widget.Toolbar-->
-            <!--android:id="@+id/toolbar"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="?attr/actionBarSize"-->
-            <!--android:background="?attr/colorPrimary"-->
-            <!--android:theme="@style/AppTheme.AppBarOverlay"-->
-            <!--app:popupTheme="@style/AppTheme.PopupOverlay"-->
-            <!--/>-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/menuFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/yellow_plus"
+        android:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        android:scaleType="fitXY"
+        app:layout_behavior="hk.ust.cse.comp4521.reminder.FabHideOnScroll"
+        />
 
-        <android.support.design.widget.CoordinatorLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ListView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/reminder_list"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/menuFab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="16dp"
-                android:src="@drawable/yellow_plus"
-                android:elevation="6dp"
-                app:pressedTranslationZ="12dp"
-                android:scaleType="fitXY"
-                app:layout_behavior="hk.ust.cse.comp4521.reminder.FabHideOnScroll"
-                />
-
-            <include layout="@layout/activity_main_fab_menu" />
-
-        </android.support.design.widget.CoordinatorLayout>
-    </LinearLayout>
+    <include layout="@layout/activity_main_fab_menu" />
 
 </android.support.design.widget.CoordinatorLayout>

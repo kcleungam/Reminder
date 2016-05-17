@@ -150,7 +150,7 @@ public class TimeReminderActivity extends AppCompatActivity {
             reminderData = ReminderDataController.getInstance().getReminder(reminderId);
         else
             reminderData = new ReminderData();
-        if (reminderData != null) {
+        if (reminderData.getId()!=-1) {
             editTitle.setText(reminderData.getTitle());
             editTime.setText(reminderData.getTime());
             for (int i = 0; i < checkBoxes.length; i++) {

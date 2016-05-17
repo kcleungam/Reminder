@@ -110,7 +110,7 @@ public class LocationReminderActivity extends AppCompatActivity {
             reminderData = ReminderDataController.getInstance().getReminder(reminderId);
         else
             reminderData = new ReminderData();
-        if (reminderData != null) {
+        if (reminderData.getId()!=-1) {
             editTitle.setText(reminderData.getTitle());
             editTime.setText(reminderData.getValidUntilTime());
             editDate.setText(reminderData.getValidUntilDate());
