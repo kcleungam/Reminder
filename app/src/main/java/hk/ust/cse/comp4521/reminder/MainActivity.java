@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         menuFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Fab clicked", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
                 if(fabMenuShown)
                     hideFabMenu();
                 else
