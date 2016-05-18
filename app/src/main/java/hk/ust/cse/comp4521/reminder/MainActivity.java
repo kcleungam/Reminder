@@ -116,9 +116,6 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener, onLongClickListener);
         // 建立資料庫物件
         ReminderDataController.setContext(getApplicationContext());
-        //TODO: remove the following tow lines after your first run
-        ReminderDataController.getInstance().clear();
-        ReminderDataController.getInstance().sample();
         // 取得所有記事資料
         ArrayList<ReminderData> reminders = ReminderDataController.getInstance().getAll();
         for(ReminderData sample:reminders){
@@ -139,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
          */
         mGeofenceList = new ArrayList<Geofence>();//empty list for storing geo-fences
         mGeofencePendingIntent=null;//Initially set the PendingIntent used in addGeofences() and removeGeofences() to null
-        populateGeofenceList();//get the geo-fences used
         buildGoogleApiClient();//kick off the request to build GooogleApiClient
 
 
@@ -350,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
             return;
         }
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        addGeofence("123", 22.337398, 114.259114);
+        populateGeofenceList();//get the geo-fences used
     }
 
     @Override
@@ -363,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         for(ReminderData reminderData:ReminderDataController.getInstance().getAll()){
             //validate the location
             if(reminderData.getReminderType()== ReminderData.ReminderType.Location && reminderData.getLocation()!=null && !reminderData.getLocation().equals("") && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null){
-                addGeofence(String.valueOf(reminderData.getId()),reminderData.getLatitude(),reminderData.getLongitude());
+                addGeofence(String.valueOf(reminderData.getId()), reminderData.getLatitude(), reminderData.getLongitude());
             }
         }
     }
