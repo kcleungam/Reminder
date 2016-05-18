@@ -16,11 +16,14 @@ import java.io.InputStream;
 
 public class ViewTimeActivity extends AppCompatActivity {
 
+    private ReminderDataController dataController;
+
     private ReminderData reminderData;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            dataController = ReminderDataController.getInstance(getApplication());
 
             //TODO: turn this into permission listener
             //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
@@ -42,7 +45,7 @@ public class ViewTimeActivity extends AppCompatActivity {
 
             long reminderId = getIntent().getLongExtra("ReminderId", -1);
             if (reminderId != -1)
-                reminderData = ReminderDataController.getInstance().getReminder(reminderId);
+                reminderData = dataController.getReminder(reminderId);
             else
                 reminderData = new ReminderData();
 

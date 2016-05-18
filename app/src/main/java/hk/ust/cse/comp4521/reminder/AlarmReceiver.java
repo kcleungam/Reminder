@@ -20,10 +20,12 @@ import java.util.GregorianCalendar;
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
+    ReminderDataController dataController;
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        ReminderDAO reminderDAO = new ReminderDAO(context);
-        ReminderData reminderData = reminderDAO.get(intent.getLongExtra("ReminderId", -1));
+        dataController = ReminderDataController.getInstance(context);
+        ReminderData reminderData = dataController.getReminder(intent.getLongExtra("ReminderId", -1));
         long notificationId = intent.getLongExtra("NotificationId", -1);
         Log.i("AlarmReceiver", ""+notificationId);
 
@@ -45,20 +47,19 @@ public class AlarmReceiver extends BroadcastReceiver {
         //notification.setNumber(5);
 
         //當使用者按下通知欄中的通知時要開啟的 Activity
-        Intent resultIntent = null;
+        Intent resultIntent = new Intent();
         switch(reminderData.getReminderType()){
         case Time:
-            resultIntent = new Intent(context, ViewTimeActivity.class);
+            resultIntent.setClass(context, ViewTimeActivity.class);
             break;
         case Location:
-            resultIntent=new Intent(context,ViewLocationActivity.class);
+            resultIntent.setClass(context, ViewLocationActivity.class);
             break;
         default:
             Log.d("Alarm","Reminder type not on the list.");
         }
-        intent.setAction(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        resultIntent.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
         //非必要,可以利用intent傳值
         resultIntent.putExtra("ReminderId", reminderData.getId());
         //建立待處理意圖
@@ -79,11 +80,11 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //執行通知
         //TODO: unsafe long to int conversion
-        mNotificationManager.notify((int) notificationId, notification.build());
+        mNotificationManager.notify(1, notification.build());
 
         if(reminderData.noRepeat()) {
             reminderData.setEnabled(false);
-            ReminderDataController.getInstance().putReminder(reminderData);
+            dataController.putReminder(reminderData);
         }
     }
 }

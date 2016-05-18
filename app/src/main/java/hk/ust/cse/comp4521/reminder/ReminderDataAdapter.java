@@ -18,12 +18,15 @@ import java.util.ArrayList;
  */
 public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
+    ReminderDataController dataController;
+
     ArrayList<ReminderData> reminderList = new ArrayList<>();
     private View.OnClickListener onClickListener;
     private View.OnLongClickListener onLongClickListener;
 
     public ReminderDataAdapter(Context context, int resource, View.OnClickListener onClickListener, View.OnLongClickListener onLongClickListener){
         super(context, resource);
+        dataController = ReminderDataController.getInstance(context);
         this.onClickListener = onClickListener;
         this.onLongClickListener = onLongClickListener;
     }
@@ -103,7 +106,7 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
                     // true if the switch is in the On position
                     ReminderData data = getItem(position);
                     data.setEnabled(isChecked);
-                    ReminderDataController.getInstance().putReminder(data);
+                    dataController.putReminder(data);
                 }
             });
             row.setOnClickListener(onClickListener);

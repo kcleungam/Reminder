@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -32,15 +33,19 @@ import com.google.android.gms.location.LocationServices;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
+    /* View component */
     ListView reminderList;
     public static ReminderDataAdapter reminderAdaptor;
     ReminderDataAdapter.RowHandler rowOnSelected;
+
+    /* FAB animation */
     private boolean fabMenuShown = false;
     private int[] fabMenuItems = {R.id.timeReminderFab, R.id.fab_2};
     private double[][] fabMenuOffsetRatio = {{1.7, 0.25}, {1.5, 1.5}};
     private int[] fabMenuShowAnimation = {R.anim.fab1_show, R.anim.fab2_show};
     private int[] fabMenuHideAnimation = {R.anim.fab1_hide, R.anim.fab2_hide};
 
+    /* Location */
     protected LocationRequest mLocationRequest;
     private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
     private final static int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 100000;
@@ -50,12 +55,19 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     private boolean mGeofencesAdded = false;
     private PendingIntent mGeofencePendingIntent;
 
+    /* Database */
+    private ReminderDataController dataController;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        dataController = ReminderDataController.getInstance(getApplication()); // 建立資料庫物件
+        //        //TODO: remove the following tow lines after your first run
+//        dataController.clear();
+//        dataController.sample();
+
         setContentView(R.layout.new_activity_main);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
         reminderList = (ListView)findViewById(R.id.reminder_list);
 
         FloatingActionButton menuFab = (FloatingActionButton)findViewById(R.id.menuFab);
@@ -113,14 +125,10 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
                 return true;
             }
         };
-        reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener, onLongClickListener);
-        // 建立資料庫物件
-        ReminderDataController.setContext(getApplicationContext());
-        //TODO: remove the following tow lines after your first run
-        ReminderDataController.getInstance().clear();
-        ReminderDataController.getInstance().sample();
+        reminderAdaptor = new ReminderDataAdapter(getApplication(), R.layout.row_layout, onClickListener, onLongClickListener);
+
         // 取得所有記事資料
-        ArrayList<ReminderData> reminders = ReminderDataController.getInstance().getAll();
+        ArrayList<ReminderData> reminders = dataController.getAll();
         for(ReminderData sample:reminders){
             reminderAdaptor.addItem(sample);
         }
@@ -182,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     protected void onResume() {
         super.onResume();
         reminderAdaptor.clear();
-        for(ReminderData reminderData:ReminderDataController.getInstance().getAll())
+        for(ReminderData reminderData:dataController.getAll())
             reminderAdaptor.add(reminderData);
         reminderAdaptor.notifyDataSetChanged();
     }
@@ -222,10 +230,10 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if(item.getTitle().equals("Delete")){
-            ReminderDataController.getInstance().deleteReminder(rowOnSelected.reminderId);
+            dataController.deleteReminder(rowOnSelected.reminderId);
             Toast.makeText(MainActivity.this, "Reminder "+rowOnSelected.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
             reminderAdaptor.clear();
-            for(ReminderData reminderData:ReminderDataController.getInstance().getAll())
+            for(ReminderData reminderData:dataController.getAll())
                 reminderAdaptor.add(reminderData);
             reminderAdaptor.notifyDataSetChanged();
         }
@@ -360,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
 
     public void populateGeofenceList(){
         //Get all the reminder from the database
-        for(ReminderData reminderData:ReminderDataController.getInstance().getAll()){
+        for(ReminderData reminderData:dataController.getAll()){
             //validate the location
             if(reminderData.getLocation()!=null && !reminderData.getLocation().equals("") && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null){
                 mGeofenceList.add(new Geofence.Builder()

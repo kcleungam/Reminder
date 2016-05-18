@@ -99,7 +99,7 @@ public class GeofenceTransitionIntentService extends IntentService {
 
         //TODO: this may be buggy and not efficient
         //as Android M doesn't support lambda expression but will support in Android N
-        ReminderDataController reminderDataController=ReminderDataController.getInstance();
+        ReminderDataController reminderDataController=ReminderDataController.getInstance(getApplication());
         for(ReminderData reminderData:MainActivity.reminderAdaptor.reminderList){
             if(String.valueOf(reminderData.getId()).equals(geofenceID)){
                 reminderDataController.setGeoAlarm(reminderData);

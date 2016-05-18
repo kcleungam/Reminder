@@ -22,11 +22,12 @@ import android.widget.Toast;
 import java.util.Calendar;
 
 public class LocationReminderActivity extends AppCompatActivity {
+    private ReminderDataController dataController;
+
     private ReminderData reminderData;
     private TextView editTitle;
     private TextView editTime;
     private TextView editDate;
-//    private ImageButton timeButton;
     private TextView locationText;
     private ImageButton locationButton;
     private TextView editDescription;
@@ -43,6 +44,7 @@ public class LocationReminderActivity extends AppCompatActivity {
     //@TargetApi(23)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dataController = ReminderDataController.getInstance(getApplication());
 
         //TODO: turn this into permission listener
         //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
@@ -107,7 +109,7 @@ public class LocationReminderActivity extends AppCompatActivity {
 
         long reminderId = getIntent().getLongExtra("ReminderId", -1);
         if (reminderId != -1)
-            reminderData = ReminderDataController.getInstance().getReminder(reminderId);
+            reminderData = dataController.getReminder(reminderId);
         else
             reminderData = new ReminderData();
         if (reminderData.getId()!=-1) {
@@ -162,9 +164,9 @@ public class LocationReminderActivity extends AppCompatActivity {
                 reminderData.setDescription(editDescription.getText().toString());
                 if (reminderData.getId() < 0) {
                     reminderData.setEnabled(true);
-                    ReminderDataController.getInstance().addReminder(reminderData);
+                    dataController.addReminder(reminderData);
                 }else
-                    ReminderDataController.getInstance().putReminder(reminderData);
+                    dataController.putReminder(reminderData);
                 finish();
                 break;
             case R.id.action_cancel:

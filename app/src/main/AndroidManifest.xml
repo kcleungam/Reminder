@@ -20,7 +20,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:name=".GlobalState"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -32,6 +34,7 @@
 
         <receiver
             android:name=".AlarmReceiver"
+            android:process=":remote"
             android:enabled="true" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -58,10 +61,6 @@
             android:name=".ViewTimeActivity"
             android:label="@string/title_activity_time_reminder"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -76,10 +75,6 @@
             android:name=".ViewLocationActivity"
             android:label="@string/title_activity_location_reminder"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <service

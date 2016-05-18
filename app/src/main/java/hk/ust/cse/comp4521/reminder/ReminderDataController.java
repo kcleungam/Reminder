@@ -3,6 +3,7 @@ package hk.ust.cse.comp4521.reminder;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +18,7 @@ import java.util.Calendar;
 public class ReminderDataController {
 
     private static ReminderDataController instance;
-    private static Context context;
+    private Context context;
     private ReminderDAO reminderDAO;
     public static final int NOTIFICATION_DELAY=10;
     public static final int TIME_ALARM_NOTIFY_BEFORE = 10; //seconds
@@ -27,21 +28,22 @@ public class ReminderDataController {
 
     }
 
-    public static ReminderDataController getInstance(){
+    public static ReminderDataController getInstance(Context application){
         if(instance==null) {
-            if(context==null)
-                throw new IllegalArgumentException("Call setContext(getApplicationContext) in your onCreate before using getInstance().");
+            if(application==null)
+                throw new IllegalArgumentException("context is null");
             instance = new ReminderDataController();
-            instance.reminderDAO = new ReminderDAO(context);
+            instance.reminderDAO = new ReminderDAO(application);
+            instance.context = application;
             // 如果資料庫是空的，就建立一些範例資料
             // 這是為了方便測試用的，完成應用程式以後可以拿掉
         }
         return instance;
     }
 
-    public static void setContext(Context context){
-        ReminderDataController.context = context;
-    }
+//    public static void setContext(Context context){
+//        ReminderDataController.context = context;
+//    }
 
     public ReminderData getReminder(long reminderId){
         return reminderDAO.get(reminderId);
@@ -155,7 +157,7 @@ public class ReminderDataController {
                 calendar.add(Calendar.DATE, 1);
             //TODO: unsafe long to int conversion
             intent.putExtra("NotificationId", reminderData.getId()*7);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7, intent, 0);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
                 alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
             else//legacy support for sdk_api<19
@@ -167,7 +169,7 @@ public class ReminderDataController {
                 calendar.set(Calendar.DAY_OF_WEEK, i + 1);
                 intent.putExtra("NotificationId", reminderData.getId()*7+i);
                 //TODO: unsafe long to int conversion
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7+i, intent, 0);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7+i, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
             }
         }
