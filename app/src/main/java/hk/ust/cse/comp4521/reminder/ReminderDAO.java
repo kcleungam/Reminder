@@ -78,8 +78,8 @@ public class ReminderDAO {
         cv.put(REPEAT_TIME_COL, item.getTime());
         cv.put(REPEAT_WKDAY_COL, Util.toWkday(item.getRepeat()));
         cv.put(LOCATION_COL, item.getLocation());
-        cv.put(LONGITUDE_COL, 0);
-        cv.put(LATITUDE_COL, 0);
+        cv.put(LONGITUDE_COL, item.getLongitude());
+        cv.put(LATITUDE_COL, item.getLatitude());
         cv.put(EXPIRE_TIME_COL, item.getValidUntil());
         cv.put(ENABLED_COL, item.isEnabled());
         cv.put(LASTMODIFY_COL, DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.ISO8601));
@@ -110,8 +110,8 @@ public class ReminderDAO {
         cv.put(REPEAT_TIME_COL, item.getTime());
         cv.put(REPEAT_WKDAY_COL, Util.toWkday(item.getRepeat()));
         cv.put(LOCATION_COL, item.getLocation());
-        cv.put(LONGITUDE_COL, 0);
-        cv.put(LATITUDE_COL, 0);
+        cv.put(LONGITUDE_COL, item.getLongitude());
+        cv.put(LATITUDE_COL, item.getLatitude());
         cv.put(EXPIRE_TIME_COL, item.getValidUntil());
         cv.put(ENABLED_COL, item.isEnabled());
         cv.put(LASTMODIFY_COL, DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.ISO8601));
