@@ -1,5 +1,6 @@
 package hk.ust.cse.comp4521.reminder;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -17,6 +18,7 @@ public class ReminderDataController {
     private static ReminderDataController instance;
     private static Context context;
     private ReminderDAO reminderDAO;
+    public static final int NOTIFICATION_DELAY=10;
 
     //singleton pattern, no public constructor
     private ReminderDataController(){
@@ -162,6 +164,30 @@ public class ReminderDataController {
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
             }
         }
+    }
+
+    @SuppressLint("NewApi")
+    public void setGeoAlarm(ReminderData reminderData){
+        //使用Calendar指定時間
+        Calendar calendar = Calendar.getInstance();
+        //add delay
+        calendar.add(Calendar.SECOND,NOTIFICATION_DELAY);
+
+        //取得AlarmManager
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        //建立意圖
+        //這裡的 this 是指當前的 Activity
+        //AlarmReceiver.class 則是負責接收的 BroadcastReceiver
+
+        // Now create and schedule a new Alarm
+        Intent intent = new Intent(context, AlarmReceiver.class); // New component for alarm
+        intent.putExtra("ReminderId", reminderData.getId());
+        intent.putExtra("ReminderType", reminderData.getReminderType().ordinal());
+        //TODO: are these lines below correct?
+        intent.putExtra("NotificationID",reminderData.getId()*7);
+        PendingIntent pendingIntent=PendingIntent.getBroadcast(context,(int) reminderData.getId()*7,intent,0);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);
     }
 
     public void sample(){

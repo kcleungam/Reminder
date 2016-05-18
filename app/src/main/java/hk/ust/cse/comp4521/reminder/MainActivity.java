@@ -3,16 +3,12 @@ package hk.ust.cse.comp4521.reminder;
 import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.View;
 import android.view.Menu;
@@ -37,7 +33,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
     ListView reminderList;
-    ReminderDataAdapter reminderAdaptor;
+    public static ReminderDataAdapter reminderAdaptor;
     ReminderDataAdapter.RowHandler rowOnSelected;
     private boolean fabMenuShown = false;
     private int[] fabMenuItems = {R.id.timeReminderFab, R.id.fab_2};
@@ -48,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     protected LocationRequest mLocationRequest;
     private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
     private final static int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 100000;
+    private final static float GEOFENCE_RADIUS=500;//radius in meters
     protected GoogleApiClient mGoogleApiClient;
     protected ArrayList<Geofence> mGeofenceList;
     private boolean mGeofencesAdded = false;
@@ -137,9 +134,15 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
 //            double longitude = reminderData.getLongitude();
 //        }
 
-        mGeofenceList = new ArrayList<Geofence>();
+        /*
+         *  initialisation for location-triggered event
+         */
+        mGeofenceList = new ArrayList<Geofence>();//empty list for storing geo-fences
+        mGeofencePendingIntent=null;//Initially set the PendingIntent used in addGeofences() and removeGeofences() to null
+        populateGeofenceList();//get the geo-fences used
+        buildGoogleApiClient();//kick off the request to build GooogleApiClient
 
-        buildGoogleApiClient();
+
         registerForContextMenu(reminderList);
 
 //        CoordinatorLayout.LayoutParams params =
@@ -247,13 +250,34 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         return builder.build();
     }
 
-    private void addGeoFence(String id, double latitude, double longitude) {
+    /**
+     * Add a new geofence or update a new geofence
+     * @param id
+     * @param latitude
+     * @param longitude
+     */
+    public void addGeofence(String id, double latitude, double longitude) {
+        //TODO: This may be buggy
+        //check whether this id already exists
+        boolean exist=false;
+        for(Geofence geofence:mGeofenceList){
+            if(geofence.getRequestId().equals(id)){
+                exist=true;
+                break;
+            }
+        }
+        if(exist) {
+            //update the existing one
+            removeGeofence(id);
+        }
+        //add/update a new one
         mGeofenceList.add(new Geofence.Builder()
                 .setRequestId(id)
-                .setCircularRegion(latitude, longitude, 50)
+                .setCircularRegion(latitude, longitude, GEOFENCE_RADIUS)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .build());
+
 
         if (!mGoogleApiClient.isConnected()) {
             Toast.makeText(getApplicationContext(), "GOOGLE API Client Not connected", Toast.LENGTH_SHORT).show();
@@ -275,6 +299,24 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
             Toast.makeText(getApplicationContext(), "Geofence added", Toast.LENGTH_SHORT).show();
         } catch (SecurityException securityException) {
 
+        }
+    }
+
+    /**
+     * remove only one geofence
+     * @param id
+     */
+    public void removeGeofence(String id){
+        if(!mGoogleApiClient.isConnected()){
+            Toast.makeText(this,"Cannot connect to Google Service",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //remove the geo-fence
+        for(Geofence geofence:mGeofenceList){
+            if(geofence.getRequestId().equals(id)){
+                mGeofenceList.remove(geofence);
+                break;
+            }
         }
     }
 
@@ -308,12 +350,32 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
             return;
         }
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        addGeoFence("123", 22.337398, 114.259114);
+        addGeofence("123", 22.337398, 114.259114);
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         mGoogleApiClient.connect();
+    }
+
+    public void populateGeofenceList(){
+        //Get all the reminder from the database
+        for(ReminderData reminderData:ReminderDataController.getInstance().getAll()){
+            //validate the location
+            if(reminderData.getLocation()!=null && !reminderData.getLocation().equals("") && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null){
+                mGeofenceList.add(new Geofence.Builder()
+                //set the id the same as that of the reminder
+                .setRequestId(String.valueOf(reminderData.getId()))
+                //set the circular region of this geo-fence
+                .setCircularRegion(reminderData.getLatitude(),reminderData.getLongitude(),GEOFENCE_RADIUS)
+                //set the expiration duration of the geo-fence. This geo-fence gets automatically removed after this period of time
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                //set the transition types of interest. Alerts are only generated for these transitions.
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                //create the geo-fence
+                .build());
+            }
+        }
     }
 
     protected synchronized void buildGoogleApiClient() {

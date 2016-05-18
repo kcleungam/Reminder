@@ -51,7 +51,10 @@ public class AlarmReceiver extends BroadcastReceiver {
             resultIntent = new Intent(context, ViewTimeActivity.class);
             break;
         case Location:
-
+            resultIntent=new Intent(context,ViewLocationActivity.class);
+            break;
+        default:
+            Log.d("Alarm","Reminder type not on the list.");
         }
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
