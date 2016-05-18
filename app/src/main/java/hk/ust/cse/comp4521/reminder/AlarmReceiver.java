@@ -58,8 +58,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         default:
             Log.d("Alarm","Reminder type not on the list.");
         }
-        resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        resultIntent.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME);
         //非必要,可以利用intent傳值
         resultIntent.putExtra("ReminderId", reminderData.getId());
         //建立待處理意圖
@@ -74,7 +72,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 //        stackBuilder.addNextIntent(resultIntent);
 //        //TODO: unsafe long to int conversion
 //        PendingIntent pendingResultIntent = stackBuilder.getPendingIntent((int) reminderData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pendingResultIntent = PendingIntent.getActivity(context, (int) reminderData.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingResultIntent = PendingIntent.getActivity(context, (int) reminderData.getId(), resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         notification.setContentIntent(pendingResultIntent);
         //取得通知管理器
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
