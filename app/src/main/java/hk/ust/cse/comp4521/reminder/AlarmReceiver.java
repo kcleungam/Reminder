@@ -78,7 +78,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //執行通知
         //TODO: unsafe long to int conversion
-        mNotificationManager.notify(1, notification.build());
+        mNotificationManager.notify((int) notificationId, notification.build());
 
         if(reminderData.noRepeat()) {
             reminderData.setEnabled(false);
