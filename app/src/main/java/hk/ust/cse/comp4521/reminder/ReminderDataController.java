@@ -27,6 +27,8 @@ public class ReminderDataController {
 
     public static ReminderDataController getInstance(){
         if(instance==null) {
+            if(context==null)
+                throw new IllegalArgumentException("Call setContext(getApplicationContext) in your onCreate before using getInstance().");
             instance = new ReminderDataController();
             instance.reminderDAO = new ReminderDAO(context);
             // 如果資料庫是空的，就建立一些範例資料

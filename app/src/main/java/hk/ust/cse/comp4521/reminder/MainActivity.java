@@ -116,9 +116,11 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
             }
         };
         reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener, onLongClickListener);
-
         // 建立資料庫物件
         ReminderDataController.setContext(getApplicationContext());
+        //TODO: remove the following tow lines after your first run
+        ReminderDataController.getInstance().clear();
+        ReminderDataController.getInstance().sample();
         // 取得所有記事資料
         ArrayList<ReminderData> reminders = ReminderDataController.getInstance().getAll();
         for(ReminderData sample:reminders){
