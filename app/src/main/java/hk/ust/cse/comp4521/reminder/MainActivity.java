@@ -147,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
          */
         mGeofenceList = new ArrayList<Geofence>();//empty list for storing geo-fences
         mGeofencePendingIntent=null;//Initially set the PendingIntent used in addGeofences() and removeGeofences() to null
-        populateGeofenceList();//get the geo-fences used
         buildGoogleApiClient();//kick off the request to build GooogleApiClient
 
 
@@ -358,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
             return;
         }
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        addGeofence("123", 22.337398, 114.259114);
+        populateGeofenceList();//get the geo-fences used
     }
 
     @Override
@@ -370,18 +369,8 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         //Get all the reminder from the database
         for(ReminderData reminderData:dataController.getAll()){
             //validate the location
-            if(reminderData.getLocation()!=null && !reminderData.getLocation().equals("") && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null){
-                mGeofenceList.add(new Geofence.Builder()
-                //set the id the same as that of the reminder
-                .setRequestId(String.valueOf(reminderData.getId()))
-                //set the circular region of this geo-fence
-                .setCircularRegion(reminderData.getLatitude(),reminderData.getLongitude(),GEOFENCE_RADIUS)
-                //set the expiration duration of the geo-fence. This geo-fence gets automatically removed after this period of time
-                .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                //set the transition types of interest. Alerts are only generated for these transitions.
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                //create the geo-fence
-                .build());
+            if(reminderData.getReminderType()== ReminderData.ReminderType.Location && reminderData.getLocation()!=null && !reminderData.getLocation().equals("") && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null){
+                addGeofence(String.valueOf(reminderData.getId()), reminderData.getLatitude(), reminderData.getLongitude());
             }
         }
     }

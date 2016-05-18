@@ -47,8 +47,7 @@ public class GeofenceTransitionIntentService extends IntentService {
 
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
 
-        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
-                geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
 
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
             //TODO: this may be buggy
@@ -58,7 +57,7 @@ public class GeofenceTransitionIntentService extends IntentService {
     }
 
     private void sendNotification(String geofenceID) {
-        /*// Create an explicit content Intent that starts the main Activity.
+        // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
 
         // Construct a task stack.
@@ -83,7 +82,7 @@ public class GeofenceTransitionIntentService extends IntentService {
                 // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(),
                         R.drawable.pink_stick_man))
-                .setContentTitle(notificationDetails)
+                .setContentTitle("Sofa King Good")
                 .setContentText("HIHI")
                 .setContentIntent(notificationPendingIntent);
 
@@ -95,16 +94,16 @@ public class GeofenceTransitionIntentService extends IntentService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Issue the notification
-        mNotificationManager.notify(0, builder.build());*/
+        mNotificationManager.notify(0, builder.build());
 
-        //TODO: this may be buggy and not efficient
-        //as Android M doesn't support lambda expression but will support in Android N
-        ReminderDataController reminderDataController=ReminderDataController.getInstance(getApplication());
-        for(ReminderData reminderData:MainActivity.reminderAdaptor.reminderList){
-            if(String.valueOf(reminderData.getId()).equals(geofenceID)){
-                reminderDataController.setGeoAlarm(reminderData);
-            }
-        }
+//        //TODO: this may be buggy and not efficient
+//        //as Android M doesn't support lambda expression but will support in Android N
+//        ReminderDataController reminderDataController=ReminderDataController.getInstance();
+//        for(ReminderData reminderData:MainActivity.reminderAdaptor.reminderList){
+//            if(String.valueOf(reminderData.getId()).equals(geofenceID)){
+//                reminderDataController.setGeoAlarm(reminderData);
+//            }
+//        }
     }
 
     private String getGeofenceTransitionDetails(
