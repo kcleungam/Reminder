@@ -11,14 +11,15 @@ import android.widget.Toast;
  */
 public class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
-    TextView tv1,tv2;
+    TextView reminder_title,reminder_location,reminder_time;
     ImageView imageView;
 
     public RecyclerViewHolder(View itemView) {
         super(itemView);
 
-        tv1= (TextView) itemView.findViewById(R.id.list_title);
-        tv2= (TextView) itemView.findViewById(R.id.list_desc);
-        imageView= (ImageView) itemView.findViewById(R.id.list_avatar);
+        reminder_title= (TextView) itemView.findViewById(R.id.reminder_title);
+        reminder_location= (TextView) itemView.findViewById(R.id.reminder_location);
+        reminder_time=(TextView)itemView.findViewById(R.id.reminder_time);
+        imageView= (ImageView) itemView.findViewById(R.id.reminder_icon);
     }
 }

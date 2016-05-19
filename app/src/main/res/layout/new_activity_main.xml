@@ -19,7 +19,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:src="@drawable/yellow_plus"
-        android:elevation="6dp"
+        android:elevation="10dp"
         app:pressedTranslationZ="12dp"
         android:scaleType="fitXY"
         app:layout_behavior="hk.ust.cse.comp4521.reminder.FabHideOnScroll"
