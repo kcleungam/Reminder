@@ -212,6 +212,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         return remove(reminderData.getId());
     }
 
+    public boolean removeByPosition(int position){
+        return remove(UItoID.get(position));
+    }
+
     public ReminderData get(long reminderID){
         return reminderDataHashMap.get(reminderID);
     }

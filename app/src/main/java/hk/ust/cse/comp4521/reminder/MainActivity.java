@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.View;
 import android.view.Menu;
@@ -22,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -61,6 +63,11 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
 
     /* Database */
     private ReminderDataController dataController;
+
+    /* Others */
+    public static final String TAG="Main Activity";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +176,36 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
 //                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
 //        params.setBehavior(new FabHideOnScroll());
 
+        //make the card view swipe-able
+        SwipeableRecyclerViewTouchListener swipeTouchListener =
+                new SwipeableRecyclerViewTouchListener(recyclerView,
+                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
+                            @Override
+                            public boolean canSwipeLeft(int position) {
+                                return true;
+                            }
 
+                            @Override
+                            public boolean canSwipeRight(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                //remove it
+                                recyclerAdapter.removeByPosition(reverseSortedPositions[0]);
+                                recyclerAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                //remove it
+                                recyclerAdapter.removeByPosition(reverseSortedPositions[0]);
+                                recyclerAdapter.notifyDataSetChanged();
+                            }
+                        });
+
+        recyclerView.addOnItemTouchListener(swipeTouchListener);
     }
 
     private void showFabMenu(){
