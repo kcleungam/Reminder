@@ -26,13 +26,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     /* Data controls */
     ReminderDataController reminderDataController;
-    LinkedHashMap<Long,ReminderData> reminderDataHashMap=new LinkedHashMap<>();
-    ArrayList<Long> UItoID=new ArrayList<>();
+
+    public static LinkedHashMap<Long,ReminderData> reminderDataHashMap=new LinkedHashMap<>();
+    public static ArrayList<Long> UItoID=new ArrayList<>();
 
     private View.OnClickListener onClickListener;
     private View.OnLongClickListener onLongClickListener;
-    String [] name={"Androidwarriors","Stackoverflow","Developer Android","AndroidHive",
-            "Slidenerd","TheNewBoston","Truiton","HmkCode","JavaTpoint","Javapeper"};
 
     /* Others */
     public static final String TAG="RecyclerAdapter";
@@ -68,13 +67,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         };
 
         this.reminderDataController=ReminderDataController.getInstance(context);
-        Log.d(TAG,"The number of reminders is "+reminderDataController.getCount());
+        //Log.d(TAG,"The number of reminders is "+reminderDataController.getCount());
         for(ReminderData reminderData:reminderDataController.getAll()) {
             reminderDataHashMap.put(reminderData.getId(), reminderData);
             UItoID.add(reminderData.getId());
         }
 
-        layoutInflater=LayoutInflater.from(context);
+        //layoutInflater=LayoutInflater.from(context);
+        layoutInflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
 
@@ -84,6 +84,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
      */
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         View v=layoutInflater.inflate(R.layout.reminder_card, parent, false);
 
         RecyclerViewHolder viewHolder=new RecyclerViewHolder(v);
@@ -186,6 +187,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                 throw new RuntimeException();
             }
         }
+        //  Log.d(TAG,"The time is "+reminderData.getTime());
         return true;
     }
 
@@ -208,5 +210,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     public boolean remove(ReminderData reminderData) throws  RuntimeException{
         return remove(reminderData.getId());
+    }
+
+    public ReminderData get(long reminderID){
+        return reminderDataHashMap.get(reminderID);
     }
 }

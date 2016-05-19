@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -34,13 +32,14 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class MainActivity extends AppCompatActivity implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
     /* View component */
     ListView reminderList;
     //public static ReminderDataAdapter reminderAdaptor;
     //ReminderDataAdapter.RowHandler rowOnSelected;
-    RecyclerView recyclerView;
+    public static RecyclerView recyclerView;
     public static RecyclerAdapter recyclerAdapter;
 
     /* FAB animation */
@@ -70,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         dataController = ReminderDataController.getInstance(getApplication()); // 建立資料庫物件
 
        //TODO: remove the following tow lines after your first run
-       dataController.clear();
-       dataController.sample();
+       /*dataController.clear();
+       dataController.sample();*/
 
         /*setContentView(R.layout.new_activity_main);
         reminderList = (ListView)findViewById(R.id.reminder_list);*/
@@ -204,11 +203,9 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     @Override
     protected void onResume() {
         super.onResume();
-        //TODO
-        /*reminderAdaptor.clear();
-        for(ReminderData reminderData:dataController.getAll())
-            reminderAdaptor.add(reminderData);
-        reminderAdaptor.notifyDataSetChanged();*/
+
+        recyclerAdapter.notifyDataSetChanged();//this needs other parts in Adapter to work successfully
+        //otherwise, it may be no changed or duplicate the cards
     }
 
     @Override
