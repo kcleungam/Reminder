@@ -1,6 +1,8 @@
 package hk.ust.cse.comp4521.reminder;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -39,6 +41,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
    /*
     * Constructor
     */
+    @Deprecated
     public RecyclerAdapter(Context context,View.OnClickListener onClickListener,View.OnLongClickListener onLongClickListener){
         this.context=context;
         this.onClickListener=onClickListener;
@@ -53,14 +56,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         layoutInflater=LayoutInflater.from(context);
     }
 
-    public RecyclerAdapter(Context context){
+    public RecyclerAdapter(final Context context){
         this.context=context;
-        this.onClickListener=new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO
-            }
-        };
         this.onLongClickListener=new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -93,17 +90,31 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerViewHolder holder, int position) {
-        Log.d(TAG,"position = "+position);
-        /*holder.reminder_title.setText("TITLE");
-        holder.reminder_location.setText("LOCATION");
-        holder.reminder_time.setText("TIME");*/
-        ReminderData reminder=reminderDataHashMap.get(UItoID.get(position));
+    public void onBindViewHolder(final RecyclerViewHolder holder, int position) {
+        final ReminderData reminder=reminderDataHashMap.get(UItoID.get(position));
         holder.tv1.setText(reminder.getTitle());
-        if(position%2==0){
-            int id=context.getResources().getIdentifier(context.getPackageName()+":drawable/clock",null,null);
-            holder.imageView.setImageResource(id);
-        }
+        holder.tv1.setTypeface(Typeface.DEFAULT_BOLD);
+
+        /* set the listener */
+        //enter the details of the event
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=null;
+                ReminderData selectedReminder=reminderDataHashMap.get(UItoID.get(holder.getAdapterPosition()));
+                switch (selectedReminder.getReminderType()){
+                    case Time:
+                        intent=new Intent(context,TimeReminderActivity.class);
+                        break;
+                    case Location:
+                        intent=new Intent(context,LocationReminderActivity.class);
+                        break;
+                }
+                intent.putExtra("ReminderId",selectedReminder.getId());
+                context.startActivity(intent);
+            }
+        });
+        //set the icon
         int id;
         switch(reminder.getReminderType()){
             case Time:
@@ -116,12 +127,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                 break;
             default:
         }
-        //holder.imageView.setOnClickListener(clickListener);
-        //holder.imageView.setTag(holder);
-
-        //holder.itemView.setOnClickListener(this.onClickListener);
-
-
+        //enable/disable the reminder
+        //delete the reminder
     }
 
     @Override
