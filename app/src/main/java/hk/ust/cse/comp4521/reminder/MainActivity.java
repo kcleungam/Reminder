@@ -7,9 +7,12 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.View;
 import android.view.Menu;
@@ -35,8 +38,10 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
     /* View component */
     ListView reminderList;
-    public static ReminderDataAdapter reminderAdaptor;
-    ReminderDataAdapter.RowHandler rowOnSelected;
+    //public static ReminderDataAdapter reminderAdaptor;
+    //ReminderDataAdapter.RowHandler rowOnSelected;
+    RecyclerView recyclerView;
+    public static RecyclerAdapter recyclerAdapter;
 
     /* FAB animation */
     private boolean fabMenuShown = false;
@@ -63,12 +68,20 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         super.onCreate(savedInstanceState);
 
         dataController = ReminderDataController.getInstance(getApplication()); // 建立資料庫物件
-        //        //TODO: remove the following tow lines after your first run
-//        dataController.clear();
-//        dataController.sample();
 
-        setContentView(R.layout.new_activity_main);
-        reminderList = (ListView)findViewById(R.id.reminder_list);
+       //TODO: remove the following tow lines after your first run
+       dataController.clear();
+       dataController.sample();
+
+        /*setContentView(R.layout.new_activity_main);
+        reminderList = (ListView)findViewById(R.id.reminder_list);*/
+        setContentView(R.layout.main_activity);
+        recyclerView=(RecyclerView)findViewById(R.id.reminder_recycler_view);
+
+        recyclerAdapter=new RecyclerAdapter(this);
+        recyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         FloatingActionButton menuFab = (FloatingActionButton)findViewById(R.id.menuFab);
         menuFab.setOnClickListener(new View.OnClickListener() {
@@ -120,19 +133,20 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         View.OnLongClickListener onLongClickListener = new AdapterView.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                rowOnSelected = (ReminderDataAdapter.RowHandler) v.getTag();
-                openContextMenu(reminderList);
+                //rowOnSelected = (ReminderDataAdapter.RowHandler) v.getTag();
+                openContextMenu(recyclerView);
                 return true;
             }
         };
-        reminderAdaptor = new ReminderDataAdapter(getApplication(), R.layout.row_layout, onClickListener, onLongClickListener);
+        //reminderAdaptor = new ReminderDataAdapter(getApplication(), R.layout.row_layout, onClickListener, onLongClickListener);
 
         // 取得所有記事資料
-        ArrayList<ReminderData> reminders = dataController.getAll();
+        //TODO
+        /*ArrayList<ReminderData> reminders = dataController.getAll();
         for(ReminderData sample:reminders){
             reminderAdaptor.addItem(sample);
-        }
-        reminderList.setAdapter(reminderAdaptor);
+        }*/
+        //reminderList.setAdapter(reminderAdaptor);
 
 //        for(int i = 0; i < reminderList.getChildCount(); i++){
 //            ReminderDataAdapter.RowHandler rowHandler = ((ReminderDataAdapter.RowHandler) reminderList.getChildAt(i).getTag());
@@ -150,11 +164,13 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         buildGoogleApiClient();//kick off the request to build GooogleApiClient
 
 
-        registerForContextMenu(reminderList);
+        //registerForContextMenu(reminderList);
 
 //        CoordinatorLayout.LayoutParams params =
 //                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
 //        params.setBehavior(new FabHideOnScroll());
+
+
     }
 
     private void showFabMenu(){
@@ -188,10 +204,11 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     @Override
     protected void onResume() {
         super.onResume();
-        reminderAdaptor.clear();
+        //TODO
+        /*reminderAdaptor.clear();
         for(ReminderData reminderData:dataController.getAll())
             reminderAdaptor.add(reminderData);
-        reminderAdaptor.notifyDataSetChanged();
+        reminderAdaptor.notifyDataSetChanged();*/
     }
 
     @Override
@@ -220,8 +237,8 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
         if (v instanceof ListView) {
-            menu.setHeaderTitle(rowOnSelected.titleView.getText());
-            menu.add(Menu.NONE, 0, 0, "Delete");
+            /*menu.setHeaderTitle(rowOnSelected.titleView.getText());
+            menu.add(Menu.NONE, 0, 0, "Delete");*/
         }
         super.onCreateContextMenu(menu, v, menuInfo);
     }
@@ -229,12 +246,13 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if(item.getTitle().equals("Delete")){
-            dataController.deleteReminder(rowOnSelected.reminderId);
+            //TODO
+            /*dataController.deleteReminder(rowOnSelected.reminderId);
             Toast.makeText(MainActivity.this, "Reminder "+rowOnSelected.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
             reminderAdaptor.clear();
             for(ReminderData reminderData:dataController.getAll())
                 reminderAdaptor.add(reminderData);
-            reminderAdaptor.notifyDataSetChanged();
+            reminderAdaptor.notifyDataSetChanged();*/
         }
         return true;
     }
