@@ -67,8 +67,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         dataController = ReminderDataController.getInstance(getApplication()); // 建立資料庫物件
+        mGoogleApiClient = GoogleApiClientProvider.getInstance(getApplication());
 
-       //TODO: remove the following tow lines after your first run
+        //TODO: remove the following tow lines after your first run
        /*dataController.clear();
        dataController.sample();*/
 
@@ -183,14 +184,14 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
                                 //remove it
-                                recyclerAdapter.removeByPosition(reverseSortedPositions[0]);
+                                recyclerAdapter.remove(reverseSortedPositions[0]);
                                 recyclerAdapter.notifyDataSetChanged();
                             }
 
                             @Override
                             public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
                                 //remove it
-                                recyclerAdapter.removeByPosition(reverseSortedPositions[0]);
+                                recyclerAdapter.remove(reverseSortedPositions[0]);
                                 recyclerAdapter.notifyDataSetChanged();
                             }
                         });
@@ -229,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        recyclerAdapter.reset();
         recyclerAdapter.notifyDataSetChanged();//this needs other parts in Adapter to work successfully
         //otherwise, it may be no changed or duplicate the cards
     }

@@ -43,7 +43,7 @@ public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallba
         return providerIsntance.mGoogleApiClient;
     }
 
-    private GoogleApiClient buildClient(Context application){
+    private void buildClient(Context application){
         mGoogleApiClient = new GoogleApiClient.Builder(application)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -58,7 +58,6 @@ public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallba
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
 
-        return mGoogleApiClient;
     }
 
     @Override

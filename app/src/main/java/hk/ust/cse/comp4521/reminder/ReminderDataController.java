@@ -71,7 +71,7 @@ public class ReminderDataController implements ResultCallback<Status> {
         return reminderDAO.getCount();
     }
 
-    public ReminderData addReminder(ReminderData reminderData){
+    public boolean addReminder(ReminderData reminderData){
         reminderDAO.insert(reminderData);
         if(reminderData.isEnabled()) {
             switch (reminderData.getReminderType()) {
@@ -83,7 +83,7 @@ public class ReminderDataController implements ResultCallback<Status> {
                     break;
             }
         }
-        return reminderData;
+        return reminderData.getId()!=-1;
     }
 
     public boolean putReminder(ReminderData reminderData){

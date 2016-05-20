@@ -25,7 +25,7 @@ import java.util.Calendar;
 
 public class TimeReminderActivity extends AppCompatActivity {
 
-    private RecyclerAdapter recyclerAdapter;
+    private ReminderDataController dataController;
 
     private ReminderData reminderData;
     private TextView editTitle;
@@ -49,8 +49,7 @@ public class TimeReminderActivity extends AppCompatActivity {
     //@TargetApi(23)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //recyclerAdapter = ReminderDataController.getInstance(getApplication());
-        recyclerAdapter=new RecyclerAdapter(getApplication());
+        dataController = ReminderDataController.getInstance(getApplication());
 
         //TODO: turn this into permission listener
         //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
@@ -151,7 +150,7 @@ public class TimeReminderActivity extends AppCompatActivity {
 
         long reminderId = getIntent().getLongExtra("ReminderId", -1);
         if (reminderId != -1)
-            reminderData = recyclerAdapter.get(reminderId);
+            reminderData = dataController.getReminder(reminderId);
         else
             reminderData = new ReminderData();
         if (reminderData.getId()!=-1) {
@@ -219,9 +218,9 @@ public class TimeReminderActivity extends AppCompatActivity {
                 reminderData.setDescription(editDescription.getText().toString());
                 if (reminderData.getId() < 0) {
                     reminderData.setEnabled(true);
-                    recyclerAdapter.add(reminderData);
+                    dataController.addReminder(reminderData);
                 }else
-                    recyclerAdapter.add(reminderData);
+                    dataController.putReminder(reminderData);
                 finish();
                 break;
             case R.id.action_cancel:
