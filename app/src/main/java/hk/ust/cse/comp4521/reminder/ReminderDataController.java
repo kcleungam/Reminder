@@ -8,6 +8,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,13 +24,18 @@ import java.util.Calendar;
 /**
  * Created by Jeffrey on 17/5/2016.
  */
-public class ReminderDataController {
+public class ReminderDataController implements ResultCallback<Status> {
 
     private static ReminderDataController instance;
     private Context context;
     private ReminderDAO reminderDAO;
     public static final int NOTIFICATION_DELAY=10;
     public static final int TIME_ALARM_NOTIFY_BEFORE = 10; //seconds
+
+    protected ArrayList<Geofence> mGeofenceList;
+    protected GoogleApiClient mGoogleApiClient;
+    private final static float GEOFENCE_RADIUS=500;//radius in meters
+    private boolean mGeofencesAdded = false;
 
     //singleton pattern, no public constructor
     private ReminderDataController(){
@@ -40,10 +54,6 @@ public class ReminderDataController {
         }
         return instance;
     }
-
-//    public static void setContext(Context context){
-//        ReminderDataController.context = context;
-//    }
 
     public ReminderData getReminder(long reminderId){
         return reminderDAO.get(reminderId);
@@ -175,6 +185,11 @@ public class ReminderDataController {
         }
     }
 
+    /**
+     * I do not recommend calling notification through alarm manager
+     * @param reminderData
+     */
+    @Deprecated
     @SuppressLint("NewApi")
     public void setGeoAlarm(ReminderData reminderData){
         //使用Calendar指定時間
@@ -200,6 +215,114 @@ public class ReminderDataController {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         else//legacy support for sdk_api<19
             alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+    }
+
+    /**
+     * Add a new geofence or update a new geofence
+     * @param id
+     * @param latitude
+     * @param longitude
+     */
+    public void addGeofence(int id, double latitude, double longitude) {
+        //TODO: Could someone prove this is working?
+        //check whether this id already exists
+//        boolean exist=false;
+//        for(Geofence geofence:mGeofenceList){
+//            if(geofence.getRequestId().equals(id)){
+//                exist=true;
+//                break;
+//            }
+//        }
+//        if(exist) {
+//            //update the existing one
+//            removeGeofence(id);
+//        }
+        //add/update a new one
+        mGeofenceList.add(new Geofence.Builder()
+                .setRequestId(""+id)
+                .setCircularRegion(latitude, longitude, GEOFENCE_RADIUS)
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build());
+
+
+        if (!mGoogleApiClient.isConnected()) {
+            Log.i("Reminder", "GOOGLE API Client Not connected");
+            return;
+        }
+
+        try {
+            GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+            // The INITIAL_TRIGGER_ENTER flag indicates that geofencing service should trigger a
+            // GEOFENCE_TRANSITION_ENTER notification when the geofence is added and if the device
+            // is already inside that geofence.
+            builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+            // Add the geofences to be monitored by geofencing service.
+            builder.addGeofences(mGeofenceList);
+            // Return a GeofencingRequest.
+            GeofencingRequest geofencingRequest = builder.build();
+            Intent intent = new Intent(context, GeofenceTransitionIntentService.class);
+            // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
+            // addGeofences() and removeGeofences().
+            PendingIntent pendingIntent = PendingIntent.getService(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            LocationServices.GeofencingApi.addGeofences(
+                    mGoogleApiClient,
+                    // The GeofenceRequest object.
+                    geofencingRequest,
+                    // A pending intent that that is reused when calling removeGeofences(). This
+                    // pending intent is used to generate an intent when a matched geofence
+                    // transition is observed.
+                    pendingIntent
+            ).setResultCallback(this); // Result processed in onResult().
+            mGeofencesAdded = true;
+
+            Log.i("Reminder", "Geofence added");
+        } catch (SecurityException securityException) {
+
+        }
+    }
+
+    /**
+     * remove only one geofence
+     * @param id
+     */
+    public boolean removeGeofence(int id){
+        if(!mGoogleApiClient.isConnected()){
+            Log.i("Reminder","Cannot connect to Google Service");
+            return false;
+        }
+        //remove the geo-fence
+        //TODO: Could anyone prove this is working?
+//        for(Geofence geofence:mGeofenceList){
+//            if(geofence.getRequestId().equals(id)){
+//                mGeofenceList.remove(geofence);
+//                break;
+//            }
+//        }
+        //TODO: Or I will try using my own way to implement.
+        Intent intent = new Intent(context, GeofenceTransitionIntentService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(context, id, intent, PendingIntent.FLAG_NO_CREATE);
+        LocationServices.GeofencingApi.removeGeofences(
+                mGoogleApiClient,
+                // This is the same pending intent that was used in addGeofences().
+                pendingIntent
+        ).setResultCallback(this); // Result processed in onResult().
+        return true;
+    }
+
+    public void populateGeofenceList(){
+        //Get all the reminder from the database
+        for(ReminderData reminderData:getAll()){
+            //validate the location
+            if(reminderData.getReminderType()== ReminderData.ReminderType.Location && reminderData.getLocation()!=null && !reminderData.getLocation().equals("") && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null){
+                addGeofence((int) reminderData.getId(), reminderData.getLatitude(), reminderData.getLongitude());
+            }
+        }
+    }
+
+    @Override
+    public void onResult(Status status) {
+
     }
 
     public void sample(){

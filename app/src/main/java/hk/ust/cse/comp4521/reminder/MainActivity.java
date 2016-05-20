@@ -36,7 +36,7 @@ import com.google.android.gms.location.LocationServices;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public class MainActivity extends AppCompatActivity implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
+public class MainActivity extends AppCompatActivity {
     /* View component */
     ListView reminderList;
     //public static ReminderDataAdapter reminderAdaptor;
@@ -52,14 +52,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     private int[] fabMenuHideAnimation = {R.anim.fab1_hide, R.anim.fab2_hide};
 
     /* Location */
-    protected LocationRequest mLocationRequest;
-    private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
-    private final static int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 100000;
-    private final static float GEOFENCE_RADIUS=500;//radius in meters
     protected GoogleApiClient mGoogleApiClient;
-    protected ArrayList<Geofence> mGeofenceList;
-    private boolean mGeofencesAdded = false;
-    private PendingIntent mGeofencePendingIntent;
 
     /* Database */
     private ReminderDataController dataController;
@@ -165,10 +158,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         /*
          *  initialisation for location-triggered event
          */
-        mGeofenceList = new ArrayList<Geofence>();//empty list for storing geo-fences
-        mGeofencePendingIntent=null;//Initially set the PendingIntent used in addGeofences() and removeGeofences() to null
-        buildGoogleApiClient();//kick off the request to build GooogleApiClient
-
+        GoogleApiClientProvider.getInstance(getApplication());//kick off the request to build GooogleApiClient
 
         //registerForContextMenu(reminderList);
 
@@ -290,181 +280,6 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         return true;
     }
 
-
-
-
-    private GeofencingRequest getGeofencingRequest() {
-        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-
-        // The INITIAL_TRIGGER_ENTER flag indicates that geofencing service should trigger a
-        // GEOFENCE_TRANSITION_ENTER notification when the geofence is added and if the device
-        // is already inside that geofence.
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-
-        // Add the geofences to be monitored by geofencing service.
-        builder.addGeofences(mGeofenceList);
-
-        // Return a GeofencingRequest.
-        return builder.build();
-    }
-
-    /**
-     * Add a new geofence or update a new geofence
-     * @param id
-     * @param latitude
-     * @param longitude
-     */
-    public void addGeofence(String id, double latitude, double longitude) {
-        //TODO: This may be buggy
-        //check whether this id already exists
-        boolean exist=false;
-        for(Geofence geofence:mGeofenceList){
-            if(geofence.getRequestId().equals(id)){
-                exist=true;
-                break;
-            }
-        }
-        if(exist) {
-            //update the existing one
-            removeGeofence(id);
-        }
-        //add/update a new one
-        mGeofenceList.add(new Geofence.Builder()
-                .setRequestId(id)
-                .setCircularRegion(latitude, longitude, GEOFENCE_RADIUS)
-                .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                .build());
-
-
-        if (!mGoogleApiClient.isConnected()) {
-            Toast.makeText(getApplicationContext(), "GOOGLE API Client Not connected", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        try {
-            LocationServices.GeofencingApi.addGeofences(
-                    mGoogleApiClient,
-                    // The GeofenceRequest object.
-                    getGeofencingRequest(),
-                    // A pending intent that that is reused when calling removeGeofences(). This
-                    // pending intent is used to generate an intent when a matched geofence
-                    // transition is observed.
-                    getGeofencePendingIntent()
-            ).setResultCallback(this); // Result processed in onResult().
-            mGeofencesAdded = true;
-
-            Toast.makeText(getApplicationContext(), "Geofence added", Toast.LENGTH_SHORT).show();
-        } catch (SecurityException securityException) {
-
-        }
-    }
-
-    /**
-     * remove only one geofence
-     * @param id
-     */
-    public void removeGeofence(String id){
-        if(!mGoogleApiClient.isConnected()){
-            Toast.makeText(this,"Cannot connect to Google Service",Toast.LENGTH_SHORT).show();
-            return;
-        }
-        //remove the geo-fence
-        for(Geofence geofence:mGeofenceList){
-            if(geofence.getRequestId().equals(id)){
-                mGeofenceList.remove(geofence);
-                break;
-            }
-        }
-    }
-
-    private PendingIntent getGeofencePendingIntent() {
-        // Reuse the PendingIntent if we already have it.
-        if (mGeofencePendingIntent != null) {
-            return mGeofencePendingIntent;
-        }
-        Intent intent = new Intent(this, GeofenceTransitionIntentService.class);
-        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
-        // addGeofences() and removeGeofences().
-        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Toast.makeText(this,"On connected", Toast.LENGTH_SHORT).show();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        populateGeofenceList();//get the geo-fences used
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        mGoogleApiClient.connect();
-    }
-
-    public void populateGeofenceList(){
-        //Get all the reminder from the database
-        for(ReminderData reminderData:dataController.getAll()){
-            //validate the location
-            if(reminderData.getReminderType()== ReminderData.ReminderType.Location && reminderData.getLocation()!=null && !reminderData.getLocation().equals("") && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null){
-                addGeofence(String.valueOf(reminderData.getId()), reminderData.getLatitude(), reminderData.getLongitude());
-            }
-        }
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        mGoogleApiClient.connect();
-        createLocationRequest();
-    }
-
-    protected void createLocationRequest() {
-        Toast.makeText(this,"create location request", Toast.LENGTH_SHORT).show();
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
-    }
-
-    @Override
-    public void onResult(Status status) {
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-    }
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
     @Override
     protected void onStop() {
         if (mGoogleApiClient.isConnected()) {
@@ -472,12 +287,6 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         }
         super.onStop();
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
 
     /**
      *
