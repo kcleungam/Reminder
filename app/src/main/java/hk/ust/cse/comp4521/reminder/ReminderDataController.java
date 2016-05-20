@@ -26,16 +26,16 @@ import java.util.Calendar;
  */
 public class ReminderDataController implements ResultCallback<Status> {
 
+    public final static String TAG = "ReminderDataController";
+
     private static ReminderDataController instance;
     private Context context;
     private ReminderDAO reminderDAO;
     public static final int NOTIFICATION_DELAY=10;
     public static final int TIME_ALARM_NOTIFY_BEFORE = 10; //seconds
 
-    protected ArrayList<Geofence> mGeofenceList;
     protected GoogleApiClient mGoogleApiClient;
     private final static float GEOFENCE_RADIUS=500;//radius in meters
-    private boolean mGeofencesAdded = false;
 
     //singleton pattern, no public constructor
     private ReminderDataController(){
@@ -76,9 +76,10 @@ public class ReminderDataController implements ResultCallback<Status> {
         if(reminderData.isEnabled()) {
             switch (reminderData.getReminderType()) {
                 case Location:
+                    addGeofence(reminderData);
                     break;
                 case Time:
-                    setAlarm(reminderData);
+                    addAlarm(reminderData);
                     break;
             }
         }
@@ -87,13 +88,21 @@ public class ReminderDataController implements ResultCallback<Status> {
 
     public boolean putReminder(ReminderData reminderData){
         if(reminderDAO.update(reminderData)) {
-            deleteAlarm(reminderData.getId());
+            switch (reminderData.getReminderType()) {
+                case Location:
+                    removeGeofence(reminderData.getId());
+                    break;
+                case Time:
+                    removeAlarm(reminderData.getId());
+                    break;
+            }
             if(reminderData.isEnabled()) {
                 switch (reminderData.getReminderType()) {
                     case Location:
+                        addGeofence(reminderData);
                         break;
                     case Time:
-                        setAlarm(reminderData);
+                        addAlarm(reminderData);
                         break;
                 }
             }
@@ -102,9 +111,32 @@ public class ReminderDataController implements ResultCallback<Status> {
             return false;
     }
 
-    public boolean deleteReminder(long reminderId){
-        if(reminderDAO.delete(reminderId)){
-            deleteAlarm(reminderId);
+    public boolean deleteReminder(long id){
+        ReminderData reminderData = getReminder(id);
+        if(reminderDAO.delete(id)){
+            switch (reminderData.getReminderType()) {
+                case Location:
+                    removeGeofence(reminderData.getId());
+                    break;
+                case Time:
+                    removeAlarm(reminderData.getId());
+                    break;
+            }
+            return true;
+        }else
+            return false;
+    }
+
+    public boolean deleteReminder(ReminderData reminderData){
+        if(reminderDAO.delete(reminderData.getId())){
+            switch (reminderData.getReminderType()) {
+                case Location:
+                    removeGeofence(reminderData.getId());
+                    break;
+                case Time:
+                    removeAlarm(reminderData.getId());
+                    break;
+            }
             return true;
         }else
             return false;
@@ -113,14 +145,14 @@ public class ReminderDataController implements ResultCallback<Status> {
     public void enableReminder(long reminderId, boolean enable){
         if(enable) {
             ReminderData reminderData = getReminder(reminderId);
-            deleteAlarm(reminderId);
-            setAlarm(reminderData);
+            removeAlarm(reminderId);
+            addAlarm(reminderData);
         }else{
-            deleteAlarm(reminderId);
+            removeAlarm(reminderId);
         }
     }
 
-    private boolean deleteAlarm(long reminderId){
+    private boolean removeAlarm(long reminderId){
         //取得AlarmManager
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -138,7 +170,7 @@ public class ReminderDataController implements ResultCallback<Status> {
     }
 
     @SuppressLint("NewApi")
-    private void setAlarm(ReminderData reminderData){
+    private void addAlarm(ReminderData reminderData){
         //使用Calendar指定時間
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, reminderData.getTime(Calendar.HOUR_OF_DAY));
@@ -208,7 +240,6 @@ public class ReminderDataController implements ResultCallback<Status> {
         Intent intent = new Intent(context, AlarmReceiver.class); // New component for alarm
         intent.putExtra("ReminderId", reminderData.getId());
         intent.putExtra("ReminderType", reminderData.getReminderType().ordinal());
-        //TODO: are these lines below correct?
         intent.putExtra("NotificationId",reminderData.getId()*7);
         PendingIntent pendingIntent=PendingIntent.getBroadcast(context,(int) reminderData.getId()*7,intent,0);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
@@ -219,11 +250,8 @@ public class ReminderDataController implements ResultCallback<Status> {
 
     /**
      * Add a new geofence or update a new geofence
-     * @param id
-     * @param latitude
-     * @param longitude
      */
-    public void addGeofence(int id, double latitude, double longitude) {
+    public void addGeofence(ReminderData reminderData) {
         //TODO: Could someone prove this is working?
         //check whether this id already exists
 //        boolean exist=false;
@@ -238,16 +266,16 @@ public class ReminderDataController implements ResultCallback<Status> {
 //            removeGeofence(id);
 //        }
         //add/update a new one
-        mGeofenceList.add(new Geofence.Builder()
-                .setRequestId(""+id)
-                .setCircularRegion(latitude, longitude, GEOFENCE_RADIUS)
+        Geofence geoFence = new Geofence.Builder()
+                .setRequestId(""+reminderData.getId())
+                .setCircularRegion(reminderData.getLatitude(), reminderData.getLongitude(), GEOFENCE_RADIUS)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                .build());
+                .build();
 
 
         if (!mGoogleApiClient.isConnected()) {
-            Log.i("Reminder", "GOOGLE API Client Not connected");
+            Log.i(TAG, "GOOGLE API Client Not connected");
             return;
         }
 
@@ -258,13 +286,16 @@ public class ReminderDataController implements ResultCallback<Status> {
             // is already inside that geofence.
             builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
             // Add the geofences to be monitored by geofencing service.
-            builder.addGeofences(mGeofenceList);
+            builder.addGeofence(geoFence);
             // Return a GeofencingRequest.
             GeofencingRequest geofencingRequest = builder.build();
             Intent intent = new Intent(context, GeofenceTransitionIntentService.class);
+            intent.putExtra("ReminderId", reminderData.getId());
+            intent.putExtra("ReminderType", reminderData.getReminderType().ordinal());
+            intent.putExtra("NotificationId", reminderData.getId()*7);
             // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
             // addGeofences() and removeGeofences().
-            PendingIntent pendingIntent = PendingIntent.getService(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getService(context, (int)reminderData.getId()*7, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             LocationServices.GeofencingApi.addGeofences(
                     mGoogleApiClient,
                     // The GeofenceRequest object.
@@ -274,9 +305,8 @@ public class ReminderDataController implements ResultCallback<Status> {
                     // transition is observed.
                     pendingIntent
             ).setResultCallback(this); // Result processed in onResult().
-            mGeofencesAdded = true;
 
-            Log.i("Reminder", "Geofence added");
+            Log.i(TAG, "Geofence added");
         } catch (SecurityException securityException) {
 
         }
@@ -286,9 +316,9 @@ public class ReminderDataController implements ResultCallback<Status> {
      * remove only one geofence
      * @param id
      */
-    public boolean removeGeofence(int id){
+    public boolean removeGeofence(long id){
         if(!mGoogleApiClient.isConnected()){
-            Log.i("Reminder","Cannot connect to Google Service");
+            Log.i(TAG,"Cannot connect to Google Service");
             return false;
         }
         //remove the geo-fence
@@ -301,7 +331,7 @@ public class ReminderDataController implements ResultCallback<Status> {
 //        }
         //TODO: Or I will try using my own way to implement.
         Intent intent = new Intent(context, GeofenceTransitionIntentService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(context, id, intent, PendingIntent.FLAG_NO_CREATE);
+        PendingIntent pendingIntent = PendingIntent.getService(context, (int) id*7, intent, PendingIntent.FLAG_NO_CREATE);
         LocationServices.GeofencingApi.removeGeofences(
                 mGoogleApiClient,
                 // This is the same pending intent that was used in addGeofences().
@@ -314,8 +344,11 @@ public class ReminderDataController implements ResultCallback<Status> {
         //Get all the reminder from the database
         for(ReminderData reminderData:getAll()){
             //validate the location
-            if(reminderData.getReminderType()== ReminderData.ReminderType.Location && reminderData.getLocation()!=null && !reminderData.getLocation().equals("") && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null){
-                addGeofence((int) reminderData.getId(), reminderData.getLatitude(), reminderData.getLongitude());
+            if(reminderData.getReminderType()== ReminderData.ReminderType.Location
+                    && reminderData.getLocation()!=null && !reminderData.getLocation().equals("")
+                    && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null
+                    && reminderData.isEnabled()){
+                addGeofence(reminderData);
             }
         }
     }
