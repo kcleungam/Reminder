@@ -18,12 +18,15 @@ import java.util.ArrayList;
  */
 public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
+    ReminderDataController dataController;
+
     ArrayList<ReminderData> reminderList = new ArrayList<>();
     private View.OnClickListener onClickListener;
     private View.OnLongClickListener onLongClickListener;
 
     public ReminderDataAdapter(Context context, int resource, View.OnClickListener onClickListener, View.OnLongClickListener onLongClickListener){
         super(context, resource);
+        dataController = ReminderDataController.getInstance(context);
         this.onClickListener = onClickListener;
         this.onLongClickListener = onLongClickListener;
     }
@@ -40,12 +43,14 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
     @Override
     public ReminderData getItem(int position){
+        if(position>=reminderList.size())
+            return null;
         return reminderList.get(position);
     }
 
     @Override
     public int getCount() {
-        return reminderList.size();
+        return reminderList.size()+1;
     }
 
     @Override
@@ -70,26 +75,44 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
             handler = (RowHandler) row.getTag();
             handler.enabledSwitch.setOnCheckedChangeListener(null);
         }
-        ReminderData data = getItem(position);
-        handler.reminderId = data.getId();
-        handler.reminderType = data.getReminderType();
-        handler.enabledSwitch.setChecked(data.isEnabled());
-        handler.timeView.setText(data.getTime());
-        handler.titleView.setText(data.getTitle());
-        handler.locationView.setText(data.getLocation());
-        handler.enabledSwitch.setTag(handler);
-        handler.enabledSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // do something, the isChecked will be
-                // true if the switch is in the On position
-                ReminderData data = getItem(position);
-                data.setEnabled(isChecked);
-                ReminderDataController.getInstance().putReminder(data);
-            }
-        });
-        row.setOnClickListener(onClickListener);
-        row.setOnLongClickListener(onLongClickListener);
-        return row;
+        if(position>=reminderList.size()) {
+            handler.enabledSwitch.setVisibility(View.INVISIBLE);
+            handler.timeView.setVisibility(View.INVISIBLE);
+            handler.titleView.setVisibility(View.INVISIBLE);
+            handler.locationView.setVisibility(View.INVISIBLE);
+            handler.enabledSwitch.setVisibility(View.INVISIBLE);
+            handler.enabledSwitch.setEnabled(false);
+            row.setOnLongClickListener(null);
+            row.setOnClickListener(null);
+            return row;
+        }else{
+            handler.enabledSwitch.setVisibility(View.VISIBLE);
+            handler.timeView.setVisibility(View.VISIBLE);
+            handler.titleView.setVisibility(View.VISIBLE);
+            handler.locationView.setVisibility(View.VISIBLE);
+            handler.enabledSwitch.setVisibility(View.VISIBLE);
+            handler.enabledSwitch.setEnabled(true);
+            ReminderData data = getItem(position);
+            handler.reminderId = data.getId();
+            handler.reminderType = data.getReminderType();
+            handler.enabledSwitch.setChecked(data.isEnabled());
+            handler.timeView.setText(data.getTime());
+            handler.titleView.setText(data.getTitle());
+            handler.locationView.setText(data.getLocation());
+            handler.enabledSwitch.setTag(handler);
+            handler.enabledSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    // do something, the isChecked will be
+                    // true if the switch is in the On position
+                    ReminderData data = getItem(position);
+                    data.setEnabled(isChecked);
+                    dataController.putReminder(data);
+                }
+            });
+            row.setOnClickListener(onClickListener);
+            row.setOnLongClickListener(onLongClickListener);
+            return row;
+        }
     }
 
     public static class RowHandler{

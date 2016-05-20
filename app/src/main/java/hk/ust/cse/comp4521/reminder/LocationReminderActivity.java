@@ -22,11 +22,12 @@ import android.widget.Toast;
 import java.util.Calendar;
 
 public class LocationReminderActivity extends AppCompatActivity {
+    private ReminderDataController dataController;
+
     private ReminderData reminderData;
     private TextView editTitle;
     private TextView editTime;
     private TextView editDate;
-//    private ImageButton timeButton;
     private TextView locationText;
     private ImageButton locationButton;
     private TextView editDescription;
@@ -43,6 +44,7 @@ public class LocationReminderActivity extends AppCompatActivity {
     //@TargetApi(23)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dataController = ReminderDataController.getInstance(getApplication());
 
         //TODO: turn this into permission listener
         //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
@@ -105,17 +107,18 @@ public class LocationReminderActivity extends AppCompatActivity {
         };
         imageView.setOnClickListener(imageViewListener);
 
-        long reminderId = getIntent().getLongExtra("ReminderDataId", -1);
+        long reminderId = getIntent().getLongExtra("ReminderId", -1);
         if (reminderId != -1)
-            reminderData = ReminderDataController.getInstance().getReminder(reminderId);
+            reminderData = dataController.getReminder(reminderId);
         else
             reminderData = new ReminderData();
-        if (reminderData != null) {
+        if (reminderData.getId()!=-1) {
             editTitle.setText(reminderData.getTitle());
             editTime.setText(reminderData.getValidUntilTime());
             editDate.setText(reminderData.getValidUntilDate());
             editDescription.setText(reminderData.getDescription());
             locationText.setText(reminderData.getLocation());
+            //TODO: Enable image view
             if(reminderData.getImageUri()!=null) {
 //                try {
 //                    Uri imageUri = Uri.parse(reminderData.getImageUri());
@@ -145,8 +148,12 @@ public class LocationReminderActivity extends AppCompatActivity {
                     Toast.makeText(LocationReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                if(editTime.getText().length()==0){
-                    Toast.makeText(LocationReminderActivity.this, "Empty time", Toast.LENGTH_SHORT).show();
+                if(!DateTimeParser.validate(editTime.getText().toString(), DateTimeParser.Format.SHORT)){
+                    Toast.makeText(LocationReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                if(!DateTimeParser.validate(editDate.getText().toString(), DateTimeParser.Format.DATE)){
+                    Toast.makeText(LocationReminderActivity.this, "Empty date", Toast.LENGTH_SHORT).show();
                     return true;
                 }
                 reminderData.setReminderType(ReminderData.ReminderType.Location);
@@ -157,9 +164,9 @@ public class LocationReminderActivity extends AppCompatActivity {
                 reminderData.setDescription(editDescription.getText().toString());
                 if (reminderData.getId() < 0) {
                     reminderData.setEnabled(true);
-                    ReminderDataController.getInstance().addReminder(reminderData);
+                    dataController.addReminder(reminderData);
                 }else
-                    ReminderDataController.getInstance().putReminder(reminderData);
+                    dataController.putReminder(reminderData);
                 finish();
                 break;
             case R.id.action_cancel:
@@ -178,6 +185,7 @@ public class LocationReminderActivity extends AppCompatActivity {
                 //Display an error
                 return;
             }
+            //TODO: Enable image preview
 //            try {
 //                Uri imageUri = data.getData();
 //                InputStream imageStream = getContentResolver().openInputStream(imageUri);
@@ -225,7 +233,7 @@ public class LocationReminderActivity extends AppCompatActivity {
                 // set time picker as current time
                 TimePickerDialog timePickerDialog;
                 if(reminderData.getId()!=-1) {
-                    timePickerDialog = new TimePickerDialog(this, onTimeSetListener, DateTimeParser.toHour(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()), true);
+                    timePickerDialog = new TimePickerDialog(this, onTimeSetListener, reminderData.getValidUntilTime(Calendar.HOUR_OF_DAY), reminderData.getValidUntilTime(Calendar.MINUTE), true);
                 }else{
                     Calendar now = Calendar.getInstance();
                     timePickerDialog = new TimePickerDialog(this, onTimeSetListener, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true);
@@ -235,7 +243,7 @@ public class LocationReminderActivity extends AppCompatActivity {
                 // set date picker as current time
                 DatePickerDialog datePickerDialog;
                 if(reminderData.getId()!=-1) {
-                    datePickerDialog = new DatePickerDialog(this, onDateSetListener, DateTimeParser.toYear(reminderData.getTimeInMillis()), DateTimeParser.toMonth(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()));
+                    datePickerDialog = new DatePickerDialog(this, onDateSetListener, reminderData.getValidUntilDate(Calendar.YEAR), reminderData.getValidUntilDate(Calendar.MONTH), reminderData.getValidUntilDate(Calendar.DAY_OF_MONTH));
                 }else{
                     Calendar now = Calendar.getInstance();
                     datePickerDialog = new DatePickerDialog(this, onDateSetListener, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));

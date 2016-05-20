@@ -9,6 +9,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/editLocationLayout"
+        android:focusableInTouchMode="true"
         android:paddingRight="10dp">
 
         <TextView
@@ -76,7 +77,8 @@
             android:scaleType="fitXY"
             android:layout_below="@+id/editTitle"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="false" />
+            android:layout_alignParentEnd="false"
+            android:visibility="invisible" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -89,7 +91,7 @@
             android:layout_below="@+id/validText"
             android:layout_alignLeft="@+id/validText"
             android:layout_alignStart="@+id/validText"
-            android:enabled="false" />
+            android:enabled="true" />
 
         <TextView
             android:layout_width="wrap_content"

@@ -25,6 +25,8 @@ import java.util.Calendar;
 
 public class TimeReminderActivity extends AppCompatActivity {
 
+    private RecyclerAdapter recyclerAdapter;
+
     private ReminderData reminderData;
     private TextView editTitle;
     private TextView editTime;
@@ -47,6 +49,8 @@ public class TimeReminderActivity extends AppCompatActivity {
     //@TargetApi(23)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //recyclerAdapter = ReminderDataController.getInstance(getApplication());
+        recyclerAdapter=new RecyclerAdapter(getApplication());
 
         //TODO: turn this into permission listener
         //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
@@ -145,12 +149,12 @@ public class TimeReminderActivity extends AppCompatActivity {
         };
         imageView.setOnClickListener(imageViewListener);
 
-        long reminderId = getIntent().getLongExtra("ReminderDataId", -1);
+        long reminderId = getIntent().getLongExtra("ReminderId", -1);
         if (reminderId != -1)
-            reminderData = ReminderDataController.getInstance().getReminder(reminderId);
+            reminderData = recyclerAdapter.get(reminderId);
         else
             reminderData = new ReminderData();
-        if (reminderData != null) {
+        if (reminderData.getId()!=-1) {
             editTitle.setText(reminderData.getTitle());
             editTime.setText(reminderData.getTime());
             for (int i = 0; i < checkBoxes.length; i++) {
@@ -159,6 +163,7 @@ public class TimeReminderActivity extends AppCompatActivity {
             setSelectAll(!Arrays.asList(reminderData.getRepeat()).contains(false));
             editDescription.setText(reminderData.getDescription());
             locationText.setText(reminderData.getLocation());
+            //TODO: Enable image view
             if(reminderData.getImageUri()!=null) {
 //                try {
 //                    Uri imageUri = Uri.parse(reminderData.getImageUri());
@@ -198,7 +203,7 @@ public class TimeReminderActivity extends AppCompatActivity {
                     Toast.makeText(TimeReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                if(editTime.getText().length()==0){
+                if(!DateTimeParser.validate(editTime.getText().toString(), DateTimeParser.Format.SHORT)){
                     Toast.makeText(TimeReminderActivity.this, "Empty time", Toast.LENGTH_SHORT).show();
                     return true;
                 }
@@ -214,9 +219,9 @@ public class TimeReminderActivity extends AppCompatActivity {
                 reminderData.setDescription(editDescription.getText().toString());
                 if (reminderData.getId() < 0) {
                     reminderData.setEnabled(true);
-                    ReminderDataController.getInstance().addReminder(reminderData);
+                    recyclerAdapter.add(reminderData);
                 }else
-                    ReminderDataController.getInstance().putReminder(reminderData);
+                    recyclerAdapter.add(reminderData);
                 finish();
                 break;
             case R.id.action_cancel:
@@ -235,6 +240,7 @@ public class TimeReminderActivity extends AppCompatActivity {
                 //Display an error
                 return;
             }
+            //TODO: Enable image preview
 //            try {
 //                Uri imageUri = data.getData();
 //                InputStream imageStream = getContentResolver().openInputStream(imageUri);

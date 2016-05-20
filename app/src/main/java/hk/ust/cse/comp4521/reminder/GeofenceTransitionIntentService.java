@@ -27,7 +27,6 @@ import java.util.List;
  * helper methods.
  */
 public class GeofenceTransitionIntentService extends IntentService {
-
     protected static final String TAG = "GeofenceTransitionIntentService";
 
 
@@ -48,18 +47,16 @@ public class GeofenceTransitionIntentService extends IntentService {
 
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
 
-        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
-                geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
 
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
-            String geofenceTransitionDetails = getGeofenceTransitionDetails(this, geofenceTransition, triggeringGeofences);
-
-            sendNotification(geofenceTransitionDetails);
+            //TODO: this may be buggy
+            for(Geofence geofence:triggeringGeofences)
+                sendNotification(geofence.getRequestId());
         }
-
     }
 
-    private void sendNotification(String notificationDetails) {
+    private void sendNotification(String geofenceID) {
         // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
 
@@ -85,7 +82,7 @@ public class GeofenceTransitionIntentService extends IntentService {
                 // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(),
                         R.drawable.pink_stick_man))
-                .setContentTitle(notificationDetails)
+                .setContentTitle("Sofa King Good")
                 .setContentText("HIHI")
                 .setContentIntent(notificationPendingIntent);
 
@@ -98,6 +95,15 @@ public class GeofenceTransitionIntentService extends IntentService {
 
         // Issue the notification
         mNotificationManager.notify(0, builder.build());
+
+//        //TODO: this may be buggy and not efficient
+//        //as Android M doesn't support lambda expression but will support in Android N
+//        ReminderDataController reminderDataController=ReminderDataController.getInstance();
+//        for(ReminderData reminderData:MainActivity.reminderAdaptor.reminderList){
+//            if(String.valueOf(reminderData.getId()).equals(geofenceID)){
+//                reminderDataController.setGeoAlarm(reminderData);
+//            }
+//        }
     }
 
     private String getGeofenceTransitionDetails(

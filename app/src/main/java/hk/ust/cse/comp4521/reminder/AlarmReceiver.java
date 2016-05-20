@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -19,10 +20,12 @@ import java.util.GregorianCalendar;
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
+    ReminderDataController dataController;
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        ReminderDAO reminderDAO = new ReminderDAO(context);
-        ReminderData reminderData = reminderDAO.get(intent.getLongExtra("ReminderId", -1));
+        dataController = ReminderDataController.getInstance(context);
+        ReminderData reminderData = dataController.getReminder(intent.getLongExtra("ReminderId", -1));
         long notificationId = intent.getLongExtra("NotificationId", -1);
         Log.i("AlarmReceiver", ""+notificationId);
 
@@ -44,15 +47,32 @@ public class AlarmReceiver extends BroadcastReceiver {
         //notification.setNumber(5);
 
         //當使用者按下通知欄中的通知時要開啟的 Activity
-        Intent resultIntent = new Intent(context, MainActivity.class);
+        Intent resultIntent = new Intent();
+        switch(reminderData.getReminderType()){
+        case Time:
+            resultIntent.setClass(context, ViewTimeActivity.class);
+            break;
+        case Location:
+            resultIntent.setClass(context, ViewLocationActivity.class);
+            break;
+        default:
+            Log.d("Alarm","Reminder type not on the list.");
+        }
         //非必要,可以利用intent傳值
         resultIntent.putExtra("ReminderId", reminderData.getId());
         //建立待處理意圖
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        //TODO: unsafe long to int conversion
-        PendingIntent pendingResultIntent = stackBuilder.getPendingIntent((int) reminderData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
+//        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+//        switch(reminderData.getReminderType()){
+//            case Time:
+//                stackBuilder.addParentStack(MainActivity.class);
+//                break;
+//            case Location:
+//
+//        }
+//        stackBuilder.addNextIntent(resultIntent);
+//        //TODO: unsafe long to int conversion
+//        PendingIntent pendingResultIntent = stackBuilder.getPendingIntent((int) reminderData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingResultIntent = PendingIntent.getActivity(context, (int) reminderData.getId(), resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         notification.setContentIntent(pendingResultIntent);
         //取得通知管理器
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -62,7 +82,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         if(reminderData.noRepeat()) {
             reminderData.setEnabled(false);
-            ReminderDataController.getInstance().putReminder(reminderData);
+            dataController.putReminder(reminderData);
         }
     }
 }

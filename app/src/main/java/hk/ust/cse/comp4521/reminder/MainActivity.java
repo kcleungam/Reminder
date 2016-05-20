@@ -3,15 +3,14 @@ package hk.ust.cse.comp4521.reminder;
 import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.View;
@@ -24,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -34,39 +34,65 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class MainActivity extends AppCompatActivity implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
+    /* View component */
     ListView reminderList;
-    ReminderDataAdapter reminderAdaptor;
-    ReminderDataAdapter.RowHandler rowOnSelected;
-    private boolean fabMenuShown = false;
-    private int[] fabMenuItems = {R.id.timeReminderFab, R.id.fab_2, R.id.fab_3};
-    private double[][] fabMenuOffsetRatio = {{1.7, 0.25}, {1.5, 1.5}, {0.25, 1.7}};
-    private int[] fabMenuShowAnimation = {R.anim.fab1_show, R.anim.fab2_show, R.anim.fab3_show};
-    private int[] fabMenuHideAnimation = {R.anim.fab1_hide, R.anim.fab2_hide, R.anim.fab3_hide};
+    //public static ReminderDataAdapter reminderAdaptor;
+    //ReminderDataAdapter.RowHandler rowOnSelected;
+    public static RecyclerView recyclerView;
+    public static RecyclerAdapter recyclerAdapter;
 
+    /* FAB animation */
+    private boolean fabMenuShown = false;
+    private int[] fabMenuItems = {R.id.timeReminderFab, R.id.fab_2};
+    private double[][] fabMenuOffsetRatio = {{1.7, 0.25}, {1.5, 1.5}};
+    private int[] fabMenuShowAnimation = {R.anim.fab1_show, R.anim.fab2_show};
+    private int[] fabMenuHideAnimation = {R.anim.fab1_hide, R.anim.fab2_hide};
+
+    /* Location */
     protected LocationRequest mLocationRequest;
     private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
     private final static int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 100000;
+    private final static float GEOFENCE_RADIUS=500;//radius in meters
     protected GoogleApiClient mGoogleApiClient;
     protected ArrayList<Geofence> mGeofenceList;
     private boolean mGeofencesAdded = false;
     private PendingIntent mGeofencePendingIntent;
 
+    /* Database */
+    private ReminderDataController dataController;
+
+    /* Others */
+    public static final String TAG="Main Activity";
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_activity_main);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-        reminderList = (ListView)findViewById(R.id.reminder_list);
+
+        dataController = ReminderDataController.getInstance(getApplication()); // 建立資料庫物件
+
+       //TODO: remove the following tow lines after your first run
+       /*dataController.clear();
+       dataController.sample();*/
+
+        /*setContentView(R.layout.new_activity_main);
+        reminderList = (ListView)findViewById(R.id.reminder_list);*/
+        setContentView(R.layout.main_activity);
+        recyclerView=(RecyclerView)findViewById(R.id.reminder_recycler_view);
+
+        recyclerAdapter=new RecyclerAdapter(this);
+        recyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         FloatingActionButton menuFab = (FloatingActionButton)findViewById(R.id.menuFab);
         menuFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Fab clicked", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
                 if(fabMenuShown)
                     hideFabMenu();
                 else
@@ -86,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         locationReminderFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(getApplicationContext(),LocationReminderActivity.class);
+                Intent intent=new Intent(getApplicationContext(), LocationReminderActivity.class);
                 startActivity(intent);
                 hideFabMenu();
             }
@@ -106,28 +132,27 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
                         intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
                         break;
                 }
-                intent.putExtra("ReminderDataId", id);
+                intent.putExtra("ReminderId", id);
                 startActivity(intent);
             }
         };
         View.OnLongClickListener onLongClickListener = new AdapterView.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                rowOnSelected = (ReminderDataAdapter.RowHandler) v.getTag();
-                openContextMenu(reminderList);
+                //rowOnSelected = (ReminderDataAdapter.RowHandler) v.getTag();
+                openContextMenu(recyclerView);
                 return true;
             }
         };
-        reminderAdaptor = new ReminderDataAdapter(getApplicationContext(), R.layout.row_layout, onClickListener, onLongClickListener);
+        //reminderAdaptor = new ReminderDataAdapter(getApplication(), R.layout.row_layout, onClickListener, onLongClickListener);
 
-        // 建立資料庫物件
-        ReminderDataController.setContext(getApplicationContext());
         // 取得所有記事資料
-        ArrayList<ReminderData> reminders = ReminderDataController.getInstance().getAll();
+        //TODO
+        /*ArrayList<ReminderData> reminders = dataController.getAll();
         for(ReminderData sample:reminders){
             reminderAdaptor.addItem(sample);
-        }
-        reminderList.setAdapter(reminderAdaptor);
+        }*/
+        //reminderList.setAdapter(reminderAdaptor);
 
 //        for(int i = 0; i < reminderList.getChildCount(); i++){
 //            ReminderDataAdapter.RowHandler rowHandler = ((ReminderDataAdapter.RowHandler) reminderList.getChildAt(i).getTag());
@@ -137,14 +162,50 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
 //            double longitude = reminderData.getLongitude();
 //        }
 
-        mGeofenceList = new ArrayList<Geofence>();
+        /*
+         *  initialisation for location-triggered event
+         */
+        mGeofenceList = new ArrayList<Geofence>();//empty list for storing geo-fences
+        mGeofencePendingIntent=null;//Initially set the PendingIntent used in addGeofences() and removeGeofences() to null
+        buildGoogleApiClient();//kick off the request to build GooogleApiClient
 
-        buildGoogleApiClient();
-        registerForContextMenu(reminderList);
+
+        //registerForContextMenu(reminderList);
 
 //        CoordinatorLayout.LayoutParams params =
 //                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
 //        params.setBehavior(new FabHideOnScroll());
+
+        //make the card view swipe-able
+        SwipeableRecyclerViewTouchListener swipeTouchListener =
+                new SwipeableRecyclerViewTouchListener(recyclerView,
+                        new SwipeableRecyclerViewTouchListener.SwipeListener() {
+                            @Override
+                            public boolean canSwipeLeft(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public boolean canSwipeRight(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                //remove it
+                                recyclerAdapter.removeByPosition(reverseSortedPositions[0]);
+                                recyclerAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                //remove it
+                                recyclerAdapter.removeByPosition(reverseSortedPositions[0]);
+                                recyclerAdapter.notifyDataSetChanged();
+                            }
+                        });
+
+        recyclerView.addOnItemTouchListener(swipeTouchListener);
     }
 
     private void showFabMenu(){
@@ -178,10 +239,9 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     @Override
     protected void onResume() {
         super.onResume();
-        reminderAdaptor.clear();
-        for(ReminderData reminderData:ReminderDataController.getInstance().getAll())
-            reminderAdaptor.add(reminderData);
-        reminderAdaptor.notifyDataSetChanged();
+
+        recyclerAdapter.notifyDataSetChanged();//this needs other parts in Adapter to work successfully
+        //otherwise, it may be no changed or duplicate the cards
     }
 
     @Override
@@ -210,8 +270,8 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
         if (v instanceof ListView) {
-            menu.setHeaderTitle(rowOnSelected.titleView.getText());
-            menu.add(Menu.NONE, 0, 0, "Delete");
+            /*menu.setHeaderTitle(rowOnSelected.titleView.getText());
+            menu.add(Menu.NONE, 0, 0, "Delete");*/
         }
         super.onCreateContextMenu(menu, v, menuInfo);
     }
@@ -219,12 +279,13 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if(item.getTitle().equals("Delete")){
-            ReminderDataController.getInstance().deleteReminder(rowOnSelected.reminderId);
+            //TODO
+            /*dataController.deleteReminder(rowOnSelected.reminderId);
             Toast.makeText(MainActivity.this, "Reminder "+rowOnSelected.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
             reminderAdaptor.clear();
-            for(ReminderData reminderData:ReminderDataController.getInstance().getAll())
+            for(ReminderData reminderData:dataController.getAll())
                 reminderAdaptor.add(reminderData);
-            reminderAdaptor.notifyDataSetChanged();
+            reminderAdaptor.notifyDataSetChanged();*/
         }
         return true;
     }
@@ -247,13 +308,34 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         return builder.build();
     }
 
-    private void addGeoFence(String id, double latitude, double longitude) {
+    /**
+     * Add a new geofence or update a new geofence
+     * @param id
+     * @param latitude
+     * @param longitude
+     */
+    public void addGeofence(String id, double latitude, double longitude) {
+        //TODO: This may be buggy
+        //check whether this id already exists
+        boolean exist=false;
+        for(Geofence geofence:mGeofenceList){
+            if(geofence.getRequestId().equals(id)){
+                exist=true;
+                break;
+            }
+        }
+        if(exist) {
+            //update the existing one
+            removeGeofence(id);
+        }
+        //add/update a new one
         mGeofenceList.add(new Geofence.Builder()
                 .setRequestId(id)
-                .setCircularRegion(latitude, longitude, 50)
+                .setCircularRegion(latitude, longitude, GEOFENCE_RADIUS)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .build());
+
 
         if (!mGoogleApiClient.isConnected()) {
             Toast.makeText(getApplicationContext(), "GOOGLE API Client Not connected", Toast.LENGTH_SHORT).show();
@@ -275,6 +357,24 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
             Toast.makeText(getApplicationContext(), "Geofence added", Toast.LENGTH_SHORT).show();
         } catch (SecurityException securityException) {
 
+        }
+    }
+
+    /**
+     * remove only one geofence
+     * @param id
+     */
+    public void removeGeofence(String id){
+        if(!mGoogleApiClient.isConnected()){
+            Toast.makeText(this,"Cannot connect to Google Service",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //remove the geo-fence
+        for(Geofence geofence:mGeofenceList){
+            if(geofence.getRequestId().equals(id)){
+                mGeofenceList.remove(geofence);
+                break;
+            }
         }
     }
 
@@ -308,12 +408,22 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
             return;
         }
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        addGeoFence("123", 22.337398, 114.259114);
+        populateGeofenceList();//get the geo-fences used
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         mGoogleApiClient.connect();
+    }
+
+    public void populateGeofenceList(){
+        //Get all the reminder from the database
+        for(ReminderData reminderData:dataController.getAll()){
+            //validate the location
+            if(reminderData.getReminderType()== ReminderData.ReminderType.Location && reminderData.getLocation()!=null && !reminderData.getLocation().equals("") && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null){
+                addGeofence(String.valueOf(reminderData.getId()), reminderData.getLatitude(), reminderData.getLongitude());
+            }
+        }
     }
 
     protected synchronized void buildGoogleApiClient() {

@@ -1,10 +1,13 @@
 package hk.ust.cse.comp4521.reminder;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,30 +18,32 @@ import java.util.Calendar;
 public class ReminderDataController {
 
     private static ReminderDataController instance;
-    private static Context context;
+    private Context context;
     private ReminderDAO reminderDAO;
+    public static final int NOTIFICATION_DELAY=10;
+    public static final int TIME_ALARM_NOTIFY_BEFORE = 10; //seconds
 
     //singleton pattern, no public constructor
     private ReminderDataController(){
 
     }
 
-    public static ReminderDataController getInstance(){
+    public static ReminderDataController getInstance(Context application){
         if(instance==null) {
+            if(application==null)
+                throw new IllegalArgumentException("context is null");
             instance = new ReminderDataController();
-            instance.reminderDAO = new ReminderDAO(context);
+            instance.reminderDAO = new ReminderDAO(application);
+            instance.context = application;
             // 如果資料庫是空的，就建立一些範例資料
             // 這是為了方便測試用的，完成應用程式以後可以拿掉
-            if (instance.getCount() == 0) {
-                instance.sample();
-            }
         }
         return instance;
     }
 
-    public static void setContext(Context context){
-        ReminderDataController.context = context;
-    }
+//    public static void setContext(Context context){
+//        ReminderDataController.context = context;
+//    }
 
     public ReminderData getReminder(long reminderId){
         return reminderDAO.get(reminderId);
@@ -48,6 +53,10 @@ public class ReminderDataController {
         return reminderDAO.getAll();
     }
 
+    public void clear(){
+        reminderDAO.clear();
+    }
+
     public int getCount(){
         return reminderDAO.getCount();
     }
@@ -55,14 +64,12 @@ public class ReminderDataController {
     public ReminderData addReminder(ReminderData reminderData){
         reminderDAO.insert(reminderData);
         if(reminderData.isEnabled()) {
-            if (reminderData.isEnabled()) {
-                switch (reminderData.getReminderType()) {
-                    case Location:
-                        break;
-                    case Time:
-                        setAlarm(reminderData);
-                        break;
-                }
+            switch (reminderData.getReminderType()) {
+                case Location:
+                    break;
+                case Time:
+                    setAlarm(reminderData);
+                    break;
             }
         }
         return reminderData;
@@ -96,6 +103,7 @@ public class ReminderDataController {
     public void enableReminder(long reminderId, boolean enable){
         if(enable) {
             ReminderData reminderData = getReminder(reminderId);
+            deleteAlarm(reminderId);
             setAlarm(reminderData);
         }else{
             deleteAlarm(reminderId);
@@ -119,13 +127,14 @@ public class ReminderDataController {
         return hasPendingIntent;
     }
 
-    @TargetApi(19)
+    @SuppressLint("NewApi")
     private void setAlarm(ReminderData reminderData){
         //使用Calendar指定時間
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, DateTimeParser.toHour(reminderData.getTimeInMillis()));
-        calendar.set(Calendar.MINUTE, DateTimeParser.toMin(reminderData.getTimeInMillis()));
+        calendar.set(Calendar.HOUR_OF_DAY, reminderData.getTime(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE, reminderData.getTime(Calendar.MINUTE));
         calendar.set(Calendar.SECOND, 0);
+        calendar.add(Calendar.SECOND, -TIME_ALARM_NOTIFY_BEFORE);
 
         //取得AlarmManager
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -137,6 +146,7 @@ public class ReminderDataController {
         // Now create and schedule a new Alarm
         Intent intent = new Intent(context, AlarmReceiver.class); // New component for alarm
         intent.putExtra("ReminderId", reminderData.getId());
+        intent.putExtra("ReminderType", reminderData.getReminderType().ordinal());
 
         //設定一個警報
         //參數1,我們選擇一個會在指定時間喚醒裝置的警報類型
@@ -147,19 +157,49 @@ public class ReminderDataController {
                 calendar.add(Calendar.DATE, 1);
             //TODO: unsafe long to int conversion
             intent.putExtra("NotificationId", reminderData.getId()*7);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7, intent, 0);
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            else//legacy support for sdk_api<19
+                alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }else{ //if repeats, alarms every day-of-week
             for (int i = 0; i < reminderData.getRepeat().length; i++) {
                 if (!reminderData.getRepeat()[i])
                     continue;
                 calendar.set(Calendar.DAY_OF_WEEK, i + 1);
-                //TODO: unsafe long to int conversion
                 intent.putExtra("NotificationId", reminderData.getId()*7+i);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7+i, intent, 0);
+                //TODO: unsafe long to int conversion
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) reminderData.getId()*7+i, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
             }
         }
+    }
+
+    @SuppressLint("NewApi")
+    public void setGeoAlarm(ReminderData reminderData){
+        //使用Calendar指定時間
+        Calendar calendar = Calendar.getInstance();
+        //add delay
+        calendar.add(Calendar.SECOND,NOTIFICATION_DELAY);
+
+        //取得AlarmManager
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        //建立意圖
+        //這裡的 this 是指當前的 Activity
+        //AlarmReceiver.class 則是負責接收的 BroadcastReceiver
+
+        // Now create and schedule a new Alarm
+        Intent intent = new Intent(context, AlarmReceiver.class); // New component for alarm
+        intent.putExtra("ReminderId", reminderData.getId());
+        intent.putExtra("ReminderType", reminderData.getReminderType().ordinal());
+        //TODO: are these lines below correct?
+        intent.putExtra("NotificationId",reminderData.getId()*7);
+        PendingIntent pendingIntent=PendingIntent.getBroadcast(context,(int) reminderData.getId()*7,intent,0);
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        else//legacy support for sdk_api<19
+            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
     public void sample(){

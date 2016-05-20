@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.ParseException;
+import java.util.Calendar;
 
 /**
  * Created by Krauser on 9/5/2016.
@@ -24,7 +25,8 @@ public class ReminderData implements Serializable{
     private String location = null;
     private Double longitude = null;
     private Double latitude = null;
-    private Time validUntil = null;                     // location event may valid until a certain time
+    private Date validUntilDate = null;                     // location event may valid until a certain time
+    private Time validUntilTime = null;
     private boolean enabled = false;
 
     public ReminderData(){
@@ -34,23 +36,23 @@ public class ReminderData implements Serializable{
     /**
      *         Location event constructor, should inculde:      location, title, validUntil, description, image
      */
-    public ReminderData(String title, Time validUntil, String description){  // need to add location and image
-        this.reminderType = ReminderType.Location;
-        this.setTitle(title);
-        this.validUntil = validUntil;
-        this.setDescription(description);
-    }
+//    public ReminderData(String title, Time validUntil, String description){  // need to add location and image
+//        this.reminderType = ReminderType.Location;
+//        this.setTitle(title);
+//        this.validUntil = validUntil;
+//        this.setDescription(description);
+//    }
 
     /**
      *          TIme event constructor, should include:     time, title, repeat, description,
      */
-    public ReminderData(String title, Time time, boolean[] repeat, String description){     // need to add location and image
-        this.reminderType = ReminderType.Time;
-        this.setTitle(title);
-        this.time = time;
-        this.setRepeat(repeat);
-        this.setDescription(description);
-    }
+//    public ReminderData(String title, Time time, boolean[] repeat, String description){     // need to add location and image
+//        this.reminderType = ReminderType.Time;
+//        this.setTitle(title);
+//        this.time = time;
+//        this.setRepeat(repeat);
+//        this.setDescription(description);
+//    }
 
     public void setId(long id){
         this.id = id;
@@ -104,35 +106,50 @@ public class ReminderData implements Serializable{
         return DateTimeParser.toString(time, DateTimeParser.Format.SHORT);
     }
 
+    public int getTime(int field){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(time.getTime());
+        return c.get(field);
+    }
+
     public long getTimeInMillis(){
         return time.getTime();
     }
 
-    public void setValidUntil(String time){
-        try {
-            validUntil = DateTimeParser.toTime(time, DateTimeParser.Format.ISO8601);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+    public String getValidUntil(){
+        return getValidUntilDate()+" "+getValidUntilTime();
     }
 
-    public String getValidUntil() {
-        return DateTimeParser.toString(validUntil, DateTimeParser.Format.ISO8601);
+    public void setValidUntil(String time){
+        String[] times = time.split(" ");
+        setValidUntilDate(times[0]);
+        setValidUntilTime(times[1]);
     }
 
     public String getValidUntilDate(){
-        return DateTimeParser.toString(validUntil, DateTimeParser.Format.DATE);
+        return DateTimeParser.toString(validUntilDate, DateTimeParser.Format.DATE);
+    }
+
+    public int getValidUntilDate(int field){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(validUntilDate.getTime());
+        return c.get(field);
     }
 
     public String getValidUntilTime(){
-        return DateTimeParser.toString(validUntil, DateTimeParser.Format.SHORT);
+        return DateTimeParser.toString(validUntilTime, DateTimeParser.Format.SHORT);
+    }
+
+    public int getValidUntilTime(int field){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(validUntilTime.getTime());
+        return c.get(field);
     }
 
     public void setValidUntilTime(String time){
         try {
             long t = DateTimeParser.toLong(time, DateTimeParser.Format.SHORT);
-            validUntil.setHours(DateTimeParser.toHour(t));
-            validUntil.setMinutes(DateTimeParser.toMin(t));
+            validUntilTime = new Time(DateTimeParser.toHour(t), DateTimeParser.toMin(t), 0);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -141,9 +158,7 @@ public class ReminderData implements Serializable{
     public void setValidUntilDate(String date){
         try {
             long t = DateTimeParser.toLong(date, DateTimeParser.Format.DATE);
-            validUntil.setDate(DateTimeParser.toDay(t));
-            validUntil.setMonth(DateTimeParser.toMonth(t));
-            validUntil.setYear(DateTimeParser.toYear(t));
+            validUntilDate = new Date(DateTimeParser.toYear(t)-1900, DateTimeParser.toMonth(t), DateTimeParser.toDay(t));
         } catch (ParseException e) {
             e.printStackTrace();
         }
