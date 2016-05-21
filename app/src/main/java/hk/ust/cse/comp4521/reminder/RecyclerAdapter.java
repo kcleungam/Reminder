@@ -22,7 +22,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     /* Data controls */
     ReminderDataController mController;
 
-    public ArrayList<ReminderData> reminderDatas = new ArrayList<>();
+    public static ArrayList<ReminderData> reminderDatas;
 
     /* Others */
     public static final String TAG="RecyclerAdapter";
@@ -52,7 +52,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
         this.mController =ReminderDataController.getInstance(context);
         //Log.d(TAG,"The number of reminders is "+mController.getCount());
-        reminderDatas.addAll(mController.getAll());
+        if(reminderDatas==null) {
+            reminderDatas = new ArrayList<>();
+            reminderDatas.addAll(mController.getAll());
+        }
 
         //layoutInflater=LayoutInflater.from(context);
         layoutInflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -73,15 +76,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerViewHolder holder, int position) {
-        ReminderData reminder = reminderDatas.get(position);
+    public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
+        final ReminderData reminder = reminderDatas.get(position);
 
         /* set info of the card */
-        holder.reminder_type = reminder.getReminderType();
         holder.reminder_id = reminder.getId();
-        holder.reminder_enabled = reminder.isEnabled();
         /* set style of the card */
-        if(holder.reminder_enabled){
+        if(reminder.isEnabled()){
             holder.itemView.setElevation(5.0f);
             holder.itemView.setAlpha(1.0f);
         }else{//disable it
@@ -116,7 +117,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
             @Override
             public void onClick(View v) {
                 Intent intent=null;
-                switch (holder.reminder_type){
+                switch (reminder.getReminderType()){
                     case Time:
                         intent=new Intent(context,TimeReminderActivity.class);
                         break;
@@ -136,12 +137,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                     holder.itemView.setElevation(5.0f);
                     holder.itemView.setAlpha(1.0f);
                     mController.enableReminder(holder.reminder_id, true);
-                    holder.reminder_enabled = true;
+                    reminder.setEnabled(true);
+                    notifyItemChanged(position);
                 }else{//disable it
                     holder.itemView.setElevation(0.0f);
                     holder.itemView.setAlpha(0.1f);
                     mController.enableReminder(holder.reminder_id, false);
-                    holder.reminder_enabled = false;
+                    reminder.setEnabled(false);
+                    notifyItemChanged(position);
                 }
                 return true;//consume the long click
             }

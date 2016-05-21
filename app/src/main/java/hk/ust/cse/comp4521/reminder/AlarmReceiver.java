@@ -30,6 +30,10 @@ public class AlarmReceiver extends BroadcastReceiver {
         ReminderData reminderData = dataController.getReminder(intent.getLongExtra("ReminderId", -1));
         long notificationId = intent.getLongExtra("NotificationId", -1);
         Log.i("AlarmReceiver", ""+notificationId);
+
+        if(reminderData==null)
+            return;
+
         //取得通知管理器
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //執行通知

@@ -59,6 +59,10 @@ public class GeofenceTransitionIntentService extends IntentService {
                 dataController = ReminderDataController.getInstance(getApplication());
                 ReminderData reminderData = dataController.getReminder(intent.getLongExtra("ReminderId", -1));
                 long notificationId = intent.getLongExtra("NotificationId", -1);
+
+                if(reminderData==null)
+                    return;
+
                 //取得通知管理器
                 NotificationManager mNotificationManager = (NotificationManager) getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
                 //執行通知
