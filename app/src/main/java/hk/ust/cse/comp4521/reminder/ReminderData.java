@@ -62,6 +62,10 @@ public class ReminderData implements Serializable{
         return this.id;
     }
 
+    public boolean hasId(){
+        return this.id!=-1;
+    }
+
     public ReminderType getReminderType(){
         return reminderType;
     }
