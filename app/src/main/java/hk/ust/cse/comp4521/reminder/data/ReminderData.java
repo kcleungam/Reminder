@@ -154,6 +154,10 @@ public class ReminderData implements Serializable{
         }
     }
 
+    public boolean noValidUntil(){
+        return validUntilDate==null || validUntilTime==null;
+    }
+
     //TODO: no more object reference
     public void setRepeat(boolean[] repeat){
         this.repeat = repeat;

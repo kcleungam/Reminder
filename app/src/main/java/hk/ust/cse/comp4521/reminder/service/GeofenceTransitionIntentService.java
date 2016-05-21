@@ -73,7 +73,7 @@ public class GeofenceTransitionIntentService extends IntentService {
                 //TODO: unsafe long to int conversion
                 mNotificationManager.notify((int) notificationId, notification);
 
-                if(reminderData.noRepeat()) {
+                if(reminderData.noValidUntil()) {
                     reminderData.setEnabled(false);
                     dataController.putReminder(reminderData);
                 }
