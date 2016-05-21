@@ -45,7 +45,7 @@ public class ViewLocationActivity extends AppCompatActivity {
                 reminderData = new ReminderData();
 
             ( (TextView) layout.findViewById(R.id.showTitle) ).setText(reminderData.getTitle());
-            ( (TextView) layout.findViewById(R.id.showValid) ).setText(reminderData.getTime());
+            ( (TextView) layout.findViewById(R.id.showValid) ).setText(reminderData.getValidUntil());
             ( (TextView) layout.findViewById(R.id.showDescription) ).setText(reminderData.getDescription());
             ( (TextView) layout.findViewById(R.id.showLocation) ).setText(reminderData.getLocation());
 
