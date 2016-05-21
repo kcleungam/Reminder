@@ -26,19 +26,19 @@ public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallba
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
 
-    private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 200000;   //20 second update once
-    private final static int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 100000;
+    private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 10000;   //10 second update once
+    private final static int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 50000;
 
     private GoogleApiClientProvider(){
 
     }
 
     public static GoogleApiClient getInstance(Context application){
-        if(providerIsntance==null) {
+//        if(providerIsntance==null) {
             providerIsntance = new GoogleApiClientProvider();
             providerIsntance.buildClient(application);
             providerIsntance.application = application;
-        }
+//        }
         return providerIsntance.mGoogleApiClient;
     }
 

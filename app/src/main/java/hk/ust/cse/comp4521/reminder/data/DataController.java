@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationServices;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import hk.ust.cse.comp4521.reminder.LocationData;
 import hk.ust.cse.comp4521.reminder.service.AlarmReceiver;
 import hk.ust.cse.comp4521.reminder.service.GeofenceTransitionIntentService;
 import hk.ust.cse.comp4521.reminder.service.GoogleApiClientProvider;
@@ -262,7 +263,7 @@ public class DataController implements ResultCallback<Status> {
         intent.putExtra("ReminderId", reminderData.getId());
         intent.putExtra("ReminderType", reminderData.getReminderType().ordinal());
         intent.putExtra("NotificationId",reminderData.getId()*7);
-        PendingIntent pendingIntent=PendingIntent.getBroadcast(context,(int) reminderData.getId()*7,intent,0);
+        PendingIntent pendingIntent=PendingIntent.getBroadcast(context, (int) reminderData.getId() * 7, intent, 0);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         else//legacy support for sdk_api<19
@@ -331,7 +332,6 @@ public class DataController implements ResultCallback<Status> {
 
             Log.i(TAG, "Geofence added");
         } catch (SecurityException securityException) {
-
         }
     }
 
@@ -418,4 +418,6 @@ public class DataController implements ResultCallback<Status> {
     public void sample(){
         dataAccessObject.sample();
     }
+
+
 }
