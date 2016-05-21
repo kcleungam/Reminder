@@ -2,6 +2,7 @@ package hk.ust.cse.comp4521.reminder.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,18 +16,21 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 import hk.ust.cse.comp4521.reminder.service.GoogleApiClientProvider;
 import hk.ust.cse.comp4521.reminder.R;
 import hk.ust.cse.comp4521.reminder.ReminderDataAdapter;
 import hk.ust.cse.comp4521.reminder.data.ReminderData;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ResultCallback<Status>{
     /* View component */
-    ListView reminderList;
+    //ListView reminderList;
     //public static ReminderDataAdapter reminderAdaptor;
     //ReminderDataAdapter.RowHandler rowOnSelected;
     public static RecyclerView recyclerView;
@@ -39,9 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private int[] fabMenuShowAnimation = {R.anim.fab1_show, R.anim.fab2_show};
     private int[] fabMenuHideAnimation = {R.anim.fab1_hide, R.anim.fab2_hide};
 
-    /* Location */
-    protected GoogleApiClient mGoogleApiClient;
-
     /* Others */
     public static final String TAG="Main Activity";
 
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mGoogleApiClient = GoogleApiClientProvider.getInstance(getApplication());
+        GoogleApiClientProvider.getInstance(getApplication(), this); //kick off the request to build GooogleApiClient
 
         //TODO: remove the following tow lines after your first run
        /*dataController.clear();
@@ -143,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
         /*
          *  initialisation for location-triggered event
          */
-        GoogleApiClientProvider.getInstance(getApplication());//kick off the request to build GooogleApiClient
 
         //registerForContextMenu(reminderList);
 
@@ -265,13 +265,19 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+//    @Override
+//    protected void onStop() {
+//        if (mGoogleApiClient.isConnected()) {
+//            mGoogleApiClient.disconnect();
+//        }
+//        super.onStop();
+//    }
+
     @Override
-    protected void onStop() {
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
-        super.onStop();
+    public void onResult(@NonNull Status status) {
+        Toast.makeText(MainActivity.this, "Google api online", Toast.LENGTH_SHORT).show();
     }
+
 
     /**
      *

@@ -15,16 +15,21 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.ArrayList;
+
 /**
  * Created by Jeffrey on 21/5/2016.
  */
-public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
+public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
-    private static GoogleApiClientProvider providerIsntance;
+    public static final String TAG = "GoogleApiClientProvider";
+
+    private static GoogleApiClientProvider providerInstance;
 
     private Context application;
     private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
+    private ArrayList<ResultCallback<Status>> listeners;
+//    private LocationRequest mLocationRequest;
 
     private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 10000;   //10 second update once
     private final static int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 50000;
@@ -33,13 +38,15 @@ public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallba
 
     }
 
-    public static GoogleApiClient getInstance(Context application){
-//        if(providerIsntance==null) {
-            providerIsntance = new GoogleApiClientProvider();
-            providerIsntance.buildClient(application);
-            providerIsntance.application = application;
-//        }
-        return providerIsntance.mGoogleApiClient;
+    public static GoogleApiClient getInstance(Context application, ResultCallback<Status> listener){
+        if(providerInstance ==null) {
+            providerInstance = new GoogleApiClientProvider();
+            providerInstance.buildClient(application);
+            providerInstance.application = application;
+            providerInstance.listeners = new ArrayList<>();
+        }
+        providerInstance.listeners.add(listener);
+        return providerInstance.mGoogleApiClient;
     }
 
     private void buildClient(Context application){
@@ -51,11 +58,11 @@ public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallba
         mGoogleApiClient.connect();
 
         //TODO: What does mLocaitonReuest do?
-        Log.i("Reminder", "create location request");
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+//        Log.i(TAG, "create location request");
+//        mLocationRequest = LocationRequest.create();
+//        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+//        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+//        mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
 
     }
 
@@ -66,7 +73,7 @@ public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallba
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.i("Reminder", "On connected");
+        Log.i(TAG, "On connected");
         //TODO: this may need to move back to GUI classes
         if (ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -80,9 +87,11 @@ public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallba
             return;
         }
         //TODO: What does mLastLocaiton do?
-        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        //TODO: Move this to broadcast receiver
-        //populateGeofenceList();//get the geo-fences used
+//        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        for(ResultCallback listener:listeners){
+            listener.onResult(new Status(1));
+        }
     }
 
     @Override
@@ -90,8 +99,4 @@ public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallba
         mGoogleApiClient.connect();
     }
 
-    @Override
-    public void onResult(Status status) {
-
-    }
 }

@@ -1,11 +1,11 @@
 package hk.ust.cse.comp4521.reminder.data;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,7 +18,6 @@ import com.google.android.gms.location.LocationServices;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import hk.ust.cse.comp4521.reminder.LocationData;
 import hk.ust.cse.comp4521.reminder.service.AlarmReceiver;
 import hk.ust.cse.comp4521.reminder.service.GeofenceTransitionIntentService;
 import hk.ust.cse.comp4521.reminder.service.GoogleApiClientProvider;
@@ -34,11 +33,28 @@ public class DataController implements ResultCallback<Status> {
     private Context context;
     private DataAccessObject dataAccessObject;
 
-    public static final int NOTIFICATION_DELAY=10;
+    public static final int NOTIFICATION_DELAY=10;  //no runtime use at the moment
     public static final int TIME_ALARM_NOTIFY_BEFORE = 10; //seconds
-
-    private GoogleApiClient mGoogleApiClient;
     public final static float GEOFENCE_RADIUS=500;//radius in meters
+
+    private GoogleApiClient googleApiClient;
+    private ArrayList<PendingGeofenceAction> pendingGeofenceActions;
+    public class PendingGeofenceAction{
+        Action action;
+        ReminderData reminder;
+        long reminderId;
+        public PendingGeofenceAction(Action action, ReminderData reminder){
+            this.action = action;
+            this.reminder = reminder;
+        }
+        public PendingGeofenceAction(Action action, long reminderId){
+            this.action = action;
+            this.reminderId = reminderId;
+        }
+    }
+    enum Action{
+        ADD, REMOVE
+    }
 
     //singleton pattern, no public constructor
     private DataController(){
@@ -52,7 +68,8 @@ public class DataController implements ResultCallback<Status> {
             instance = new DataController();
             instance.dataAccessObject = new DataAccessObject(application);
             instance.context = application;
-            instance.mGoogleApiClient = GoogleApiClientProvider.getInstance(application);
+            instance.googleApiClient = GoogleApiClientProvider.getInstance(application, instance);
+            instance.pendingGeofenceActions = new ArrayList<>();
             // 如果資料庫是空的，就建立一些範例資料
             // 這是為了方便測試用的，完成應用程式以後可以拿掉
         }
@@ -188,7 +205,6 @@ public class DataController implements ResultCallback<Status> {
         return true;
     }
 
-    @SuppressLint("NewApi")
     private void addAlarm(ReminderData reminderData){
         if(reminderData.getReminderType()!= ReminderData.ReminderType.Time)
             throw new IllegalArgumentException("Invalid reminder type.");
@@ -244,7 +260,6 @@ public class DataController implements ResultCallback<Status> {
      * @param reminderData
      */
     @Deprecated
-    @SuppressLint("NewApi")
     public void setGeoAlarm(ReminderData reminderData){
         //使用Calendar指定時間
         Calendar calendar = Calendar.getInstance();
@@ -272,10 +287,16 @@ public class DataController implements ResultCallback<Status> {
 
     /**
      * Add a new geofence or update a new geofence
+     * return false if pending in queue, return true if it handles the request immediately
      */
-    public void addGeofence(ReminderData reminderData) {
-        if(reminderData.getReminderType()!= ReminderData.ReminderType.Location)
+    public boolean addGeofence(ReminderData reminder) {
+        if(reminder.getReminderType()!= ReminderData.ReminderType.Location)
             throw new IllegalArgumentException("Invalid reminder type.");
+        if(!googleApiClient.isConnected()){
+            Log.i(TAG, "GOOGLE API Client Not connected");
+            pendingGeofenceActions.add(new PendingGeofenceAction(Action.ADD, reminder));
+            return false;
+        }
         //TODO: Could someone prove this is working?
         //check whether this id already exists
 //        boolean exist=false;
@@ -291,17 +312,11 @@ public class DataController implements ResultCallback<Status> {
 //        }
         //add/update a new one
         Geofence geoFence = new Geofence.Builder()
-                .setRequestId(""+reminderData.getId())
-                .setCircularRegion(reminderData.getLatitude(), reminderData.getLongitude(), GEOFENCE_RADIUS)
+                .setRequestId(""+reminder.getId())
+                .setCircularRegion(reminder.getLatitude(), reminder.getLongitude(), GEOFENCE_RADIUS)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .build();
-
-
-        if (!mGoogleApiClient.isConnected()) {
-            Log.i(TAG, "GOOGLE API Client Not connected");
-            return;
-        }
 
         try {
             GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
@@ -314,34 +329,36 @@ public class DataController implements ResultCallback<Status> {
             // Return a GeofencingRequest.
             GeofencingRequest geofencingRequest = builder.build();
             Intent intent = new Intent(context, GeofenceTransitionIntentService.class);
-            intent.putExtra("ReminderId", reminderData.getId());
-            intent.putExtra("ReminderType", reminderData.getReminderType().ordinal());
-            intent.putExtra("NotificationId", reminderData.getId()*7);
+            intent.putExtra("ReminderId", reminder.getId());
+            intent.putExtra("ReminderType", reminder.getReminderType().ordinal());
+            intent.putExtra("NotificationId", reminder.getId()*7);
             // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
             // addGeofences() and removeGeofences().
-            PendingIntent pendingIntent = PendingIntent.getService(context, (int)reminderData.getId()*7, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getService(context, (int)reminder.getId()*7, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             LocationServices.GeofencingApi.addGeofences(
-                    mGoogleApiClient,
+                    googleApiClient,
                     // The GeofenceRequest object.
                     geofencingRequest,
                     // A pending intent that that is reused when calling removeGeofences(). This
                     // pending intent is used to generate an intent when a matched geofence
                     // transition is observed.
                     pendingIntent
-            ).setResultCallback(this); // Result processed in onResult().
-
+            );
             Log.i(TAG, "Geofence added");
         } catch (SecurityException securityException) {
         }
+        return true;
     }
 
     /**
      * remove only one geofence
+     * return false if pending in queue, return true if it handles the request immediately
      * @param id
      */
     public boolean removeGeofence(long id){
-        if(!mGoogleApiClient.isConnected()){
-            Log.i(TAG,"Cannot connect to Google Service");
+        if(!googleApiClient.isConnected()){
+            Log.i(TAG, "GOOGLE API Client Not connected");
+            pendingGeofenceActions.add(new PendingGeofenceAction(Action.REMOVE, id));
             return false;
         }
         //remove the geo-fence
@@ -358,10 +375,10 @@ public class DataController implements ResultCallback<Status> {
         if(pendingIntent==null)
             return true;
         LocationServices.GeofencingApi.removeGeofences(
-                mGoogleApiClient,
+                googleApiClient,
                 // This is the same pending intent that was used in addGeofences().
                 pendingIntent
-        ).setResultCallback(this); // Result processed in onResult().
+        );
         return true;
     }
 
@@ -411,8 +428,22 @@ public class DataController implements ResultCallback<Status> {
     }
 
     @Override
-    public void onResult(Status status) {
-
+    /**
+     * On connected
+     */
+    public void onResult(@NonNull Status status) {
+        for(PendingGeofenceAction pga: pendingGeofenceActions){
+            switch(pga.action){
+                case ADD:
+                    addGeofence(pga.reminder);
+                    break;
+                case REMOVE:
+                    removeGeofence(pga.reminderId);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Missing action");
+            }
+        }
     }
 
     public void sample(){

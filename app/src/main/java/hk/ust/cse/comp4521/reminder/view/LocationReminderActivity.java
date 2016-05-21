@@ -71,7 +71,7 @@ public class LocationReminderActivity extends AppCompatActivity {
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.editLocationLayout);
         editTitle = (TextView) layout.findViewById(R.id.editTitle);
         editDate=(TextView)layout.findViewById(R.id.editDate);
-        editDate.setText(DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.DATE));
+        editDate.setText(DateTimeParser.toString(Calendar.getInstance().getTimeInMillis()+86400000, DateTimeParser.Format.DATE));
         editDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
