@@ -108,8 +108,8 @@ public class GeofenceTransitionIntentService extends IntentService {
                 // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(),
                         R.drawable.pink_stick_man))
-                .setContentTitle("Sofa King Good")
-                .setContentText("HIHI")
+                .setContentTitle(reminderData.getTitle())
+                .setContentText(reminderData.getDescription())
                 .setContentIntent(notificationPendingIntent);
 
         // Dismiss notification once the user touches it.
