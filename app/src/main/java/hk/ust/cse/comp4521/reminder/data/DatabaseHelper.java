@@ -1,4 +1,4 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.data;
 
 /**
  * Created by Jeffrey on 13/5/2016.
@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class ReminderDatabaseHelper extends SQLiteOpenHelper {
+public class DatabaseHelper extends SQLiteOpenHelper {
 
     // 資料庫名稱
     public static final String DATABASE_NAME = "mydata.db";
@@ -18,15 +18,15 @@ public class ReminderDatabaseHelper extends SQLiteOpenHelper {
     private static SQLiteDatabase database;
 
     // 建構子，在一般的應用都不需要修改
-    public ReminderDatabaseHelper(Context context, String name, CursorFactory factory,
-                                  int version) {
+    public DatabaseHelper(Context context, String name, CursorFactory factory,
+                          int version) {
         super(context, name, factory, version);
     }
 
     // 需要資料庫的元件呼叫這個方法，這個方法在一般的應用都不需要修改
     public static SQLiteDatabase getDatabase(Context context) {
         if (database == null || !database.isOpen()) {
-            database = new ReminderDatabaseHelper(context, DATABASE_NAME,
+            database = new DatabaseHelper(context, DATABASE_NAME,
                     null, VERSION).getWritableDatabase();
         }
 
@@ -36,13 +36,13 @@ public class ReminderDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // 建立應用程式需要的表格
-        db.execSQL(ReminderDAO.CREATE_TABLE);
+        db.execSQL(DataAccessObject.CREATE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // 刪除原有的表格
-        db.execSQL("DROP TABLE IF EXISTS " + ReminderDAO.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DataAccessObject.TABLE_NAME);
         // 呼叫onCreate建立新版的表格
         onCreate(db);
     }

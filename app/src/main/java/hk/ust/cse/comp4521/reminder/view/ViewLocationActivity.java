@@ -1,28 +1,24 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.view;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import hk.ust.cse.comp4521.reminder.R;
+import hk.ust.cse.comp4521.reminder.data.DataController;
+import hk.ust.cse.comp4521.reminder.data.ReminderData;
 
 public class ViewLocationActivity extends AppCompatActivity {
 
-    private ReminderDataController dataController;
+    private DataController dataController;
 
     private ReminderData reminderData;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            dataController = ReminderDataController.getInstance(getApplication());
+            dataController = DataController.getInstance(getApplication());
 
             //TODO: turn this into permission listener
             //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method

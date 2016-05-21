@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    >
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/reminder_list"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/reminder_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp"
+        android:scrollbars="vertical"
+        />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/menuFab"
@@ -19,10 +23,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:src="@drawable/yellow_plus"
-        android:elevation="10dp"
+        android:elevation="6dp"
         app:pressedTranslationZ="12dp"
         android:scaleType="fitXY"
-        app:layout_behavior="hk.ust.cse.comp4521.reminder.FabHideOnScroll"
         />
 
     <include layout="@layout/activity_main_fab_menu" />

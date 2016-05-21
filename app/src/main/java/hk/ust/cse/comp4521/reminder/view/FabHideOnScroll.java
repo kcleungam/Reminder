@@ -1,4 +1,4 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.view;
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;

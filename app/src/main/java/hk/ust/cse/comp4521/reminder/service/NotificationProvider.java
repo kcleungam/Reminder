@@ -1,34 +1,25 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.service;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import hk.ust.cse.comp4521.reminder.R;
+import hk.ust.cse.comp4521.reminder.data.ReminderData;
+import hk.ust.cse.comp4521.reminder.view.ViewLocationActivity;
+import hk.ust.cse.comp4521.reminder.view.ViewTimeActivity;
 
 /**
- * Created by Jeffrey on 16/5/2016.
+ * Created by Jeffrey on 21/5/2016.
  */
-public class AlarmReceiver extends BroadcastReceiver {
+public class NotificationProvider {
 
-    ReminderDataController dataController;
+    public static final String TAG = "NotificationProvider";
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        dataController = ReminderDataController.getInstance(context);
-        ReminderData reminderData = dataController.getReminder(intent.getLongExtra("ReminderId", -1));
-        long notificationId = intent.getLongExtra("NotificationId", -1);
-        Log.i("AlarmReceiver", ""+notificationId);
-
+    public static Notification getNotifiction(Context context, ReminderData reminderData){
         //建立通知物件
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
         //指定通知欄位要顯示的圖示
@@ -49,15 +40,16 @@ public class AlarmReceiver extends BroadcastReceiver {
         //當使用者按下通知欄中的通知時要開啟的 Activity
         Intent resultIntent = new Intent();
         switch(reminderData.getReminderType()){
-        case Time:
-            resultIntent.setClass(context, ViewTimeActivity.class);
-            break;
-        case Location:
-            resultIntent.setClass(context, ViewLocationActivity.class);
-            break;
-        default:
-            Log.d("Alarm","Reminder type not on the list.");
+            case Time:
+                resultIntent.setClass(context, ViewTimeActivity.class);
+                break;
+            case Location:
+                resultIntent.setClass(context, ViewLocationActivity.class);
+                break;
+            default:
+                Log.d(TAG,"Reminder type not on the list.");
         }
+
         //非必要,可以利用intent傳值
         resultIntent.putExtra("ReminderId", reminderData.getId());
         //建立待處理意圖
@@ -74,15 +66,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 //        PendingIntent pendingResultIntent = stackBuilder.getPendingIntent((int) reminderData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent pendingResultIntent = PendingIntent.getActivity(context, (int) reminderData.getId(), resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         notification.setContentIntent(pendingResultIntent);
-        //取得通知管理器
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        //執行通知
-        //TODO: unsafe long to int conversion
-        mNotificationManager.notify((int) notificationId, notification.build());
 
-        if(reminderData.noRepeat()) {
-            reminderData.setEnabled(false);
-            dataController.putReminder(reminderData);
-        }
+        return notification.build();
     }
 }

@@ -1,17 +1,18 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.view;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.DatePicker;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -19,15 +20,24 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.util.Arrays;
 import java.util.Calendar;
 
-public class LocationReminderActivity extends AppCompatActivity {
-    private ReminderDataController dataController;
+import hk.ust.cse.comp4521.reminder.R;
+import hk.ust.cse.comp4521.reminder.data.DataController;
+import hk.ust.cse.comp4521.reminder.data.ReminderData;
+import hk.ust.cse.comp4521.reminder.util.DateTimeParser;
+
+public class TimeReminderActivity extends AppCompatActivity {
+
+    private DataController dataController;
 
     private ReminderData reminderData;
     private TextView editTitle;
     private TextView editTime;
-    private TextView editDate;
+    private ImageButton timeButton;
+    private CheckBox[] checkBoxes;
+    private Button selectAllButton;
     private TextView locationText;
     private ImageButton locationButton;
     private TextView editDescription;
@@ -44,7 +54,7 @@ public class LocationReminderActivity extends AppCompatActivity {
     //@TargetApi(23)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dataController = ReminderDataController.getInstance(getApplication());
+        dataController = DataController.getInstance(getApplication());
 
         //TODO: turn this into permission listener
         //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
@@ -62,26 +72,59 @@ public class LocationReminderActivity extends AppCompatActivity {
 //            }
 //        }
 
-        setContentView(R.layout.edit_location_container);
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.editLocationLayout);
+
+        setContentView(R.layout.edit_time_container);
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.editTimeLayout);
         editTitle = (TextView) layout.findViewById(R.id.editTitle);
-        editDate=(TextView)layout.findViewById(R.id.editDate);
-        editDate.setText(DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.DATE));
-        editDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(R.id.editDate);
-            }
-        });
         editTime = (TextView) layout.findViewById(R.id.editTime);
-        editTime.setText(DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.SHORT));
         editTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDialog(R.id.editTime);
             }
         });
-//        timeButton = (ImageButton) layout.findViewById(R.id.timeButton);
+        timeButton = (ImageButton) layout.findViewById(R.id.timeButton);
+        timeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(R.id.timeButton);
+            }
+        });
+        checkBoxes = new CheckBox[7];
+        checkBoxes[1] = (CheckBox) layout.findViewById(R.id.monBox);
+        checkBoxes[2] = (CheckBox) layout.findViewById(R.id.tueBox);
+        checkBoxes[3] = (CheckBox) layout.findViewById(R.id.wedBox);
+        checkBoxes[4] = (CheckBox) layout.findViewById(R.id.thurBox);
+        checkBoxes[5] = (CheckBox) layout.findViewById(R.id.friBox);
+        checkBoxes[6] = (CheckBox) layout.findViewById(R.id.satBox);
+        checkBoxes[0] = (CheckBox) layout.findViewById(R.id.sunBox);
+        CompoundButton.OnClickListener wkdayBoxListener = new CompoundButton.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for (CheckBox box : checkBoxes) {
+                    if(box.isChecked()!=true) {
+                        setSelectAll(true);
+                        return;
+                    }
+                }
+                setSelectAll(false);
+            }
+        };
+        for(CheckBox checkBox: checkBoxes){
+            checkBox.setOnClickListener(wkdayBoxListener);
+        }
+        selectAllButton = (Button) layout.findViewById(R.id.selectAll);
+        View.OnClickListener selectAllListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { //if all box checked, set button to "unselect all", vice versa
+                for (CheckBox box : checkBoxes) {
+                    box.setChecked(v.getTag().equals(true));
+                }
+                setSelectAll(!v.getTag().equals(true));
+            }
+        };
+        selectAllButton.setOnClickListener(selectAllListener);
+        selectAllButton.setTag(true);
         locationText = (TextView) layout.findViewById(R.id.editLocation);
         locationButton = (ImageButton) layout.findViewById(R.id.locationButton);
         locationButton.setOnClickListener(new View.OnClickListener() {
@@ -91,6 +134,9 @@ public class LocationReminderActivity extends AppCompatActivity {
                 startActivityForResult(intent, RETURN_LOCATION);
             }
         });
+
+
+
         editDescription = (TextView) layout.findViewById(R.id.editDescription);
         imageView = (ImageView) layout.findViewById(R.id.imageView);
         ImageView.OnClickListener imageViewListener = new View.OnClickListener() {
@@ -114,8 +160,11 @@ public class LocationReminderActivity extends AppCompatActivity {
             reminderData = new ReminderData();
         if (reminderData.getId()!=-1) {
             editTitle.setText(reminderData.getTitle());
-            editTime.setText(reminderData.getValidUntilTime());
-            editDate.setText(reminderData.getValidUntilDate());
+            editTime.setText(reminderData.getTime());
+            for (int i = 0; i < checkBoxes.length; i++) {
+                checkBoxes[i].setChecked(reminderData.getRepeat()[i]);
+            }
+            setSelectAll(!Arrays.asList(reminderData.getRepeat()).contains(false));
             editDescription.setText(reminderData.getDescription());
             locationText.setText(reminderData.getLocation());
             //TODO: Enable image view
@@ -132,6 +181,16 @@ public class LocationReminderActivity extends AppCompatActivity {
         }
     }
 
+    private void setSelectAll(boolean selectAll){
+        if(selectAll){
+            selectAllButton.setText("Select all");
+            selectAllButton.setTag(true);
+        }else{
+            selectAllButton.setText("Unselect all");
+            selectAllButton.setTag(false);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -145,21 +204,21 @@ public class LocationReminderActivity extends AppCompatActivity {
         switch (item_id) {
             case R.id.action_save:
                 if(editTitle.getText().length()==0){
-                    Toast.makeText(LocationReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TimeReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
                     return true;
                 }
                 if(!DateTimeParser.validate(editTime.getText().toString(), DateTimeParser.Format.SHORT)){
-                    Toast.makeText(LocationReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TimeReminderActivity.this, "Empty time", Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                if(!DateTimeParser.validate(editDate.getText().toString(), DateTimeParser.Format.DATE)){
-                    Toast.makeText(LocationReminderActivity.this, "Empty date", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-                reminderData.setReminderType(ReminderData.ReminderType.Location);
+                reminderData.setReminderType(ReminderData.ReminderType.Time);
                 reminderData.setTitle(editTitle.getText().toString());
-                reminderData.setValidUntilTime(editTime.getText().toString());
-                reminderData.setValidUntilDate(editDate.getText().toString());
+                reminderData.setTime(editTime.getText().toString());
+                boolean[] repeat = new boolean[checkBoxes.length];
+                for (int i = 0; i < checkBoxes.length; i++) {
+                    repeat[i] = checkBoxes[i].isChecked();
+                }
+                reminderData.setRepeat(repeat);
                 reminderData.setLocation(locationText.getText().toString());
                 reminderData.setDescription(editDescription.getText().toString());
                 if (reminderData.getId() < 0) {
@@ -229,26 +288,18 @@ public class LocationReminderActivity extends AppCompatActivity {
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
+            case R.id.timeButton:
             case R.id.editTime:
                 // set time picker as current time
                 TimePickerDialog timePickerDialog;
                 if(reminderData.getId()!=-1) {
-                    timePickerDialog = new TimePickerDialog(this, onTimeSetListener, reminderData.getValidUntilTime(Calendar.HOUR_OF_DAY), reminderData.getValidUntilTime(Calendar.MINUTE), true);
+                    timePickerDialog = new TimePickerDialog(this, onTimeSetListener, DateTimeParser.toHour(reminderData.getTimeInMillis()), DateTimeParser.toMin(reminderData.getTimeInMillis()), true);
                 }else{
                     Calendar now = Calendar.getInstance();
                     timePickerDialog = new TimePickerDialog(this, onTimeSetListener, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true);
                 }
                 return timePickerDialog;
-            case R.id.editDate:
-                // set date picker as current time
-                DatePickerDialog datePickerDialog;
-                if(reminderData.getId()!=-1) {
-                    datePickerDialog = new DatePickerDialog(this, onDateSetListener, reminderData.getValidUntilDate(Calendar.YEAR), reminderData.getValidUntilDate(Calendar.MONTH), reminderData.getValidUntilDate(Calendar.DAY_OF_MONTH));
-                }else{
-                    Calendar now = Calendar.getInstance();
-                    datePickerDialog = new DatePickerDialog(this, onDateSetListener, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
-                }
-                return datePickerDialog;
+
         }
         return null;
     }
@@ -263,15 +314,7 @@ public class LocationReminderActivity extends AppCompatActivity {
         }
     };
 
-    private DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener(){
-        @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            Calendar now = Calendar.getInstance();
-            now.set(Calendar.YEAR, year);
-            now.set(Calendar.MONTH, monthOfYear);
-            now.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            editDate.setText(DateTimeParser.toString(now.getTimeInMillis(), DateTimeParser.Format.DATE));
-        }
-    };
-}
 
+
+
+}

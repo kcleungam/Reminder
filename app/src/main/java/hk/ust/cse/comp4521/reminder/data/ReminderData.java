@@ -1,10 +1,12 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.data;
 
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.ParseException;
 import java.util.Calendar;
+
+import hk.ust.cse.comp4521.reminder.util.DateTimeParser;
 
 /**
  * Created by Krauser on 9/5/2016.
@@ -27,32 +29,12 @@ public class ReminderData implements Serializable{
     private Double latitude = null;
     private Date validUntilDate = null;                     // location event may valid until a certain time
     private Time validUntilTime = null;
+    private long lastModify = 0L;                           //I should change all time related attribute to long in the beginning :(
     private boolean enabled = false;
 
     public ReminderData(){
 
     }
-
-    /**
-     *         Location event constructor, should inculde:      location, title, validUntil, description, image
-     */
-//    public ReminderData(String title, Time validUntil, String description){  // need to add location and image
-//        this.reminderType = ReminderType.Location;
-//        this.setTitle(title);
-//        this.validUntil = validUntil;
-//        this.setDescription(description);
-//    }
-
-    /**
-     *          TIme event constructor, should include:     time, title, repeat, description,
-     */
-//    public ReminderData(String title, Time time, boolean[] repeat, String description){     // need to add location and image
-//        this.reminderType = ReminderType.Time;
-//        this.setTitle(title);
-//        this.time = time;
-//        this.setRepeat(repeat);
-//        this.setDescription(description);
-//    }
 
     public void setId(long id){
         this.id = id;
@@ -60,6 +42,10 @@ public class ReminderData implements Serializable{
 
     public long getId(){
         return this.id;
+    }
+
+    public boolean hasId(){
+        return this.id!=-1;
     }
 
     public ReminderType getReminderType(){
@@ -118,6 +104,10 @@ public class ReminderData implements Serializable{
 
     public String getValidUntil(){
         return getValidUntilDate()+" "+getValidUntilTime();
+    }
+
+    public long getValidUntilInMillis(){
+        return validUntilTime.getTime() + validUntilDate.getTime();
     }
 
     public void setValidUntil(String time){
@@ -211,6 +201,14 @@ public class ReminderData implements Serializable{
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public long getLastModify() {
+        return lastModify;
+    }
+
+    public void setLastModify(long lastModify) {
+        this.lastModify = lastModify;
     }
 }
 

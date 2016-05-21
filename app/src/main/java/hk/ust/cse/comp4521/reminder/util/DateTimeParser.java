@@ -1,4 +1,4 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.util;
 
 import java.sql.Time;
 import java.text.ParseException;

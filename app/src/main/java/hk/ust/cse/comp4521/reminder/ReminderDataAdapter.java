@@ -4,21 +4,22 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import hk.ust.cse.comp4521.reminder.data.DataController;
+import hk.ust.cse.comp4521.reminder.data.ReminderData;
 
 /**
  * Created by Jeffrey on 12/5/2016.
  */
 public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
-    ReminderDataController dataController;
+    DataController dataController;
 
     ArrayList<ReminderData> reminderList = new ArrayList<>();
     private View.OnClickListener onClickListener;
@@ -26,7 +27,7 @@ public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
     public ReminderDataAdapter(Context context, int resource, View.OnClickListener onClickListener, View.OnLongClickListener onLongClickListener){
         super(context, resource);
-        dataController = ReminderDataController.getInstance(context);
+        dataController = DataController.getInstance(context);
         this.onClickListener = onClickListener;
         this.onLongClickListener = onLongClickListener;
     }
