@@ -1,19 +1,14 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import hk.ust.cse.comp4521.reminder.data.DataController;
+import hk.ust.cse.comp4521.reminder.data.ReminderData;
 
 /**
  * Created by Jeffrey on 16/5/2016.
@@ -22,11 +17,11 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     public static final String TAG = "AlarmReceiver";
 
-    ReminderDataController dataController;
+    DataController dataController;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        dataController = ReminderDataController.getInstance(context);
+        dataController = DataController.getInstance(context);
         ReminderData reminderData = dataController.getReminder(intent.getLongExtra("ReminderId", -1));
         long notificationId = intent.getLongExtra("NotificationId", -1);
         Log.i("AlarmReceiver", ""+notificationId);

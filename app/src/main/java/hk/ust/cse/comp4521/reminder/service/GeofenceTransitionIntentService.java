@@ -1,4 +1,4 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.service;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -8,9 +8,7 @@ import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.content.Context;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
@@ -18,6 +16,11 @@ import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import hk.ust.cse.comp4521.reminder.R;
+import hk.ust.cse.comp4521.reminder.data.DataController;
+import hk.ust.cse.comp4521.reminder.data.ReminderData;
+import hk.ust.cse.comp4521.reminder.view.MainActivity;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -29,7 +32,7 @@ import java.util.List;
 public class GeofenceTransitionIntentService extends IntentService {
     protected static final String TAG = "GeofenceTransitionIntentService";
 
-    ReminderDataController dataController;
+    DataController dataController;
 
     public GeofenceTransitionIntentService() {
         super("GeofenceTransitionIntentService");
@@ -38,7 +41,7 @@ public class GeofenceTransitionIntentService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        dataController = ReminderDataController.getInstance(getApplication());
+        dataController = DataController.getInstance(getApplication());
     }
 
     @Override
@@ -56,7 +59,7 @@ public class GeofenceTransitionIntentService extends IntentService {
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
             //TODO: this may be buggy
             for(Geofence geofence:triggeringGeofences) {
-                dataController = ReminderDataController.getInstance(getApplication());
+                dataController = DataController.getInstance(getApplication());
                 ReminderData reminderData = dataController.getReminder(intent.getLongExtra("ReminderId", -1));
                 long notificationId = intent.getLongExtra("NotificationId", -1);
 
@@ -121,7 +124,7 @@ public class GeofenceTransitionIntentService extends IntentService {
 
 //        //TODO: this may be buggy and not efficient
 //        //as Android M doesn't support lambda expression but will support in Android N
-//        ReminderDataController mController=ReminderDataController.getInstance();
+//        DataController mController=DataController.getInstance();
 //        for(ReminderData reminderData:MainActivity.reminderAdaptor.reminderList){
 //            if(String.valueOf(reminderData.getId()).equals(geofenceID)){
 //                mController.setGeoAlarm(reminderData);

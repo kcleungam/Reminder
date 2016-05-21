@@ -1,15 +1,12 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.data;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.AlarmManager;
-import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -21,16 +18,20 @@ import com.google.android.gms.location.LocationServices;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import hk.ust.cse.comp4521.reminder.service.AlarmReceiver;
+import hk.ust.cse.comp4521.reminder.service.GeofenceTransitionIntentService;
+import hk.ust.cse.comp4521.reminder.service.GoogleApiClientProvider;
+
 /**
  * Created by Jeffrey on 17/5/2016.
  */
-public class ReminderDataController implements ResultCallback<Status> {
+public class DataController implements ResultCallback<Status> {
 
-    public final static String TAG = "ReminderDataController";
+    public final static String TAG = "DataController";
 
-    private static ReminderDataController instance;
+    private static DataController instance;
     private Context context;
-    private ReminderDAO reminderDAO;
+    private DataAccessObject dataAccessObject;
 
     public static final int NOTIFICATION_DELAY=10;
     public static final int TIME_ALARM_NOTIFY_BEFORE = 10; //seconds
@@ -39,16 +40,16 @@ public class ReminderDataController implements ResultCallback<Status> {
     public final static float GEOFENCE_RADIUS=500;//radius in meters
 
     //singleton pattern, no public constructor
-    private ReminderDataController(){
+    private DataController(){
 
     }
 
-    public static ReminderDataController getInstance(Context application){
+    public static DataController getInstance(Context application){
         if(instance==null) {
             if(application==null)
                 throw new IllegalArgumentException("context is null");
-            instance = new ReminderDataController();
-            instance.reminderDAO = new ReminderDAO(application);
+            instance = new DataController();
+            instance.dataAccessObject = new DataAccessObject(application);
             instance.context = application;
             instance.mGoogleApiClient = GoogleApiClientProvider.getInstance(application);
             // 如果資料庫是空的，就建立一些範例資料
@@ -58,23 +59,23 @@ public class ReminderDataController implements ResultCallback<Status> {
     }
 
     public ReminderData getReminder(long reminderId){
-        return reminderDAO.get(reminderId);
+        return dataAccessObject.get(reminderId);
     }
 
     public ArrayList<ReminderData> getAll(){
-        return reminderDAO.getAll();
+        return dataAccessObject.getAll();
     }
 
     public void clear(){
-        reminderDAO.clear();
+        dataAccessObject.clear();
     }
 
     public int getCount(){
-        return reminderDAO.getCount();
+        return dataAccessObject.getCount();
     }
 
     public boolean addReminder(ReminderData reminderData){
-        reminderDAO.insert(reminderData);
+        dataAccessObject.insert(reminderData);
         if(reminderData.isEnabled()) {
             switch (reminderData.getReminderType()) {
                 case Location:
@@ -89,7 +90,7 @@ public class ReminderDataController implements ResultCallback<Status> {
     }
 
     public boolean putReminder(ReminderData reminderData){
-        if(reminderDAO.update(reminderData)) {
+        if(dataAccessObject.update(reminderData)) {
             switch (reminderData.getReminderType()) {
                 case Location:
                     removeGeofence(reminderData.getId());
@@ -115,7 +116,7 @@ public class ReminderDataController implements ResultCallback<Status> {
 
     public boolean deleteReminder(long id){
         ReminderData reminderData = getReminder(id);
-        if(reminderDAO.delete(id)){
+        if(dataAccessObject.delete(id)){
             switch (reminderData.getReminderType()) {
                 case Location:
                     removeGeofence(reminderData.getId());
@@ -130,7 +131,7 @@ public class ReminderDataController implements ResultCallback<Status> {
     }
 
     public boolean deleteReminder(ReminderData reminderData){
-        if(reminderDAO.delete(reminderData.getId())){
+        if(dataAccessObject.delete(reminderData.getId())){
             switch (reminderData.getReminderType()) {
                 case Location:
                     removeGeofence(reminderData.getId());
@@ -188,6 +189,9 @@ public class ReminderDataController implements ResultCallback<Status> {
 
     @SuppressLint("NewApi")
     private void addAlarm(ReminderData reminderData){
+        if(reminderData.getReminderType()!= ReminderData.ReminderType.Time)
+            throw new IllegalArgumentException("Invalid reminder type.");
+
         //使用Calendar指定時間
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, reminderData.getTime(Calendar.HOUR_OF_DAY));
@@ -269,6 +273,8 @@ public class ReminderDataController implements ResultCallback<Status> {
      * Add a new geofence or update a new geofence
      */
     public void addGeofence(ReminderData reminderData) {
+        if(reminderData.getReminderType()!= ReminderData.ReminderType.Location)
+            throw new IllegalArgumentException("Invalid reminder type.");
         //TODO: Could someone prove this is working?
         //check whether this id already exists
 //        boolean exist=false;
@@ -359,25 +365,47 @@ public class ReminderDataController implements ResultCallback<Status> {
         return true;
     }
 
-    public void populateGeofences(){
+    public void update(){
         //Get all the reminder from the database
-        for(ReminderData reminderData:getAll()){
-            //validate the location
-            if(reminderData.getReminderType() == ReminderData.ReminderType.Location
-                    && reminderData.getLocation()!=null && reminderData.getLatitude()!=null && reminderData.getLongitude()!=null
-                    && reminderData.isEnabled()){
-                addGeofence(reminderData);
+        for(ReminderData reminder:getAll()){
+            switch (reminder.getReminderType()) {
+                case Location:
+                    if(reminder.isEnabled() && reminder.getValidUntilInMillis() < System.currentTimeMillis()) {
+                        reminder.setEnabled(false);
+                        putReminder(reminder);
+                    }
+                    break;
+                case Time:
+                    //check if a one time time reminder is a past reminder
+                    //note that one time reminder only alarms in the coming 24 hours
+                    if(reminder.isEnabled() && reminder.noRepeat() && reminder.getLastModify() < System.currentTimeMillis() + (24*60*60*1000)) {
+                        reminder.setEnabled(false);
+                        putReminder(reminder);
+                    }
+                    break;
             }
         }
+        Log.i(TAG, "Updated database");
     }
 
     public void populateAlarms(){
         //Get all the reminder from the database
-        for(ReminderData reminderData:getAll()){
-            if(reminderData.getReminderType() == ReminderData.ReminderType.Time
-                    && reminderData.getRepeat()!=null && reminderData.getTime()!=null
-                    && reminderData.isEnabled()){
-                addGeofence(reminderData);
+        for(ReminderData reminder:getAll()){
+            if(!reminder.isEnabled())
+                continue;
+            switch (reminder.getReminderType()) {
+                case Location:
+                    if(reminder.getLocation()!=null && reminder.getLatitude()!=null && reminder.getLongitude()!=null) {
+                        addGeofence(reminder);
+                        Log.i(TAG, "Broadcasted geofence for reminder " + reminder.getTitle());
+                    }
+                    break;
+                case Time:
+                    if(reminder.getRepeat()!=null && reminder.getTime()!=null) {
+                        addAlarm(reminder);
+                        Log.i(TAG, "Broadcasted alarm for reminder " + reminder.getTitle());
+                    }
+                    break;
             }
         }
     }
@@ -388,6 +416,6 @@ public class ReminderDataController implements ResultCallback<Status> {
     }
 
     public void sample(){
-        reminderDAO.sample();
+        dataAccessObject.sample();
     }
 }

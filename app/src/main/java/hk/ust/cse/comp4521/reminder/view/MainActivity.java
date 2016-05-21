@@ -1,17 +1,11 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.view;
 
-import android.Manifest;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.View;
 import android.view.Menu;
@@ -21,20 +15,14 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import hk.ust.cse.comp4521.reminder.service.GoogleApiClientProvider;
+import hk.ust.cse.comp4521.reminder.R;
+import hk.ust.cse.comp4521.reminder.ReminderDataAdapter;
+import hk.ust.cse.comp4521.reminder.data.ReminderData;
 
 public class MainActivity extends AppCompatActivity {
     /* View component */
@@ -108,32 +96,32 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        View.OnClickListener onClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                long id = ( (ReminderDataAdapter.RowHandler) v.getTag() ).reminderId;
-                ReminderData.ReminderType reminderType = ( (ReminderDataAdapter.RowHandler) v.getTag() ).reminderType;
-                Intent intent = null;
-                switch(reminderType){
-                    case Location:
-                        intent = new Intent(getApplicationContext(), LocationReminderActivity.class);
-                        break;
-                    case Time:
-                        intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
-                        break;
-                }
-                intent.putExtra("ReminderId", id);
-                startActivity(intent);
-            }
-        };
-        View.OnLongClickListener onLongClickListener = new AdapterView.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                //rowOnSelected = (ReminderDataAdapter.RowHandler) v.getTag();
-                openContextMenu(recyclerView);
-                return true;
-            }
-        };
+//        View.OnClickListener onClickListener = new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                long id = ( (ReminderDataAdapter.RowHandler) v.getTag() ).reminderId;
+//                ReminderData.ReminderType reminderType = ( (ReminderDataAdapter.RowHandler) v.getTag() ).reminderType;
+//                Intent intent = null;
+//                switch(reminderType){
+//                    case Location:
+//                        intent = new Intent(getApplicationContext(), LocationReminderActivity.class);
+//                        break;
+//                    case Time:
+//                        intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
+//                        break;
+//                }
+//                intent.putExtra("ReminderId", id);
+//                startActivity(intent);
+//            }
+//        };
+//        View.OnLongClickListener onLongClickListener = new AdapterView.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                //rowOnSelected = (ReminderDataAdapter.RowHandler) v.getTag();
+//                openContextMenu(recyclerView);
+//                return true;
+//            }
+//        };
         //reminderAdaptor = new ReminderDataAdapter(getApplication(), R.layout.row_layout, onClickListener, onLongClickListener);
 
         // 取得所有記事資料

@@ -1,9 +1,10 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.data;
 
 /**
  * Created by Jeffrey on 13/5/2016.
  */
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -12,8 +13,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import hk.ust.cse.comp4521.reminder.util.DateTimeParser;
+import hk.ust.cse.comp4521.reminder.util.Util;
+
 // 資料功能類別
-public class ReminderDAO {
+public class DataAccessObject {
     // 表格名稱
     public static final String TABLE_NAME = "Reminder";
 
@@ -55,8 +59,8 @@ public class ReminderDAO {
     private SQLiteDatabase db;
 
     // 建構子，一般的應用都不需要修改
-    public ReminderDAO(Context context) {
-        db = ReminderDatabaseHelper.getDatabase(context);
+    public DataAccessObject(Context context) {
+        db = DatabaseHelper.getDatabase(context);
     }
 
     // 關閉資料庫，一般的應用都不需要修改
@@ -189,6 +193,11 @@ public class ReminderDAO {
         result.setLatitude(cursor.getDouble(9));
         result.setValidUntil(cursor.getString(10));
         result.setEnabled((cursor.getInt(11))==1);
+        try {
+            result.setLastModify(DateTimeParser.toLong(cursor.getString(12), DateTimeParser.Format.ISO8601));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         // 回傳結果
         return result;

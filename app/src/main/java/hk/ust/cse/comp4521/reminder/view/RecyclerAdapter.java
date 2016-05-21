@@ -1,6 +1,5 @@
-package hk.ust.cse.comp4521.reminder;
+package hk.ust.cse.comp4521.reminder.view;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -11,6 +10,10 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
+import hk.ust.cse.comp4521.reminder.R;
+import hk.ust.cse.comp4521.reminder.data.DataController;
+import hk.ust.cse.comp4521.reminder.data.ReminderData;
+
 /**
  * Created by alex on 19/5/2016.
  */
@@ -20,7 +23,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     LayoutInflater layoutInflater;
 
     /* Data controls */
-    ReminderDataController mController;
+    DataController mController;
 
     public static ArrayList<ReminderData> reminderDatas;
 
@@ -37,7 +40,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 //        this.context=context;
 //        this.onClickListener=onClickListener;
 //        this.onLongClickListener=onLongClickListener;
-//        this.mController=ReminderDataController.getInstance(context);
+//        this.mController=DataController.getInstance(context);
 //        Log.d(TAG,"The number of reminders is "+mController.getCount());
 //        for(ReminderData reminderData:mController.getAll()) {
 //            reminderDataHashMap.put(reminderData.getId(), reminderData);
@@ -50,7 +53,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     public RecyclerAdapter(final Context context){
         this.context=context;
 
-        this.mController =ReminderDataController.getInstance(context);
+        this.mController = DataController.getInstance(context);
         //Log.d(TAG,"The number of reminders is "+mController.getCount());
         if(reminderDatas==null) {
             reminderDatas = new ArrayList<>();

@@ -20,26 +20,17 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".GlobalState"
+        android:name=".util.GlobalState"
         android:theme="@style/AppTheme" >
 
         <activity
-            android:name=".MainActivity"
+            android:name=".view.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <receiver
-            android:name=".AlarmReceiver"
-            android:process=":remote"
-            android:enabled="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -54,38 +45,52 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".TimeReminderActivity"
+            android:name=".view.TimeReminderActivity"
             android:label="@string/title_activity_time_reminder"/>
 
         <activity
-            android:name=".ViewTimeActivity"
+            android:name=".view.ViewTimeActivity"
             android:label="@string/title_activity_time_reminder"
             android:exported="true">
         </activity>
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".view.MapsActivity"
             android:label="@string/title_activity_maps" />
 
         <activity
-            android:name=".LocationReminderActivity"
+            android:name=".view.LocationReminderActivity"
             android:label="@string/title_activity_location_reminder" />
 
         <activity
-            android:name=".ViewLocationActivity"
+            android:name=".view.ViewLocationActivity"
             android:label="@string/title_activity_location_reminder"
             android:exported="true">
         </activity>
 
         <service
-            android:name=".GeofenceTransitionIntentService"
+            android:name=".service.GeofenceTransitionIntentService"
+            android:enabled="true"
             android:exported="false" />
 
         <service
-            android:name=".GeofenceService"
+            android:name=".service.DataUpdateIntentService"
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <receiver
+            android:name=".service.AlarmReceiver"
+            android:process=":remote"
+            android:enabled="true">
+        </receiver>
+
+        <receiver android:name=".service.BootReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
