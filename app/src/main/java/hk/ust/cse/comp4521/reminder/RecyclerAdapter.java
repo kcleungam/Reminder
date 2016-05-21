@@ -4,16 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by alex on 19/5/2016.
@@ -24,12 +20,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     LayoutInflater layoutInflater;
 
     /* Data controls */
-    ReminderDataController reminderDataController;
+    ReminderDataController mController;
 
-    public ArrayList<ReminderData> reminderDatas = new ArrayList<ReminderData>();
-
-    private View.OnClickListener onClickListener;
-    private View.OnLongClickListener onLongClickListener;
+    public ArrayList<ReminderData> reminderDatas = new ArrayList<>();
 
     /* Others */
     public static final String TAG="RecyclerAdapter";
@@ -44,9 +37,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 //        this.context=context;
 //        this.onClickListener=onClickListener;
 //        this.onLongClickListener=onLongClickListener;
-//        this.reminderDataController=ReminderDataController.getInstance(context);
-//        Log.d(TAG,"The number of reminders is "+reminderDataController.getCount());
-//        for(ReminderData reminderData:reminderDataController.getAll()) {
+//        this.mController=ReminderDataController.getInstance(context);
+//        Log.d(TAG,"The number of reminders is "+mController.getCount());
+//        for(ReminderData reminderData:mController.getAll()) {
 //            reminderDataHashMap.put(reminderData.getId(), reminderData);
 //            UItoID.add(reminderData.getId());
 //        }
@@ -56,17 +49,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     public RecyclerAdapter(final Context context){
         this.context=context;
-        this.onLongClickListener=new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                //TODO
-                return false;
-            }
-        };
 
-        this.reminderDataController=ReminderDataController.getInstance(context);
-        //Log.d(TAG,"The number of reminders is "+reminderDataController.getCount());
-        reminderDatas.addAll(reminderDataController.getAll());
+        this.mController =ReminderDataController.getInstance(context);
+        //Log.d(TAG,"The number of reminders is "+mController.getCount());
+        reminderDatas.addAll(mController.getAll());
 
         //layoutInflater=LayoutInflater.from(context);
         layoutInflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -93,6 +79,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         /* set info of the card */
         holder.reminder_type = reminder.getReminderType();
         holder.reminder_id = reminder.getId();
+        holder.reminder_enabled = reminder.isEnabled();
+        /* set style of the card */
+        if(holder.reminder_enabled){
+            holder.itemView.setElevation(5.0f);
+            holder.itemView.setAlpha(1.0f);
+        }else{//disable it
+            holder.itemView.setElevation(0.0f);
+            holder.itemView.setAlpha(0.1f);
+        }
         /* set the content of the card */
         //event title
         holder.reminder_title.setText(reminder.getTitle());
@@ -135,19 +130,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         });
         //enable/disable the reminder
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @SuppressLint("NewApi")
             @Override
             public boolean onLongClick(View v) {
                 if(holder.itemView.getElevation()==0.0){//enable it
                     holder.itemView.setElevation(5.0f);
                     holder.itemView.setAlpha(1.0f);
-                    //TODO: call related function
+                    mController.enableReminder(holder.reminder_id, true);
+                    holder.reminder_enabled = true;
                 }else{//disable it
                     holder.itemView.setElevation(0.0f);
                     holder.itemView.setAlpha(0.1f);
-                    //TODO: call related function
+                    mController.enableReminder(holder.reminder_id, false);
+                    holder.reminder_enabled = false;
                 }
-
                 return true;//consume the long click
             }
         });
@@ -162,13 +157,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     public void reset(){
         reminderDatas.clear();
-        reminderDatas.addAll(reminderDataController.getAll());
+        reminderDatas.addAll(mController.getAll());
     }
 
     public void remove(int position){
         ReminderData reminder = reminderDatas.remove(position);
         if(reminder!=null)
-            reminderDataController.deleteReminder(reminder.getId());
+            mController.deleteReminder(reminder.getId());
     }
 
 
@@ -179,7 +174,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 //        //Adapter layer
 //        if(!reminderData.hasId()){//insertion
 //            //Database layer
-//            if(!reminderDataController.addReminder(reminderData)){//failed to add
+//            if(!mController.addReminder(reminderData)){//failed to add
 //                Log.e(TAG,"The given reminder can't be added to the database");
 //                throw new RuntimeException();
 //            }
@@ -188,7 +183,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 //        }else {//modification
 //            Log.d(TAG, "A reminder is being modified.");
 //            //Database layer
-//            if(!reminderDataController.putReminder(reminderData)){
+//            if(!mController.putReminder(reminderData)){
 //                Log.e(TAG,"The given reminder can't be added to the database");
 //                throw new RuntimeException();
 //            }
@@ -206,7 +201,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 //            UItoID.remove(Long.valueOf(reminderID));
 //
 //            //Database layer
-//            if(!reminderDataController.deleteReminder(reminderID)){
+//            if(!mController.deleteReminder(reminderID)){
 //                Log.e(TAG,"The given reminder can't be removed from the database.");
 //                throw new RuntimeException();
 //            }

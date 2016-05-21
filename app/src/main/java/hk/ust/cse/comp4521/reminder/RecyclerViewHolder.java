@@ -15,6 +15,7 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder {
     ImageView imageView;
     public long reminder_id;
     public ReminderData.ReminderType reminder_type;
+    public boolean reminder_enabled;
 
     public RecyclerViewHolder(View itemView) {
         super(itemView);

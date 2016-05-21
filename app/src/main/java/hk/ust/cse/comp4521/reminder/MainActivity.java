@@ -54,9 +54,6 @@ public class MainActivity extends AppCompatActivity {
     /* Location */
     protected GoogleApiClient mGoogleApiClient;
 
-    /* Database */
-    private ReminderDataController dataController;
-
     /* Others */
     public static final String TAG="Main Activity";
 
@@ -66,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        dataController = ReminderDataController.getInstance(getApplication()); // 建立資料庫物件
         mGoogleApiClient = GoogleApiClientProvider.getInstance(getApplication());
 
         //TODO: remove the following tow lines after your first run
