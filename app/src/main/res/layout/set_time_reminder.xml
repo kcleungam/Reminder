@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Comp 4521-->
+<!--Leung Ka Chun       20125844        kcleungam@ust.hk-->
+<!--To Wun Yin            20112524        wytoaa@ust.hk-->
+<!--Leung Chun Fai      20113619        cfleungac@ust.hk-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/setTimeReminderLayout"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
     tools:context=".view.TimeReminderActivity">
 
     <!-- Header -->
@@ -62,6 +67,7 @@
             android:hint="Click here to select a time"
             android:textColor="@color/text_color"
             android:layout_below="@id/time_label"
+            android:focusableInTouchMode="false"
             android:editable="false"
             />
 
@@ -157,6 +163,7 @@
             android:hint="Click here to select a location"
             android:textColor="@color/text_color"
             android:layout_below="@id/location_label"
+            android:focusableInTouchMode="false"
             android:editable="false"
             />
 

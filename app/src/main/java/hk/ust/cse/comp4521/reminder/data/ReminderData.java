@@ -146,7 +146,7 @@ public class ReminderData implements Serializable{
             long t = DateTimeParser.toLong(time, DateTimeParser.Format.SHORT);
             validUntilTime = new Time(DateTimeParser.toHour(t), DateTimeParser.toMin(t), 0);
         } catch (ParseException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
     }
 
@@ -155,7 +155,7 @@ public class ReminderData implements Serializable{
             long t = DateTimeParser.toLong(date, DateTimeParser.Format.DATE);
             validUntilDate = new Date(DateTimeParser.toYear(t)-1900, DateTimeParser.toMonth(t), DateTimeParser.toDay(t));
         } catch (ParseException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 

@@ -18,7 +18,7 @@ import hk.ust.cse.comp4521.reminder.R;
  */
 public class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
-    TextView reminder_title,reminder_location,reminder_time;
+    TextView reminder_title,reminder_location,reminder_time,reminder_status;
     ImageView imageView;
     public long reminder_id;
 
@@ -28,6 +28,7 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder {
         reminder_title= (TextView) itemView.findViewById(R.id.reminder_title);
         reminder_location= (TextView) itemView.findViewById(R.id.reminder_location);
         reminder_time=(TextView)itemView.findViewById(R.id.reminder_time);
+        reminder_status = (TextView) itemView.findViewById(R.id.reminder_status);
         imageView= (ImageView) itemView.findViewById(R.id.reminder_icon);
     }
 }

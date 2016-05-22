@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Comp 4521-->
+<!--Leung Ka Chun       20125844        kcleungam@ust.hk-->
+<!--To Wun Yin            20112524        wytoaa@ust.hk-->
+<!--Leung Chun Fai      20113619        cfleungac@ust.hk-->
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cardview="http://schemas.android.com/apk/res-auto"
@@ -49,7 +53,7 @@
             android:layout_below="@+id/reminder_title"
             android:layout_marginLeft="16dp"
             android:layout_toRightOf="@+id/reminder_icon"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="1dp"
             android:textColor="#000000"
             android:ellipsize="end"
             android:singleLine="true"
@@ -64,12 +68,25 @@
             android:layout_below="@+id/reminder_location"
             android:layout_marginLeft="16dp"
             android:layout_toRightOf="@+id/reminder_icon"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="1dp"
             android:textColor="#000000"
             android:ellipsize="end"
             android:singleLine="true"
             android:text="Place to dive into android programming"
             android:textAppearance="?attr/textAppearanceListItem"
             android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_below="@+id/reminder_time"
+            android:layout_toRightOf="@+id/reminder_icon"
+            android:layout_marginTop="1dp"
+            android:text="status"
+            android:textColor="#000000"
+            android:textSize="9sp"
+            android:id="@+id/reminder_status"
+            android:layout_alignStart="@+id/reminder_time" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>
