@@ -8,6 +8,7 @@ import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -110,7 +111,8 @@ public class GeofenceTransitionIntentService extends IntentService {
                         R.drawable.pink_stick_man))
                 .setContentTitle(reminderData.getTitle())
                 .setContentText(reminderData.getDescription())
-                .setContentIntent(notificationPendingIntent);
+                .setContentIntent(notificationPendingIntent)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
         // Dismiss notification once the user touches it.
         builder.setAutoCancel(true);
