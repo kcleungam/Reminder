@@ -37,7 +37,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
    /*
     * Constructor
     */
-    @Deprecated
+//    @Deprecated
 //    public RecyclerAdapter(Context context,View.OnClickListener onClickListener,View.OnLongClickListener onLongClickListener){
 //        this.context=context;
 //        this.onClickListener=onClickListener;

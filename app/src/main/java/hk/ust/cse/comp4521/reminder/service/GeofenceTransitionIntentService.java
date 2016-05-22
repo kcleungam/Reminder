@@ -27,7 +27,6 @@ import hk.ust.cse.comp4521.reminder.view.MainActivity;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
 public class GeofenceTransitionIntentService extends IntentService {
@@ -82,6 +81,11 @@ public class GeofenceTransitionIntentService extends IntentService {
         }
     }
 
+    /**
+     * Deprecated.
+     * Please refer to NotificationProvider.java/getNotification()
+     * @param reminderData
+     */
     @Deprecated
     private void sendNotification(ReminderData reminderData){
         // Create an explicit content Intent that starts the main Activity.
@@ -124,7 +128,7 @@ public class GeofenceTransitionIntentService extends IntentService {
         // Issue the notification
         mNotificationManager.notify(0, builder.build());
 
-//        //TODO: this may be buggy and not efficient
+//        //this may be buggy and not efficient
 //        //as Android M doesn't support lambda expression but will support in Android N
 //        DataController mController=DataController.getInstance();
 //        for(ReminderData reminderData:MainActivity.reminderAdaptor.reminderList){

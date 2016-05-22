@@ -6,6 +6,9 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -19,6 +22,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Calendar;
 
 import hk.ust.cse.comp4521.reminder.R;
@@ -38,7 +43,6 @@ public class LocationReminderActivity extends AppCompatActivity {
     private TextView editDescription;
     private ImageView imageView;
 
-    private static final String[] REQUIRED_PERMISSION = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private static final int PICK_IMAGE = 1;
     public static final int RETURN_LOCATION = 2;
 
@@ -50,22 +54,6 @@ public class LocationReminderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataController = DataController.getInstance(getApplication());
-
-        //TODO: turn this into permission listener
-        //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
-//        for(String requiredPermission:REQUIRED_PERMISSION) {
-//            Integer value = checkSelfPermission(requiredPermission);
-//            synchronized (value) {
-//                if (value == -1) {
-//                    requestPermissions(REQUIRED_PERMISSION, 1);
-//                    value = checkSelfPermission(requiredPermission);
-//                    if (value == -1) {
-//                        finish();
-//                        return;
-//                    }
-//                }
-//            }
-//        }
 
         setContentView(R.layout.edit_location_container);
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.editLocationLayout);
@@ -86,7 +74,6 @@ public class LocationReminderActivity extends AppCompatActivity {
                 showDialog(R.id.editTime);
             }
         });
-//        timeButton = (ImageButton) layout.findViewById(R.id.timeButton);
         locationText = (TextView) layout.findViewById(R.id.editLocation);
         locationButton = (ImageButton) layout.findViewById(R.id.locationButton);
         locationButton.setOnClickListener(new View.OnClickListener() {
@@ -123,16 +110,15 @@ public class LocationReminderActivity extends AppCompatActivity {
             editDate.setText(reminderData.getValidUntilDate());
             editDescription.setText(reminderData.getDescription());
             locationText.setText(reminderData.getLocation());
-            //TODO: Enable image view
             if(reminderData.getImageUri()!=null) {
-//                try {
-//                    Uri imageUri = Uri.parse(reminderData.getImageUri());
-//                    InputStream imageStream = getContentResolver().openInputStream(imageUri);
-//                    Bitmap image = BitmapFactory.decodeStream(imageStream);
-//                    imageView.setImageBitmap(image);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    Uri imageUri = Uri.parse(reminderData.getImageUri());
+                    InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                    Bitmap image = BitmapFactory.decodeStream(imageStream);
+                    imageView.setImageBitmap(image);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -190,16 +176,15 @@ public class LocationReminderActivity extends AppCompatActivity {
                 //Display an error
                 return;
             }
-            //TODO: Enable image preview
-//            try {
-//                Uri imageUri = data.getData();
-//                InputStream imageStream = getContentResolver().openInputStream(imageUri);
-//                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-//                imageView.setImageBitmap(selectedImage);
-//                reminderData.setImageUri(data.getData().toString());
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                Uri imageUri = data.getData();
+                InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                imageView.setImageBitmap(selectedImage);
+                reminderData.setImageUri(data.getData().toString());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
             //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
         } else if( requestCode == RETURN_LOCATION && resultCode == Activity.RESULT_OK){
             if(data == null){

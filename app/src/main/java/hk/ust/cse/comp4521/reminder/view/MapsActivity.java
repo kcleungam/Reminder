@@ -37,7 +37,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
-import hk.ust.cse.comp4521.reminder.LocationData;
 import hk.ust.cse.comp4521.reminder.R;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener,
@@ -60,6 +59,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private EditText editLatLng;
     private Button searchButton;
     private LocationData locationData;
+
+    public class LocationData {
+        public String name;
+        public double latitude;
+        public double longitude;
+
+        public LocationData(String name, double latitude, double longitude) {
+            this.name = name;
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,9 +171,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Toast.makeText(this,"Please specify location", Toast.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
-                    intent.putExtra("locationName", locationData.getName());
-                    intent.putExtra("latitude", locationData.getLatitude());
-                    intent.putExtra("longitude", locationData.getLongitude());
+                    intent.putExtra("locationName", locationData.name);
+                    intent.putExtra("latitude", locationData.latitude);
+                    intent.putExtra("longitude", locationData.longitude);
                     setResult(Activity.RESULT_OK, intent);
                     finish();
                 }
