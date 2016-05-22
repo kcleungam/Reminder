@@ -194,12 +194,16 @@
             android:layout_below="@id/description"/>
         <ImageView
             android:id="@+id/image"
-            android:adjustViewBounds="true"
-            android:scaleType="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/image_label"/>
-
+            android:layout_height="wrap_content"
+            android:minHeight="100dp"
+            android:layout_below="@id/image_label"
+            android:clickable="true"
+            android:contextClickable="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:adjustViewBounds="true"/>
+        
     </RelativeLayout>
 
 
