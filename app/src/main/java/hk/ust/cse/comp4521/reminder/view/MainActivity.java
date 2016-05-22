@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements ResultCallback<St
         recyclerView.addOnItemTouchListener(swipeTouchListener);
     }
 
-    public boolean canUse(){return canUse;}
+    public boolean canUse(){return isAllPermissionsGranted();}
 
     private boolean isAllPermissionsGranted(){
         for(String request:PERMISSION_REQUESTS){
