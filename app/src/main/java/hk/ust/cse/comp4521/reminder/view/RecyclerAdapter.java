@@ -115,7 +115,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                 holder.imageView.setImageResource(id);
                 break;
             case Location:
-                id=context.getResources().getIdentifier(context.getPackageName()+":drawable/googlemap",null,null);
+                id=context.getResources().getIdentifier(context.getPackageName()+":drawable/map",null,null);
                 holder.imageView.setImageResource(id);
                 break;
             default:
@@ -149,14 +149,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
             public boolean onLongClick(View v) {
                 if(((MainActivity)context).canUse()) {
                     if (holder.itemView.getElevation() == 0.0) {//enable it
-                        holder.itemView.setElevation(5.0f);
-                        holder.itemView.setAlpha(1.0f);
+                        /*holder.itemView.setElevation(5.0f);
+                        holder.itemView.setAlpha(1.0f);*/
                         mController.enableReminder(holder.reminder_id, true);
                         reminder.setEnabled(true);
                         notifyItemChanged(position);
                     } else {//disable it
-                        holder.itemView.setElevation(0.0f);
-                        holder.itemView.setAlpha(0.1f);
+                        /*holder.itemView.setElevation(0.0f);
+                        holder.itemView.setAlpha(0.1f);*/
                         mController.enableReminder(holder.reminder_id, false);
                         reminder.setEnabled(false);
                         notifyItemChanged(position);
