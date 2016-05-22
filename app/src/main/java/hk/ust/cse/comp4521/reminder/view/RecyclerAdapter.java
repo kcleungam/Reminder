@@ -3,10 +3,12 @@ package hk.ust.cse.comp4521.reminder.view;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -119,36 +121,44 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=null;
-                switch (reminder.getReminderType()){
-                    case Time:
-                        intent=new Intent(context,TimeReminderActivity.class);
-                        break;
-                    case Location:
-                        intent=new Intent(context,LocationReminderActivity.class);
-                        break;
+                if(((MainActivity)context).canUse()) {
+                    Intent intent = null;
+                    switch (reminder.getReminderType()) {
+                        case Time:
+                            intent = new Intent(context, TimeReminderActivity.class);
+                            break;
+                        case Location:
+                            intent = new Intent(context, LocationReminderActivity.class);
+                            break;
+                    }
+                    intent.putExtra("ReminderId", holder.reminder_id);
+                    context.startActivity(intent);
+                }else{
+                    Toast.makeText(context,"Please grant the permissions first.",Toast.LENGTH_SHORT).show();
                 }
-                intent.putExtra("ReminderId",holder.reminder_id);
-                context.startActivity(intent);
             }
         });
         //enable/disable the reminder
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if(holder.itemView.getElevation()==0.0){//enable it
-                    holder.itemView.setElevation(5.0f);
-                    holder.itemView.setAlpha(1.0f);
-                    mController.enableReminder(holder.reminder_id, true);
-                    reminder.setEnabled(true);
-                    notifyItemChanged(position);
-                }else{//disable it
-                    holder.itemView.setElevation(0.0f);
-                    holder.itemView.setAlpha(0.1f);
-                    mController.enableReminder(holder.reminder_id, false);
-                    reminder.setEnabled(false);
-                    notifyItemChanged(position);
-                }
+                if(((MainActivity)context).canUse()) {
+                    if (holder.itemView.getElevation() == 0.0) {//enable it
+                        holder.itemView.setElevation(5.0f);
+                        holder.itemView.setAlpha(1.0f);
+                        mController.enableReminder(holder.reminder_id, true);
+                        reminder.setEnabled(true);
+                        notifyItemChanged(position);
+                    } else {//disable it
+                        holder.itemView.setElevation(0.0f);
+                        holder.itemView.setAlpha(0.1f);
+                        mController.enableReminder(holder.reminder_id, false);
+                        reminder.setEnabled(false);
+                        notifyItemChanged(position);
+                    }
+                }else
+                    Toast.makeText(context,"Please grant the permission first.",Toast.LENGTH_SHORT).show();
+
                 return true;//consume the long click
             }
         });

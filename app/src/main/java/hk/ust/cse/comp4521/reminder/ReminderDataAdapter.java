@@ -17,6 +17,7 @@ import hk.ust.cse.comp4521.reminder.data.ReminderData;
 /**
  * Created by Jeffrey on 12/5/2016.
  */
+@Deprecated
 public class ReminderDataAdapter extends ArrayAdapter<ReminderData>{
 
     DataController dataController;

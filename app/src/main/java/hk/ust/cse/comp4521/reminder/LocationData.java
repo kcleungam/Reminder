@@ -3,6 +3,7 @@ package hk.ust.cse.comp4521.reminder;
 /**
  * Created by Krauser on 17/5/2016.
  */
+@Deprecated
 public class LocationData {
     String name;
     double latitude;

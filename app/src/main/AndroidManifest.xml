@@ -2,18 +2,41 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="hk.ust.cse.comp4521.reminder" >
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- permission groups
+        cannot be checked by PackageManager directly
+        you may need to use the library for mappings on GitHub to do so -->
+    <permission-group android:name="android.permission-group.LOCATION"/>
+        <permission android:name="android.permission.ACCESS_FINE_LOCATION"
+            android:permissionGroup="android.permission-group.LOCATION"/>
+        <permission android:name="android.permission.ACCESS_COARSE_LOCATION"
+            android:permissionGroup="android.permission-group.LOCATION"/>
+
+    <permission-group android:name="android.permission-group.PHONE"/>
+        <permission android:name="android.permission.READ_PHONE_STATE"
+            android:permissionGroup="android.permission-group.PHONE"/>
+
+    <permission-group android:name="android.permission-group.STORAGE"/>
+        <permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+            android:permissionGroup="android.permission-group.STORAGE"/>
+        <permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+            android:permissionGroup="android.permission-group.STORAGE"/>
+
+
+    <!-- permissions needed user authentication -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!-- normal permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="23" />
+
 
     <application
         android:allowBackup="true"
