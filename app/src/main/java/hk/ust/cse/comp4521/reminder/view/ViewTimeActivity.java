@@ -56,12 +56,14 @@ public class ViewTimeActivity extends AppCompatActivity {
 
             title = (MaterialEditText) layout.findViewById(R.id.title);
             title.setClickable(false);
+            title.setEnabled(false);
             time = (MaterialEditText) layout.findViewById(R.id.time);
             time.setClickable(false);
             location = (MaterialEditText) layout.findViewById(R.id.location);
             location.setClickable(false);
             description = (MaterialEditText) layout.findViewById(R.id.description);
             description.setClickable(false);
+            description.setEnabled(false);
             repeat=(Switch)layout.findViewById(R.id.repeat_switch);
             repeat.setClickable(false);
             checkBoxes = new CheckBox[7];
