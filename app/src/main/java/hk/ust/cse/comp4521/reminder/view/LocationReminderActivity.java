@@ -22,6 +22,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.rengwuxian.materialedittext.MaterialEditText;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Calendar;
@@ -32,17 +34,24 @@ import hk.ust.cse.comp4521.reminder.data.ReminderData;
 import hk.ust.cse.comp4521.reminder.util.DateTimeParser;
 
 public class LocationReminderActivity extends AppCompatActivity {
+    /* variables */
+    //data controls
     private DataController dataController;
-
     private ReminderData reminderData;
+
+    //UI component controls
+    private MaterialEditText title,date,time,location,description;
+    private ImageView image;
+    /*
     private TextView editTitle;
     private TextView editTime;
     private TextView editDate;
     private TextView locationText;
     private ImageButton locationButton;
     private TextView editDescription;
-    private ImageView imageView;
+    private ImageView imageView;*/
 
+    //other UI related controls
     private static final int PICK_IMAGE = 1;
     public static final int RETURN_LOCATION = 2;
 
@@ -55,37 +64,37 @@ public class LocationReminderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         dataController = DataController.getInstance(getApplication());
 
+        /* map UI components */
         setContentView(R.layout.edit_location_container);
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.editLocationLayout);
-        editTitle = (TextView) layout.findViewById(R.id.editTitle);
-        editDate=(TextView)layout.findViewById(R.id.editDate);
-        editDate.setText(DateTimeParser.toString(Calendar.getInstance().getTimeInMillis()+86400000, DateTimeParser.Format.DATE));
-        editDate.setOnClickListener(new View.OnClickListener() {
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.setLocationReminderLayout);
+        title = (MaterialEditText) layout.findViewById(R.id.title);
+        date=(MaterialEditText) layout.findViewById(R.id.date);
+        time = (MaterialEditText) layout.findViewById(R.id.time);
+        location=(MaterialEditText)layout.findViewById(R.id.location);
+        description=(MaterialEditText)layout.findViewById(R.id.description);
+        image=(ImageView)layout.findViewById(R.id.image);
+
+        /* set up listeners */
+        date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(R.id.editDate);
+                showDialog(R.id.date);
             }
         });
-        editTime = (TextView) layout.findViewById(R.id.editTime);
-        editTime.setText(DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.SHORT));
-        editTime.setOnClickListener(new View.OnClickListener() {
+        time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDialog(R.id.editTime);
             }
         });
-        locationText = (TextView) layout.findViewById(R.id.editLocation);
-        locationButton = (ImageButton) layout.findViewById(R.id.locationButton);
-        locationButton.setOnClickListener(new View.OnClickListener() {
+        location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                 startActivityForResult(intent, RETURN_LOCATION);
             }
         });
-        editDescription = (TextView) layout.findViewById(R.id.editDescription);
-        imageView = (ImageView) layout.findViewById(R.id.imageView);
-        ImageView.OnClickListener imageViewListener = new View.OnClickListener() {
+        image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -96,8 +105,11 @@ public class LocationReminderActivity extends AppCompatActivity {
                 chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
                 startActivityForResult(chooserIntent, PICK_IMAGE);
             }
-        };
-        imageView.setOnClickListener(imageViewListener);
+        });
+
+        /* initialise the value of UI components */
+        date.setText(DateTimeParser.toString(Calendar.getInstance().getTimeInMillis()+86400000, DateTimeParser.Format.DATE));
+        time.setText(DateTimeParser.toString(Calendar.getInstance().getTimeInMillis(), DateTimeParser.Format.SHORT));
 
         long reminderId = getIntent().getLongExtra("ReminderId", -1);
         if (reminderId != -1)
@@ -105,17 +117,17 @@ public class LocationReminderActivity extends AppCompatActivity {
         else
             reminderData = new ReminderData();
         if (reminderData.getId()!=-1) {
-            editTitle.setText(reminderData.getTitle());
-            editTime.setText(reminderData.getValidUntilTime());
-            editDate.setText(reminderData.getValidUntilDate());
-            editDescription.setText(reminderData.getDescription());
-            locationText.setText(reminderData.getLocation());
+            title.setText(reminderData.getTitle());
+            time.setText(reminderData.getValidUntilTime());
+            date.setText(reminderData.getValidUntilDate());
+            description.setText(reminderData.getDescription());
+            location.setText(reminderData.getLocation());
             if(reminderData.getImageUri()!=null) {
                 try {
                     Uri imageUri = Uri.parse(reminderData.getImageUri());
                     InputStream imageStream = getContentResolver().openInputStream(imageUri);
                     Bitmap image = BitmapFactory.decodeStream(imageStream);
-                    imageView.setImageBitmap(image);
+                    this.image.setImageBitmap(image);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -135,24 +147,24 @@ public class LocationReminderActivity extends AppCompatActivity {
 
         switch (item_id) {
             case R.id.action_save:
-                if(editTitle.getText().length()==0){
+                if(title.getText().length()==0){
                     Toast.makeText(LocationReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                if(!DateTimeParser.validate(editTime.getText().toString(), DateTimeParser.Format.SHORT)){
-                    Toast.makeText(LocationReminderActivity.this, "Empty title", Toast.LENGTH_SHORT).show();
+                if(!DateTimeParser.validate(time.getText().toString(), DateTimeParser.Format.SHORT)){
+                    Toast.makeText(LocationReminderActivity.this, "Empty time", Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                if(!DateTimeParser.validate(editDate.getText().toString(), DateTimeParser.Format.DATE)){
+                if(!DateTimeParser.validate(date.getText().toString(), DateTimeParser.Format.DATE)){
                     Toast.makeText(LocationReminderActivity.this, "Empty date", Toast.LENGTH_SHORT).show();
                     return true;
                 }
                 reminderData.setReminderType(ReminderData.ReminderType.Location);
-                reminderData.setTitle(editTitle.getText().toString());
-                reminderData.setValidUntilTime(editTime.getText().toString());
-                reminderData.setValidUntilDate(editDate.getText().toString());
-                reminderData.setLocation(locationText.getText().toString());
-                reminderData.setDescription(editDescription.getText().toString());
+                reminderData.setTitle(title.getText().toString());
+                reminderData.setValidUntilTime(time.getText().toString());
+                reminderData.setValidUntilDate(date.getText().toString());
+                reminderData.setLocation(location.getText().toString());
+                reminderData.setDescription(description.getText().toString());
                 if (reminderData.getId() < 0) {
                     reminderData.setEnabled(true);
                     dataController.addReminder(reminderData);
@@ -180,7 +192,7 @@ public class LocationReminderActivity extends AppCompatActivity {
                 Uri imageUri = data.getData();
                 InputStream imageStream = getContentResolver().openInputStream(imageUri);
                 Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                imageView.setImageBitmap(selectedImage);
+                this.image.setImageBitmap(selectedImage);
                 reminderData.setImageUri(data.getData().toString());
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -195,7 +207,7 @@ public class LocationReminderActivity extends AppCompatActivity {
                 String locationName = data.getStringExtra("locationName");
                 double latitude = data.getDoubleExtra("latitude", -999);
                 double longitude = data.getDoubleExtra("longitude", -999);
-                locationText.setText(locationName);
+                location.setText(locationName);
                 reminderData.setLatitude(latitude);
                 reminderData.setLongitude(longitude);
             } catch (Exception f){
@@ -219,7 +231,7 @@ public class LocationReminderActivity extends AppCompatActivity {
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
-            case R.id.editTime:
+            case R.id.time:
                 // set time picker as current time
                 TimePickerDialog timePickerDialog;
                 if(reminderData.getId()!=-1) {
@@ -229,7 +241,7 @@ public class LocationReminderActivity extends AppCompatActivity {
                     timePickerDialog = new TimePickerDialog(this, onTimeSetListener, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true);
                 }
                 return timePickerDialog;
-            case R.id.editDate:
+            case R.id.date:
                 // set date picker as current time
                 DatePickerDialog datePickerDialog;
                 if(reminderData.getId()!=-1) {
@@ -249,7 +261,7 @@ public class LocationReminderActivity extends AppCompatActivity {
             Calendar now = Calendar.getInstance();
             now.set(Calendar.HOUR_OF_DAY, hourOfDay);
             now.set(Calendar.MINUTE, min);
-            editTime.setText(DateTimeParser.toString(now.getTimeInMillis(), DateTimeParser.Format.SHORT));
+            time.setText(DateTimeParser.toString(now.getTimeInMillis(), DateTimeParser.Format.SHORT));
         }
     };
 
@@ -260,7 +272,7 @@ public class LocationReminderActivity extends AppCompatActivity {
             now.set(Calendar.YEAR, year);
             now.set(Calendar.MONTH, monthOfYear);
             now.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            editDate.setText(DateTimeParser.toString(now.getTimeInMillis(), DateTimeParser.Format.DATE));
+            date.setText(DateTimeParser.toString(now.getTimeInMillis(), DateTimeParser.Format.DATE));
         }
     };
 }

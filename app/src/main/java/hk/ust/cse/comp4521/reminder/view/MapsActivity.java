@@ -167,7 +167,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         switch (item_id) {
             case R.id.location_save:
-                if(locationData.equals(null)){
+                if(locationData==null){
                     Toast.makeText(this,"Please specify location", Toast.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent(getApplicationContext(), TimeReminderActivity.class);
