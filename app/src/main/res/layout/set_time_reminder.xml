@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Header -->
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorPrimary"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp"
+        android:orientation="vertical">
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Library Name"
+            android:text="MaterialEditText"
+            android:textCursorDrawable="@drawable/text_cursor_cyan"
+            android:textSize="34sp"
+            app:met_baseColor="@android:color/white"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="?colorAccent"
+            app:met_singleLineEllipsis="true" />
+
+    </RelativeLayout>
+
+    <!-- Body -->
+    <RelativeLayout
+        android:id="@+id/body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp"
+        android:orientation="vertical"
+        android:layout_below="@id/header">
+
+        <!-- Time -->
+        <TextView
+            android:id="@+id/time_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textColor="#333333"
+            android:textSize="14sp" />
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Click here to select a time"
+            android:textColor="@color/text_color"
+            android:layout_below="@id/time_label"
+            />
+
+        <!-- Repeat -->
+        <Switch
+            android:id="@+id/repeat_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Repeat"
+            android:textColor="#333333"
+            android:layout_marginTop="16dp"
+            android:textSize="14sp"
+            android:switchPadding="10sp"
+            android:layout_below="@id/time"/>
+        <android.support.v7.widget.AppCompatCheckBox
+            android:layout_width=""
+            android:layout_height="" />
+
+        <!-- Location -->
+        <!--<TextView
+            android:id="@+id/location_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Location"
+            android:textColor="#333333"
+            android:textSize="14sp"
+            android:layout_marginTop="16dp"
+            android:layout_below="@id/time"/>
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Click here to select a location"
+            android:textColor="@color/text_color"
+            android:layout_below="@id/location_label"
+            />-->
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
