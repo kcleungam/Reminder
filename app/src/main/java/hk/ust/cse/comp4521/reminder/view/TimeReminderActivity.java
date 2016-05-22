@@ -209,7 +209,7 @@ public class TimeReminderActivity extends AppCompatActivity {
             for (int i = 0; i < checkBoxes.length; i++) {
                 checkBoxes[i].setChecked(reminderData.getRepeat()[i]);
             }
-            //setSelectAll(!Arrays.asList(reminderData.getRepeat()).contains(false));
+            repeat.setChecked(!reminderData.noRepeat());
             description.setText(reminderData.getDescription());
             location.setText(reminderData.getLocation());
             if(reminderData.getImageUri()!=null) {
@@ -259,11 +259,16 @@ public class TimeReminderActivity extends AppCompatActivity {
                 reminderData.setReminderType(ReminderData.ReminderType.Time);
                 reminderData.setTitle(title.getText().toString());
                 reminderData.setTime(time.getText().toString());
-                boolean[] repeat = new boolean[checkBoxes.length];
-                for (int i = 0; i < checkBoxes.length; i++) {
-                    repeat[i] = checkBoxes[i].isChecked();
+                if(this.repeat.isChecked()) {
+                    boolean[] repeat = new boolean[checkBoxes.length];
+                    for (int i = 0; i < checkBoxes.length; i++) {
+                        repeat[i] = checkBoxes[i].isChecked();
+                    }
+                    reminderData.setRepeat(repeat);
+                }else{
+                    boolean[] repeat = new boolean[checkBoxes.length];
+                    reminderData.setRepeat(repeat);
                 }
-                reminderData.setRepeat(repeat);
                 reminderData.setLocation(location.getText().toString());
                 reminderData.setDescription(description.getText().toString());
                 if (reminderData.getId() < 0) {

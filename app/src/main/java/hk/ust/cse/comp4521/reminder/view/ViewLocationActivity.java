@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.rengwuxian.materialedittext.MaterialEditText;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -25,6 +27,10 @@ public class ViewLocationActivity extends AppCompatActivity {
 
     private DataController dataController;
 
+    //UI component controls
+    private MaterialEditText title,date,time,location,description;
+    private ImageView image;
+
     private ReminderData reminderData;
 
         @Override
@@ -32,28 +38,45 @@ public class ViewLocationActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             dataController = DataController.getInstance(getApplication());
 
-            setContentView(R.layout.view_location_container);
-            RelativeLayout layout = (RelativeLayout) findViewById(R.id.viewLocationLayout);
-
             long reminderId = getIntent().getLongExtra("ReminderId", -1);
             if (reminderId != -1)
                 reminderData = dataController.getReminder(reminderId);
-            else
-                reminderData = new ReminderData();
+            else {
+                finish();
+                return;
+            }
 
-            ( (TextView) layout.findViewById(R.id.showTitle) ).setText(reminderData.getTitle());
-            ( (TextView) layout.findViewById(R.id.showValid) ).setText(reminderData.getValidUntil());
-            ( (TextView) layout.findViewById(R.id.showDescription) ).setText(reminderData.getDescription());
-            ( (TextView) layout.findViewById(R.id.showLocation) ).setText(reminderData.getLocation());
+            /* map UI components */
+            setContentView(R.layout.edit_location_container);
+            RelativeLayout layout = (RelativeLayout) findViewById(R.id.setLocationReminderLayout);
+            title = (MaterialEditText) layout.findViewById(R.id.title);
+            title.setClickable(false);
+            date=(MaterialEditText) layout.findViewById(R.id.date);
+            date.setClickable(false);
+            time = (MaterialEditText) layout.findViewById(R.id.time);
+            time.setClickable(false);
+            location=(MaterialEditText)layout.findViewById(R.id.location);
+            location.setClickable(false);
+            description=(MaterialEditText)layout.findViewById(R.id.description);
+            description.setClickable(false);
+            image=(ImageView)layout.findViewById(R.id.image);
+            image.setClickable(false);
 
-            if(reminderData.getImageUri()!=null) {
-                try {
-                    Uri imageUri = Uri.parse(reminderData.getImageUri());
-                    InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                    Bitmap image = BitmapFactory.decodeStream(imageStream);
-                    ((ImageView) layout.findViewById(R.id.imageView)).setImageBitmap(image);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+            if (reminderData.getId()!=-1) {
+                title.setText(reminderData.getTitle());
+                time.setText(reminderData.getValidUntilTime());
+                date.setText(reminderData.getValidUntilDate());
+                description.setText(reminderData.getDescription());
+                location.setText(reminderData.getLocation());
+                if(reminderData.getImageUri()!=null) {
+                    try {
+                        Uri imageUri = Uri.parse(reminderData.getImageUri());
+                        InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                        Bitmap image = BitmapFactory.decodeStream(imageStream);
+                        this.image.setImageBitmap(image);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
