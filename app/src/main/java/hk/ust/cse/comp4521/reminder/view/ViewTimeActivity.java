@@ -1,10 +1,17 @@
 package hk.ust.cse.comp4521.reminder.view;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import hk.ust.cse.comp4521.reminder.R;
 import hk.ust.cse.comp4521.reminder.data.DataController;
@@ -21,21 +28,6 @@ public class ViewTimeActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             dataController = DataController.getInstance(getApplication());
 
-            //TODO: turn this into permission listener
-            //ref: http://stackoverflow.com/questions/34211693/understanding-the-android-6-permission-method
-            //        for(String requiredPermission:REQUIRED_PERMISSION) {
-            //            Integer value = checkSelfPermission(requiredPermission);
-            //            synchronized (value) {
-            //                if (value == -1) {
-            //                    requestPermissions(REQUIRED_PERMISSION, 1);
-            //                    value = checkSelfPermission(requiredPermission);
-            //                    if (value == -1) {
-            //                        finish();
-            //                        return;
-            //                    }
-            //                }
-            //            }
-            //        }
             setContentView(R.layout.view_time_container);
             RelativeLayout layout = (RelativeLayout) findViewById(R.id.viewTimeLayout);
 
@@ -57,16 +49,15 @@ public class ViewTimeActivity extends AppCompatActivity {
             ( (CheckBox) layout.findViewById(R.id.satBox) ).setChecked(reminderData.getRepeat()[6]);
             ( (CheckBox) layout.findViewById(R.id.sunBox) ).setChecked(reminderData.getRepeat()[0]);
 
-            //TODO: Enable image view
             if(reminderData.getImageUri()!=null) {
-//                try {
-//                    Uri imageUri = Uri.parse(reminderData.getImageUri());
-//                    InputStream imageStream = getContentResolver().openInputStream(imageUri);
-//                    Bitmap image = BitmapFactory.decodeStream(imageStream);
-//                    ((ImageView) layout.findViewById(R.id.imageView)).setImageBitmap(image);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    Uri imageUri = Uri.parse(reminderData.getImageUri());
+                    InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                    Bitmap image = BitmapFactory.decodeStream(imageStream);
+                    ((ImageView) layout.findViewById(R.id.imageView)).setImageBitmap(image);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         }
 

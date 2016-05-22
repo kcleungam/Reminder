@@ -153,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements ResultCallback<St
         //reminderAdaptor = new ReminderDataAdapter(getApplication(), R.layout.row_layout, onClickListener, onLongClickListener);
 
         // 取得所有記事資料
-        //TODO
         /*ArrayList<ReminderData> reminders = dataController.getAll();
         for(ReminderData sample:reminders){
             reminderAdaptor.addItem(sample);
@@ -306,19 +305,18 @@ public class MainActivity extends AppCompatActivity implements ResultCallback<St
         super.onCreateContextMenu(menu, v, menuInfo);
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if(item.getTitle().equals("Delete")){
-            //TODO
-            /*dataController.deleteReminder(rowOnSelected.reminderId);
-            Toast.makeText(MainActivity.this, "Reminder "+rowOnSelected.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
-            reminderAdaptor.clear();
-            for(ReminderData reminderData:dataController.getAll())
-                reminderAdaptor.add(reminderData);
-            reminderAdaptor.notifyDataSetChanged();*/
-        }
-        return true;
-    }
+//    @Override
+//    public boolean onContextItemSelected(MenuItem item) {
+//        if(item.getTitle().equals("Delete")){
+//            dataController.deleteReminder(rowOnSelected.reminderId);
+//            Toast.makeText(MainActivity.this, "Reminder "+rowOnSelected.titleView.getText()+" deleted.", Toast.LENGTH_SHORT).show();
+//            reminderAdaptor.clear();
+//            for(ReminderData reminderData:dataController.getAll())
+//                reminderAdaptor.add(reminderData);
+//            reminderAdaptor.notifyDataSetChanged();
+//        }
+//        return true;
+//    }
 
 //    @Override
 //    protected void onStop() {
