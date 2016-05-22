@@ -37,6 +37,6 @@
         app:layout_behavior="hk.ust.cse.comp4521.reminder.FabHideOnScroll"
         />
 
-    <include layout="@layout/activity_main_fab_menu" />
+    <include layout="@layout/main_activity_fab_menu" />
 
 </android.support.design.widget.CoordinatorLayout>

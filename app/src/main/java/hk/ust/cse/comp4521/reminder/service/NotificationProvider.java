@@ -4,11 +4,15 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 import hk.ust.cse.comp4521.reminder.R;
 import hk.ust.cse.comp4521.reminder.data.ReminderData;
+import hk.ust.cse.comp4521.reminder.view.MainActivity;
 import hk.ust.cse.comp4521.reminder.view.ViewLocationActivity;
 import hk.ust.cse.comp4521.reminder.view.ViewTimeActivity;
 
@@ -23,7 +27,19 @@ public class NotificationProvider {
         //建立通知物件
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
         //指定通知欄位要顯示的圖示
-        notification.setSmallIcon(R.drawable.cast_ic_notification_0);
+        switch(reminderData.getReminderType()){
+            case Time:
+                notification.setSmallIcon(R.drawable.cast_ic_notification_0);
+                break;
+            case Location:
+                notification.setSmallIcon(R.drawable.pink_stick_man)
+                        // In a real app, you may want to use a library like Volley
+                        // to decode the Bitmap.
+                        .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.pink_stick_man));
+                break;
+            default:
+                Log.d(TAG,"Reminder type not on the list.");
+        }
         //指定通知標題
         notification.setContentTitle(reminderData.getTitle());
         //通知內容
@@ -33,39 +49,42 @@ public class NotificationProvider {
         //何時送出通知,傳入當前時間則立即發出通知
         notification.setWhen(System.currentTimeMillis());
         //會有通知預設的鈴聲、振動、light
+        notification.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
         notification.setDefaults(Notification.DEFAULT_ALL);
         //非必要,會在通知圖示旁顯示數字
         //notification.setNumber(5);
 
         //當使用者按下通知欄中的通知時要開啟的 Activity
-        Intent resultIntent = new Intent();
+        Intent notificationIntent = new Intent();
         switch(reminderData.getReminderType()){
             case Time:
-                resultIntent.setClass(context, ViewTimeActivity.class);
+                notificationIntent.setClass(context, ViewTimeActivity.class);
                 break;
             case Location:
-                resultIntent.setClass(context, ViewLocationActivity.class);
+                notificationIntent.setClass(context, ViewLocationActivity.class);
                 break;
             default:
                 Log.d(TAG,"Reminder type not on the list.");
         }
 
         //非必要,可以利用intent傳值
-        resultIntent.putExtra("ReminderId", reminderData.getId());
-        //建立待處理意圖
-//        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-//        switch(reminderData.getReminderType()){
-//            case Time:
-//                stackBuilder.addParentStack(MainActivity.class);
-//                break;
-//            case Location:
-//
-//        }
-//        stackBuilder.addNextIntent(resultIntent);
-//        //TODO: unsafe long to int conversion
-//        PendingIntent pendingResultIntent = stackBuilder.getPendingIntent((int) reminderData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pendingResultIntent = PendingIntent.getActivity(context, (int) reminderData.getId(), resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        notification.setContentIntent(pendingResultIntent);
+        notificationIntent.putExtra("ReminderId", reminderData.getId());
+
+        // Construct a task stack.
+        android.app.TaskStackBuilder stackBuilder = android.app.TaskStackBuilder.create(context);
+
+        // Add the main Activity to the task stack as the parent.
+        stackBuilder.addParentStack(MainActivity.class);
+
+        // Push the content Intent onto the stack.
+        stackBuilder.addNextIntent(notificationIntent);
+
+        // Get a PendingIntent containing the entire back stack.
+        //TODO: unsafe long to int conversion
+        PendingIntent notificationPendingIntent =
+                stackBuilder.getPendingIntent((int) reminderData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        notification.setContentIntent(notificationPendingIntent);
 
         return notification.build();
     }

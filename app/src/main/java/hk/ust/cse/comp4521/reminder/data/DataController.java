@@ -297,19 +297,6 @@ public class DataController implements ResultCallback<Status> {
             pendingGeofenceActions.add(new PendingGeofenceAction(Action.ADD, reminder));
             return false;
         }
-        //TODO: Could someone prove this is working?
-        //check whether this id already exists
-//        boolean exist=false;
-//        for(Geofence geofence:mGeofenceList){
-//            if(geofence.getRequestId().equals(id)){
-//                exist=true;
-//                break;
-//            }
-//        }
-//        if(exist) {
-//            //update the existing one
-//            removeGeofence(id);
-//        }
         //add/update a new one
         Geofence geoFence = new Geofence.Builder()
                 .setRequestId(""+reminder.getId())
@@ -362,14 +349,6 @@ public class DataController implements ResultCallback<Status> {
             return false;
         }
         //remove the geo-fence
-        //TODO: Could anyone prove this is working?
-//        for(Geofence geofence:mGeofenceList){
-//            if(geofence.getRequestId().equals(id)){
-//                mGeofenceList.remove(geofence);
-//                break;
-//            }
-//        }
-        //TODO: Or I will try using my own way to implement.
         Intent intent = new Intent(context, GeofenceTransitionIntentService.class);
         PendingIntent pendingIntent = PendingIntent.getService(context, (int) id*7, intent, PendingIntent.FLAG_NO_CREATE);
         if(pendingIntent==null)

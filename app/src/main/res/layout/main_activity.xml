@@ -28,6 +28,6 @@
         android:scaleType="fitXY"
         />
 
-    <include layout="@layout/activity_main_fab_menu" />
+    <include layout="@layout/main_activity_fab_menu" />
 
 </android.support.design.widget.CoordinatorLayout>

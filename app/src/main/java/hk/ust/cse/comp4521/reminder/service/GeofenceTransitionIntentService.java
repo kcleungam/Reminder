@@ -82,6 +82,11 @@ public class GeofenceTransitionIntentService extends IntentService {
         }
     }
 
+    /**
+     * Deprecated.
+     * Please refer to NotificationProvider.java/getNotification()
+     * @param reminderData
+     */
     @Deprecated
     private void sendNotification(ReminderData reminderData){
         // Create an explicit content Intent that starts the main Activity.
