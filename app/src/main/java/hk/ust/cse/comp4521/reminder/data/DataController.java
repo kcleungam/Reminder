@@ -303,7 +303,10 @@ public class DataController implements ResultCallback<Status> {
                 .setCircularRegion(reminder.getLatitude(), reminder.getLongitude(), GEOFENCE_RADIUS)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                .setNotificationResponsiveness(60000)       // set the responsiveness to 1 minute to reduce power consumption
                 .build();
+        //https://developer.android.com/training/location/geofencing.html
+        //https://developers.google.com/android/reference/com/google/android/gms/location/Geofence.Builder.html#public-methods
 
         try {
             GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
