@@ -267,6 +267,9 @@ public class TimeReminderActivity extends AppCompatActivity {
                     reminderData.setRepeat(repeat);
                 }else{
                     boolean[] repeat = new boolean[checkBoxes.length];
+                    for (int i = 0; i < checkBoxes.length; i++) {
+                        repeat[i] = false;
+                    }
                     reminderData.setRepeat(repeat);
                 }
                 reminderData.setLocation(location.getText().toString());
