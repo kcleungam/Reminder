@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Comp 4521-->
+<!--Leung Ka Chun       20125844        kcleungam@ust.hk-->
+<!--To Wun Yin            20112524        wytoaa@ust.hk-->
+<!--Leung Chun Fai      20113619        cfleungac@ust.hk-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="fill_parent"
     android:layout_height="fill_parent"

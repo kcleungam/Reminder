@@ -26,13 +26,12 @@ public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallba
 
     private static GoogleApiClientProvider providerInstance;
 
-    private Context application;
     private GoogleApiClient mGoogleApiClient;
     private ArrayList<ResultCallback<Status>> listeners;
 //    private LocationRequest mLocationRequest;
 
-    private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 10000;   //10 second update once
-    private final static int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 50000;
+//    private final static int UPDATE_INTERVAL_IN_MILLISECONDS = 10000;   //10 second update once
+//    private final static int FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 50000;
 
     private GoogleApiClientProvider(){
 
@@ -42,7 +41,6 @@ public class GoogleApiClientProvider implements GoogleApiClient.ConnectionCallba
         if(providerInstance ==null) {
             providerInstance = new GoogleApiClientProvider();
             providerInstance.buildClient(application);
-            providerInstance.application = application;
             providerInstance.listeners = new ArrayList<>();
         }
         providerInstance.listeners.add(listener);

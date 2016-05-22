@@ -107,6 +107,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         holder.reminder_location.setText(reminder.getLocation());
         //event time
         holder.reminder_time.setText((reminder.getReminderType()== ReminderData.ReminderType.Location)?reminder.getValidUntilTime():reminder.getTime());
+        //event status
+        holder.reminder_status.setText((reminder.isEnabled()?"Enabled":"Disabled"));
         //set the icon
         int id;
         switch(reminder.getReminderType()){
@@ -153,12 +155,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
                         holder.itemView.setAlpha(1.0f);*/
                         mController.enableReminder(holder.reminder_id, true);
                         reminder.setEnabled(true);
+                        holder.reminder_status.setText((reminder.isEnabled()?"Enabled":"Disabled"));
                         notifyItemChanged(position);
                     } else {//disable it
                         /*holder.itemView.setElevation(0.0f);
                         holder.itemView.setAlpha(0.1f);*/
                         mController.enableReminder(holder.reminder_id, false);
                         reminder.setEnabled(false);
+                        holder.reminder_status.setText((reminder.isEnabled()?"Enabled":"Disabled"));
                         notifyItemChanged(position);
                     }
                 }else

@@ -89,7 +89,7 @@ public class LocationReminderActivity extends AppCompatActivity {
         time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(R.id.editTime);
+                showDialog(R.id.time);
             }
         });
         location.setOnClickListener(new View.OnClickListener() {
