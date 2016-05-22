@@ -49,95 +49,35 @@
         <!-- Time -->
         <TextView
             android:id="@+id/time_label"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Time"
+            android:text="Valid until"
             android:textColor="#333333"
             android:textSize="14sp" />
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/time"
-            android:layout_width="match_parent"
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="150dp"
             android:layout_weight="1"
-            android:hint="Click here to select a time"
+            android:hint="Date"
             android:textColor="@color/text_color"
             android:layout_below="@id/time_label"
             android:editable="false"
             />
-
-        <!-- Repeat -->
-        <Switch
-            android:id="@+id/repeat_switch"
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Repeat"
-            android:textColor="#333333"
-            android:layout_marginTop="16dp"
-            android:textSize="14sp"
-            android:switchPadding="10sp"
-            android:layout_below="@id/time"/>
-        <CheckBox
-            android:id="@+id/repeat_mon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/repeat_switch"
-            android:enabled="false"
-            android:checked="false"
-            android:text="MON" />
-        <CheckBox
-            android:id="@+id/repeat_tue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/repeat_mon"
-            android:layout_below="@id/repeat_switch"
-            android:enabled="false"
-            android:checked="false"
-            android:text="TUE" />
-        <CheckBox
-            android:id="@+id/repeat_wed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/repeat_tue"
-            android:layout_below="@id/repeat_switch"
-            android:enabled="false"
-            android:checked="false"
-            android:text="WED" />
-        <CheckBox
-            android:id="@+id/repeat_thu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/repeat_wed"
-            android:layout_below="@id/repeat_switch"
-            android:enabled="false"
-            android:checked="false"
-            android:text="THU" />
-        <CheckBox
-            android:id="@+id/repeat_fri"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/repeat_thu"
-            android:layout_below="@id/repeat_switch"
-            android:enabled="false"
-            android:checked="false"
-            android:text="FRI" />
-        <CheckBox
-            android:id="@+id/repeat_sat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/repeat_mon"
-            android:enabled="false"
-            android:checked="false"
-            android:text="SAT" />
-        <CheckBox
-            android:id="@+id/repeat_sun"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/repeat_tue"
-            android:layout_toRightOf="@id/repeat_sat"
-            android:layout_marginLeft="6dp"
-            android:enabled="false"
-            android:checked="false"
-            android:text="SUN" />
+            android:minWidth="150dp"
+            android:layout_marginLeft="50dp"
+            android:layout_weight="1"
+            android:hint="Time"
+            android:textColor="@color/text_color"
+            android:layout_below="@id/time_label"
+            android:layout_toRightOf="@id/date"
+            android:editable="false"
+            />
 
         <!-- Location -->
         <TextView
@@ -148,7 +88,7 @@
             android:textColor="#333333"
             android:textSize="14sp"
             android:layout_marginTop="16dp"
-            android:layout_below="@id/repeat_sat"/>
+            android:layout_below="@id/date"/>
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/location"
             android:layout_width="match_parent"
@@ -196,7 +136,7 @@
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="100dp"
+            android:minHeight="200dp"
             android:layout_below="@id/image_label"
             android:clickable="true"
             android:contextClickable="true"
