@@ -51,20 +51,16 @@ public class ViewLocationActivity extends AppCompatActivity {
             RelativeLayout layout = (RelativeLayout) findViewById(R.id.setLocationReminderLayout);
             title = (MaterialEditText) layout.findViewById(R.id.title);
             title.setClickable(false);
-            title.setHint("");
-            title.setFocusable(false);
+            title.setEnabled(false);
             date=(MaterialEditText) layout.findViewById(R.id.date);
             date.setClickable(false);
             time = (MaterialEditText) layout.findViewById(R.id.time);
-            time.setHint("");
             time.setClickable(false);
             location=(MaterialEditText)layout.findViewById(R.id.location);
-            location.setHint("");
             location.setClickable(false);
             description=(MaterialEditText)layout.findViewById(R.id.description);
             description.setClickable(false);
-            description.setHint("");
-            description.setFocusable(false);
+            description.setEnabled(false);
             image=(ImageView)layout.findViewById(R.id.image);
             image.setClickable(false);
 
